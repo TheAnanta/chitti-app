@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "513797872748",
+    "project_id": "chitti-ananta",
+    "storage_bucket": "chitti-ananta.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:513797872748:android:163c2dc2c5eb61f0368c49",
+        "android_client_info": {
+          "package_name": "dev.theananta.chitti"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDMp4BobtekUyUhayYHDRm-6pkNZp0M5IU"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
