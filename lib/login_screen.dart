@@ -2,7 +2,7 @@ import 'dart:convert';
 import 'dart:developer' as developer show log;
 
 import 'package:chitti/domain/fetch_semester.dart';
-import 'package:chitti/main.dart';
+import 'package:chitti/home_page.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart';
@@ -18,11 +18,12 @@ class LoginScreen extends StatefulWidget {
 }
 
 class _LoginScreenState extends State<LoginScreen> {
-  Map<String, dynamic>? payload = null;
+  Map<String, dynamic>? payload;
   var username = "";
   var password = "";
   final _usernameController = TextEditingController();
   final _passwordController = TextEditingController();
+  final isLoading = ValueNotifier<bool>(false);
   getGITAMLoginPage() async {
     final response = await get(Uri.parse('https://login.gitam.edu/Login.aspx'));
     // print(response.body);
@@ -31,7 +32,7 @@ class _LoginScreenState extends State<LoginScreen> {
           'id="txtusername"',
           'id="txtusername" value="${username.toUpperCase()}"',
         )
-        .replaceAll('id="password"', 'id="password" value="${password}"')
+        .replaceAll('id="password"', 'id="password" value="$password"')
         .replaceAll("./Login.aspx", "https://login.gitam.edu/Login.aspx");
   }
 
@@ -41,7 +42,7 @@ class _LoginScreenState extends State<LoginScreen> {
   Widget build(BuildContext context) {
     return Center(
       child:
-          username == ""
+          password == ""
               ? Scaffold(
                 body: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -122,14 +123,18 @@ class _LoginScreenState extends State<LoginScreen> {
                                 borderRadius: BorderRadius.circular(4),
                               ),
                               onPressed: () async {
+                                isLoading.value = true;
                                 if (_usernameController.text != "" &&
                                     _passwordController.text != "") {
-                                  username = _usernameController.text;
-                                  password = _passwordController.text;
-                                  //TODO: Check if user is exsiting in tabase and if so add him in.
+                                  username =
+                                      _usernameController.text
+                                          .toUpperCase()
+                                          .trim();
+                                  password =
+                                      _passwordController.text.trimRight();
                                   final loginRequest = await post(
                                     Uri.parse(
-                                      "https://us-central1-chitti-ananta.cloudfunctions.net/webApi/login",
+                                      "https://asia-south1-chitti-ananta.cloudfunctions.net/webApi/login",
                                     ),
                                     headers: {
                                       "Content-Type": "application/json",
@@ -140,19 +145,23 @@ class _LoginScreenState extends State<LoginScreen> {
                                     }),
                                   );
                                   if (loginRequest.statusCode == 404) {
-                                    //TODO: Sign up the user
                                     setState(() {});
                                   } else if (loginRequest.statusCode == 403) {
                                     // MARK: Alert the user on wrong authentication details
-                                    ScaffoldMessenger.of(context).showSnackBar(
-                                      SnackBar(
-                                        content: Text(
-                                          json.decode(
-                                            loginRequest.body,
-                                          )["message"],
+                                    isLoading.value = false;
+                                    if (context.mounted) {
+                                      ScaffoldMessenger.of(
+                                        context,
+                                      ).showSnackBar(
+                                        SnackBar(
+                                          content: Text(
+                                            json.decode(
+                                              loginRequest.body,
+                                            )["message"],
+                                          ),
                                         ),
-                                      ),
-                                    );
+                                      );
+                                    }
                                   } else {
                                     // MARK: Authenticate the user
                                     final result = json.decode(
@@ -165,64 +174,67 @@ class _LoginScreenState extends State<LoginScreen> {
                                         .getIdToken(true)
                                         .then((token) {
                                           if (token == null) {
-                                            ScaffoldMessenger.of(
-                                              context,
-                                            ).showSnackBar(
-                                              SnackBar(
-                                                content: Text(
-                                                  "Unable to create token.",
+                                            isLoading.value = false;
+                                            if (context.mounted) {
+                                              ScaffoldMessenger.of(
+                                                context,
+                                              ).showSnackBar(
+                                                SnackBar(
+                                                  content: Text(
+                                                    "Unable to create token.",
+                                                  ),
                                                 ),
-                                              ),
-                                            );
+                                              );
+                                            }
                                             return;
                                           }
                                           try {
                                             fetchSemester(token).then((
                                               semester,
                                             ) {
-                                              SharedPreferences.getInstance()
-                                                  .then((sharedPreferences) {
-                                                    final name =
-                                                        FirebaseAuth
-                                                            .instance
-                                                            .currentUser
-                                                            ?.displayName
-                                                            ?.split(" ")[0];
-                                                    Navigator.of(
-                                                      context,
-                                                    ).pushReplacement(
-                                                      MaterialPageRoute(
-                                                        builder:
-                                                            (
-                                                              context,
-                                                            ) => MyHomePage(
-                                                              name:
-                                                                  userCredential
-                                                                      .user
-                                                                      ?.displayName
-                                                                      ?.split(
-                                                                        " ",
-                                                                      )[0] ??
-                                                                  "User",
-                                                              semester:
-                                                                  semester,
-                                                            ),
-                                                      ),
-                                                    );
-                                                  });
+                                              SharedPreferences.getInstance().then((
+                                                sharedPreferences,
+                                              ) {
+                                                if (context.mounted) {
+                                                  Navigator.of(
+                                                    context,
+                                                  ).pushReplacement(
+                                                    MaterialPageRoute(
+                                                      builder:
+                                                          (
+                                                            context,
+                                                          ) => MyHomePage(
+                                                            name:
+                                                                userCredential
+                                                                    .user
+                                                                    ?.displayName
+                                                                    ?.split(
+                                                                      " ",
+                                                                    )[0] ??
+                                                                "User",
+                                                            semester: semester,
+                                                          ),
+                                                    ),
+                                                  );
+                                                }
+                                              });
                                             });
                                           } on Exception catch (e) {
-                                            ScaffoldMessenger.of(
-                                              context,
-                                            ).showSnackBar(
-                                              SnackBar(
-                                                content: Text(e.toString()),
-                                              ),
-                                            );
+                                            isLoading.value = false;
+                                            if (context.mounted) {
+                                              ScaffoldMessenger.of(
+                                                context,
+                                              ).showSnackBar(
+                                                SnackBar(
+                                                  content: Text(e.toString()),
+                                                ),
+                                              );
+                                            }
                                           }
                                         });
                                   }
                                 } else {
+                                  isLoading.value = false;
                                   ScaffoldMessenger.of(context).showSnackBar(
                                     SnackBar(
                                       content: Text(
@@ -232,7 +244,16 @@ class _LoginScreenState extends State<LoginScreen> {
                                   );
                                 }
                               },
-                              child: Text("Sign in with GITAM"),
+                              child: ValueListenableBuilder(
+                                valueListenable: isLoading,
+                                builder: (context, _isLoading, _) {
+                                  return _isLoading
+                                      ? CircularProgressIndicator(
+                                        color: Colors.grey.shade800,
+                                      )
+                                      : Text("Sign in with GITAM");
+                                },
+                              ),
                             ),
                           ),
                           SizedBox(height: 48),
@@ -254,7 +275,6 @@ class _LoginScreenState extends State<LoginScreen> {
                         }
 
                         var htmlString = futurePayload.data.toString();
-                        var cookieObj = WebviewCookieManager();
                         var controller = WebViewController();
                         int? semester;
                         String? name;
@@ -270,6 +290,29 @@ class _LoginScreenState extends State<LoginScreen> {
                                         controller.runJavaScript(
                                           "document.getElementById('Submit').click();",
                                         );
+                                      } else if (url.contains(
+                                        "https://login.gitam.edu",
+                                      )) {
+                                        (controller.runJavaScriptReturningResult(
+                                          'document.body.innerHTML.search("Invalid User ID / Password. Please try again. !")',
+                                        )).then((isError) {
+                                          if (int.parse(isError.toString()) >
+                                              0) {
+                                            _passwordController.clear();
+                                            password = "";
+                                            setState(() {
+                                              ScaffoldMessenger.of(
+                                                context,
+                                              ).showSnackBar(
+                                                SnackBar(
+                                                  content: Text(
+                                                    "Invalid roll number/password. Please try again.",
+                                                  ),
+                                                ),
+                                              );
+                                            });
+                                          }
+                                        });
                                       } else if (url ==
                                               "https://gstudent.gitam.edu/Home" &&
                                           payload == null) {
@@ -288,7 +331,6 @@ class _LoginScreenState extends State<LoginScreen> {
                                                       .first,
                                             )
                                             .then((cookie) {
-                                              print("Cookie: ${cookie.value}");
                                               get(
                                                 Uri.parse(
                                                   "https://gstudent.gitam.edu/Home/GetStudentData",
@@ -365,7 +407,6 @@ class _LoginScreenState extends State<LoginScreen> {
                                                       .first,
                                             )
                                             .then((cook1) {
-                                              print(cook1.value);
                                               get(
                                                 Uri.parse(
                                                   "https://glearn.gitam.edu/student/my_courses",
@@ -390,7 +431,7 @@ class _LoginScreenState extends State<LoginScreen> {
                                                                   ?.split(
                                                                     '">',
                                                                   )[1]
-                                                                  ?.split(
+                                                                  .split(
                                                                     "</h4",
                                                                   )[0] ??
                                                               "No Data",
@@ -409,7 +450,7 @@ class _LoginScreenState extends State<LoginScreen> {
                                                   };
                                                   final signupRequest = await post(
                                                     Uri.parse(
-                                                      "https://us-central1-chitti-ananta.cloudfunctions.net/webApi/signup",
+                                                      "https://asia-south1-chitti-ananta.cloudfunctions.net/webApi/signup",
                                                     ),
                                                     headers: {
                                                       "Content-Type":
@@ -440,15 +481,17 @@ class _LoginScreenState extends State<LoginScreen> {
                                                       token,
                                                     ) {
                                                       if (token == null) {
-                                                        ScaffoldMessenger.of(
-                                                          context,
-                                                        ).showSnackBar(
-                                                          SnackBar(
-                                                            content: Text(
-                                                              "Unable to create token.",
+                                                        if (context.mounted) {
+                                                          ScaffoldMessenger.of(
+                                                            context,
+                                                          ).showSnackBar(
+                                                            SnackBar(
+                                                              content: Text(
+                                                                "Unable to create token.",
+                                                              ),
                                                             ),
-                                                          ),
-                                                        );
+                                                          );
+                                                        }
                                                         return;
                                                       }
                                                       try {
@@ -466,52 +509,59 @@ class _LoginScreenState extends State<LoginScreen> {
                                                                     ?.split(
                                                                       " ",
                                                                     )[0];
-                                                            Navigator.of(
-                                                              context,
-                                                            ).pushReplacement(
-                                                              MaterialPageRoute(
-                                                                builder:
-                                                                    (
-                                                                      context,
-                                                                    ) => MyHomePage(
-                                                                      name:
-                                                                          name?.split(
-                                                                            " ",
-                                                                          )[0] ??
-                                                                          "User",
-                                                                      semester:
-                                                                          semester,
-                                                                    ),
-                                                              ),
-                                                            );
+                                                            if (context
+                                                                .mounted) {
+                                                              Navigator.of(
+                                                                context,
+                                                              ).pushReplacement(
+                                                                MaterialPageRoute(
+                                                                  builder:
+                                                                      (
+                                                                        context,
+                                                                      ) => MyHomePage(
+                                                                        name:
+                                                                            name?.split(
+                                                                              " ",
+                                                                            )[0] ??
+                                                                            "User",
+                                                                        semester:
+                                                                            semester,
+                                                                      ),
+                                                                ),
+                                                              );
+                                                            }
                                                           });
                                                         });
                                                       } on Exception catch (e) {
-                                                        ScaffoldMessenger.of(
-                                                          context,
-                                                        ).showSnackBar(
-                                                          SnackBar(
-                                                            content: Text(
-                                                              e.toString(),
+                                                        if (context.mounted) {
+                                                          ScaffoldMessenger.of(
+                                                            context,
+                                                          ).showSnackBar(
+                                                            SnackBar(
+                                                              content: Text(
+                                                                e.toString(),
+                                                              ),
                                                             ),
-                                                          ),
-                                                        );
+                                                          );
+                                                        }
                                                       }
                                                     });
                                                   } else {
                                                     final result = json.decode(
                                                       signupRequest.body,
                                                     );
-                                                    ScaffoldMessenger.of(
-                                                      context,
-                                                    ).showSnackBar(
-                                                      SnackBar(
-                                                        content: Text(
-                                                          result["theError"] ??
-                                                              result["message"],
+                                                    if (context.mounted) {
+                                                      ScaffoldMessenger.of(
+                                                        context,
+                                                      ).showSnackBar(
+                                                        SnackBar(
+                                                          content: Text(
+                                                            result["theError"] ??
+                                                                result["message"],
+                                                          ),
                                                         ),
-                                                      ),
-                                                    );
+                                                      );
+                                                    }
                                                   }
                                                   SharedPreferences.getInstance()
                                                       .then((

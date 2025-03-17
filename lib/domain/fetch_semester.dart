@@ -5,7 +5,9 @@ import 'package:http/http.dart';
 
 Future<Semester> fetchSemester(String token) async {
   final request = await get(
-    Uri.parse("https://webapi-zu6v4azneq-uc.a.run.app/dashboard"),
+    Uri.parse(
+      "https://asia-south1-chitti-ananta.cloudfunctions.net/webApi/dashboard",
+    ),
     headers: {
       "Content-Type": "application/json",
       "Authorization": "Bearer $token",
@@ -20,7 +22,7 @@ Future<Semester> fetchSemester(String token) async {
       final message = response["message"];
       throw Exception(message);
     } catch (e) {
-      throw Exception("Unable to fetch semester, ${e}");
+      throw Exception("Unable to fetch semester, $e");
     }
   }
 }

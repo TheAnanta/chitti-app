@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-enum WidthSizeClass { COMPACT, LARGE }
+enum WidthSizeClass { compact, large }
 
 class WindowSizeClass {
   static late double width;
@@ -12,6 +12,6 @@ class WindowSizeClass {
 
 getSizeClass() {
   return WindowSizeClass.width < 640
-      ? WidthSizeClass.COMPACT
-      : WidthSizeClass.LARGE;
+      ? WidthSizeClass.compact
+      : WidthSizeClass.large;
 }
