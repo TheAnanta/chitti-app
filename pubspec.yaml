@@ -46,6 +46,8 @@ dependencies:
   collection: ^1.19.0
   flutter_svg: ^2.0.17
   intl: ^0.20.2
+  pdfrx: ^1.1.13
+  video_player: ^2.9.3
 
 dev_dependencies:
   flutter_test:

@@ -1,7 +1,6 @@
 import 'package:chitti/animated_image.dart';
 import 'package:chitti/color_filters.dart';
 import 'package:chitti/data/semester.dart';
-import 'package:chitti/domain/fetch_resources.dart';
 import 'package:chitti/injector.dart';
 import 'package:chitti/unit_resource_page.dart';
 import 'package:flutter/material.dart';
@@ -14,12 +13,14 @@ class UnitListTile extends StatelessWidget {
     required this.subjectId,
     required this.subjectCoverImage,
     required this.courseId,
+    this.onUnitTap,
   });
   final String subjectName;
   final String subjectId;
   final String courseId;
   final List<Unit> units;
   final String subjectCoverImage;
+  final Function(Unit)? onUnitTap;
 
   @override
   Widget build(BuildContext context) {
@@ -43,6 +44,10 @@ class UnitListTile extends StatelessWidget {
               onTap: () async {
                 if (units[index].isUnlocked) {
                   final selectedUnit = units[index];
+                  if (onUnitTap != null) {
+                    onUnitTap!(selectedUnit);
+                    return;
+                  }
                   // Fetch all the data
 
                   Navigator.of(context).push(
@@ -55,7 +60,6 @@ class UnitListTile extends StatelessWidget {
                             selectedUnit,
                           ),
                           builder: (context, futureValue) {
-                            print(futureValue.data);
                             if (futureValue.hasData) {
                               final unit = futureValue.data!;
                               return UnitResourcePage(

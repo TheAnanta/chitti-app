@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:chitti/data/semester.dart';
 import 'package:chitti/profile_page.dart';
 import 'package:chitti/unit_list_tile.dart';
@@ -15,6 +17,7 @@ class SubjectPage extends StatelessWidget {
       body: CustomScrollView(
         slivers: [
           SliverAppBar(
+            automaticallyImplyLeading: false,
             foregroundColor: Colors.white,
             expandedHeight: 312,
             flexibleSpace: Stack(
@@ -39,28 +42,34 @@ class SubjectPage extends StatelessWidget {
                   ),
                   height: 234,
                 ),
-                AppBar(
-                  backgroundColor: Colors.transparent,
-                  foregroundColor: Colors.white,
-                  title: Text(
-                    "CHITTI.",
-                    style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                      fontWeight: FontWeight.w800,
-                      color: Colors.white,
+                Padding(
+                  padding:
+                      Platform.isMacOS
+                          ? const EdgeInsets.only(top: 24.0)
+                          : const EdgeInsets.only(top: 0.0),
+                  child: AppBar(
+                    backgroundColor: Colors.transparent,
+                    foregroundColor: Colors.white,
+                    title: Text(
+                      "CHITTI.",
+                      style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                        fontWeight: FontWeight.w800,
+                        color: Colors.white,
+                      ),
                     ),
+                    actions: [
+                      IconButton(
+                        onPressed: () {
+                          Navigator.of(context).push(
+                            MaterialPageRoute(
+                              builder: (context) => ProfilePage(),
+                            ),
+                          );
+                        },
+                        icon: Icon(Icons.account_circle_outlined),
+                      ),
+                    ],
                   ),
-                  actions: [
-                    IconButton(
-                      onPressed: () {
-                        Navigator.of(context).push(
-                          MaterialPageRoute(
-                            builder: (context) => ProfilePage(),
-                          ),
-                        );
-                      },
-                      icon: Icon(Icons.account_circle_outlined),
-                    ),
-                  ],
                 ),
               ],
             ),

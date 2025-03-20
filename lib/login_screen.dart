@@ -3,6 +3,7 @@ import 'dart:developer' as developer show log;
 
 import 'package:chitti/domain/fetch_semester.dart';
 import 'package:chitti/home_page.dart';
+import 'package:chitti/size_config.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart';
@@ -43,225 +44,276 @@ class _LoginScreenState extends State<LoginScreen> {
     return Center(
       child:
           password == ""
-              ? Scaffold(
-                body: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Expanded(
-                      child: Container(
-                        color: Color(0xFFF26E0C),
-                        width: double.infinity,
-                      ),
-                    ),
-                    Padding(
-                      padding: const EdgeInsets.all(16.0),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          SizedBox(height: 8),
-                          Text(
-                            "Sign in to CHITTI.",
-                            style: Theme.of(context).textTheme.titleMedium
-                                ?.copyWith(fontWeight: FontWeight.bold),
-                          ),
-                          SizedBox(height: 8),
-                          Text(
-                            "Authorize with your MyGITAM credentials.",
-                            style: Theme.of(context).textTheme.labelSmall,
-                          ),
-                          SizedBox(height: 24),
-                          TextField(
-                            controller: _usernameController,
-                            decoration: InputDecoration(
-                              hintText: "Roll Number",
-                              hintStyle: Theme.of(context).textTheme.bodySmall,
-                              border: OutlineInputBorder(),
-                            ),
-                          ),
-                          SizedBox(height: 16),
-                          TextField(
-                            obscureText: obscurePassword,
-
-                            controller: _passwordController,
-                            decoration: InputDecoration(
-                              hintText: "Password",
-                              hintStyle: Theme.of(context).textTheme.bodySmall,
-                              suffixIcon: IconButton(
-                                onPressed: () {
-                                  obscurePassword = !obscurePassword;
-                                  setState(() {});
-                                },
-                                icon: Icon(
-                                  !obscurePassword
-                                      ? Icons.visibility_outlined
-                                      : Icons.visibility_off_outlined,
-                                ),
+              ? LayoutBuilder(
+                builder: (context, constraints) {
+                  WindowSizeClass().init(constraints);
+                  return Scaffold(
+                    body: Row(
+                      children: [
+                        getSizeClass() == WidthSizeClass.large
+                            ? Expanded(
+                              child: Container(
+                                color: Color(0xFFF26E0C),
+                                width: double.infinity,
                               ),
-                              border: OutlineInputBorder(),
-                            ),
-                          ),
-                          SizedBox(height: 24),
-                          DecoratedBox(
-                            decoration: BoxDecoration(
-                              borderRadius: BorderRadius.circular(4),
-                              boxShadow: [
-                                BoxShadow(
-                                  offset: Offset(10, 12),
-                                  spreadRadius: 0,
-                                ),
-                              ],
-                            ),
-                            child: MaterialButton(
-                              padding: EdgeInsets.symmetric(
-                                vertical: 16,
-                                horizontal: 28,
-                              ),
-                              minWidth: double.infinity,
-                              color: Colors.white,
-                              shape: RoundedRectangleBorder(
-                                side: BorderSide(),
-                                borderRadius: BorderRadius.circular(4),
-                              ),
-                              onPressed: () async {
-                                isLoading.value = true;
-                                if (_usernameController.text != "" &&
-                                    _passwordController.text != "") {
-                                  username =
-                                      _usernameController.text
-                                          .toUpperCase()
-                                          .trim();
-                                  password =
-                                      _passwordController.text.trimRight();
-                                  final loginRequest = await post(
-                                    Uri.parse(
-                                      "https://asia-south1-chitti-ananta.cloudfunctions.net/webApi/login",
+                            )
+                            : SizedBox(),
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              getSizeClass() == WidthSizeClass.large
+                                  ? Spacer()
+                                  : Expanded(
+                                    child: Container(
+                                      color: Color(0xFFF26E0C),
+                                      width: double.infinity,
                                     ),
-                                    headers: {
-                                      "Content-Type": "application/json",
-                                    },
-                                    body: json.encode({
-                                      "rollNo": username,
-                                      "pass": password,
-                                    }),
-                                  );
-                                  if (loginRequest.statusCode == 404) {
-                                    setState(() {});
-                                  } else if (loginRequest.statusCode == 403) {
-                                    // MARK: Alert the user on wrong authentication details
-                                    isLoading.value = false;
-                                    if (context.mounted) {
-                                      ScaffoldMessenger.of(
+                                  ),
+                              Padding(
+                                padding: EdgeInsets.all(
+                                  getSizeClass() == WidthSizeClass.large
+                                      ? 36
+                                      : 16.0,
+                                ),
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    SizedBox(height: 8),
+                                    Text(
+                                      "Sign in to CHITTI.",
+                                      style: Theme.of(
                                         context,
-                                      ).showSnackBar(
-                                        SnackBar(
-                                          content: Text(
-                                            json.decode(
-                                              loginRequest.body,
-                                            )["message"],
-                                          ),
-                                        ),
-                                      );
-                                    }
-                                  } else {
-                                    // MARK: Authenticate the user
-                                    final result = json.decode(
-                                      loginRequest.body,
-                                    );
-                                    final userCredential = await FirebaseAuth
-                                        .instance
-                                        .signInWithCustomToken(result["token"]);
-                                    FirebaseAuth.instance.currentUser!
-                                        .getIdToken(true)
-                                        .then((token) {
-                                          if (token == null) {
-                                            isLoading.value = false;
-                                            if (context.mounted) {
-                                              ScaffoldMessenger.of(
-                                                context,
-                                              ).showSnackBar(
-                                                SnackBar(
-                                                  content: Text(
-                                                    "Unable to create token.",
-                                                  ),
-                                                ),
-                                              );
-                                            }
-                                            return;
-                                          }
-                                          try {
-                                            fetchSemester(token).then((
-                                              semester,
-                                            ) {
-                                              SharedPreferences.getInstance().then((
-                                                sharedPreferences,
-                                              ) {
-                                                if (context.mounted) {
-                                                  Navigator.of(
-                                                    context,
-                                                  ).pushReplacement(
-                                                    MaterialPageRoute(
-                                                      builder:
-                                                          (
-                                                            context,
-                                                          ) => MyHomePage(
-                                                            name:
-                                                                userCredential
-                                                                    .user
-                                                                    ?.displayName
-                                                                    ?.split(
-                                                                      " ",
-                                                                    )[0] ??
-                                                                "User",
-                                                            semester: semester,
-                                                          ),
-                                                    ),
-                                                  );
-                                                }
-                                              });
-                                            });
-                                          } on Exception catch (e) {
-                                            isLoading.value = false;
-                                            if (context.mounted) {
-                                              ScaffoldMessenger.of(
-                                                context,
-                                              ).showSnackBar(
-                                                SnackBar(
-                                                  content: Text(e.toString()),
-                                                ),
-                                              );
-                                            }
-                                          }
-                                        });
-                                  }
-                                } else {
-                                  isLoading.value = false;
-                                  ScaffoldMessenger.of(context).showSnackBar(
-                                    SnackBar(
-                                      content: Text(
-                                        "Enter a valid roll number and password",
+                                      ).textTheme.titleMedium?.copyWith(
+                                        fontWeight: FontWeight.bold,
                                       ),
                                     ),
-                                  );
-                                }
-                              },
-                              child: ValueListenableBuilder(
-                                valueListenable: isLoading,
-                                builder: (context, _isLoading, _) {
-                                  return _isLoading
-                                      ? CircularProgressIndicator(
-                                        color: Colors.grey.shade800,
-                                      )
-                                      : Text("Sign in with GITAM");
-                                },
+                                    SizedBox(height: 8),
+                                    Text(
+                                      "Authorize with your MyGITAM credentials.",
+                                      style:
+                                          Theme.of(
+                                            context,
+                                          ).textTheme.labelSmall,
+                                    ),
+                                    SizedBox(height: 24),
+                                    TextField(
+                                      controller: _usernameController,
+                                      decoration: InputDecoration(
+                                        hintText: "Roll Number",
+                                        hintStyle:
+                                            Theme.of(
+                                              context,
+                                            ).textTheme.bodySmall,
+                                        border: OutlineInputBorder(),
+                                      ),
+                                    ),
+                                    SizedBox(height: 16),
+                                    TextField(
+                                      obscureText: obscurePassword,
+
+                                      controller: _passwordController,
+                                      decoration: InputDecoration(
+                                        hintText: "Password",
+                                        hintStyle:
+                                            Theme.of(
+                                              context,
+                                            ).textTheme.bodySmall,
+                                        suffixIcon: IconButton(
+                                          onPressed: () {
+                                            obscurePassword = !obscurePassword;
+                                            setState(() {});
+                                          },
+                                          icon: Icon(
+                                            !obscurePassword
+                                                ? Icons.visibility_outlined
+                                                : Icons.visibility_off_outlined,
+                                          ),
+                                        ),
+                                        border: OutlineInputBorder(),
+                                      ),
+                                    ),
+                                    SizedBox(height: 24),
+                                    DecoratedBox(
+                                      decoration: BoxDecoration(
+                                        borderRadius: BorderRadius.circular(4),
+                                        boxShadow: [
+                                          BoxShadow(
+                                            offset: Offset(10, 12),
+                                            spreadRadius: 0,
+                                          ),
+                                        ],
+                                      ),
+                                      child: MaterialButton(
+                                        padding: EdgeInsets.symmetric(
+                                          vertical: 16,
+                                          horizontal: 28,
+                                        ),
+                                        minWidth: double.infinity,
+                                        color: Colors.white,
+                                        shape: RoundedRectangleBorder(
+                                          side: BorderSide(),
+                                          borderRadius: BorderRadius.circular(
+                                            4,
+                                          ),
+                                        ),
+                                        onPressed: () async {
+                                          isLoading.value = true;
+                                          if (_usernameController.text != "" &&
+                                              _passwordController.text != "") {
+                                            username =
+                                                _usernameController.text
+                                                    .toUpperCase()
+                                                    .trim();
+                                            password =
+                                                _passwordController.text
+                                                    .trimRight();
+                                            final loginRequest = await post(
+                                              Uri.parse(
+                                                "https://asia-south1-chitti-ananta.cloudfunctions.net/webApi/login",
+                                              ),
+                                              headers: {
+                                                "Content-Type":
+                                                    "application/json",
+                                              },
+                                              body: json.encode({
+                                                "rollNo": username,
+                                                "pass": password,
+                                              }),
+                                            );
+                                            if (loginRequest.statusCode ==
+                                                404) {
+                                              setState(() {});
+                                            } else if (loginRequest
+                                                    .statusCode ==
+                                                403) {
+                                              // MARK: Alert the user on wrong authentication details
+                                              isLoading.value = false;
+                                              if (context.mounted) {
+                                                ScaffoldMessenger.of(
+                                                  context,
+                                                ).showSnackBar(
+                                                  SnackBar(
+                                                    content: Text(
+                                                      json.decode(
+                                                        loginRequest.body,
+                                                      )["message"],
+                                                    ),
+                                                  ),
+                                                );
+                                              }
+                                            } else {
+                                              // MARK: Authenticate the user
+                                              final result = json.decode(
+                                                loginRequest.body,
+                                              );
+                                              final userCredential =
+                                                  await FirebaseAuth.instance
+                                                      .signInWithCustomToken(
+                                                        result["token"],
+                                                      );
+                                              FirebaseAuth.instance.currentUser!.getIdToken(true).then((
+                                                token,
+                                              ) {
+                                                if (token == null) {
+                                                  isLoading.value = false;
+                                                  if (context.mounted) {
+                                                    ScaffoldMessenger.of(
+                                                      context,
+                                                    ).showSnackBar(
+                                                      SnackBar(
+                                                        content: Text(
+                                                          "Unable to create token.",
+                                                        ),
+                                                      ),
+                                                    );
+                                                  }
+                                                  return;
+                                                }
+                                                try {
+                                                  fetchSemester(token).then((
+                                                    semester,
+                                                  ) {
+                                                    SharedPreferences.getInstance().then((
+                                                      sharedPreferences,
+                                                    ) {
+                                                      if (context.mounted) {
+                                                        Navigator.of(
+                                                          context,
+                                                        ).pushReplacement(
+                                                          MaterialPageRoute(
+                                                            builder:
+                                                                (
+                                                                  context,
+                                                                ) => MyHomePage(
+                                                                  name:
+                                                                      userCredential
+                                                                          .user
+                                                                          ?.displayName
+                                                                          ?.split(
+                                                                            " ",
+                                                                          )[0] ??
+                                                                      "User",
+                                                                  semester:
+                                                                      semester,
+                                                                ),
+                                                          ),
+                                                        );
+                                                      }
+                                                    });
+                                                  });
+                                                } on Exception catch (e) {
+                                                  isLoading.value = false;
+                                                  if (context.mounted) {
+                                                    ScaffoldMessenger.of(
+                                                      context,
+                                                    ).showSnackBar(
+                                                      SnackBar(
+                                                        content: Text(
+                                                          e.toString(),
+                                                        ),
+                                                      ),
+                                                    );
+                                                  }
+                                                }
+                                              });
+                                            }
+                                          } else {
+                                            isLoading.value = false;
+                                            ScaffoldMessenger.of(
+                                              context,
+                                            ).showSnackBar(
+                                              SnackBar(
+                                                content: Text(
+                                                  "Enter a valid roll number and password",
+                                                ),
+                                              ),
+                                            );
+                                          }
+                                        },
+                                        child: ValueListenableBuilder(
+                                          valueListenable: isLoading,
+                                          builder: (context, _isLoading, _) {
+                                            return _isLoading
+                                                ? CircularProgressIndicator(
+                                                  color: Colors.grey.shade800,
+                                                )
+                                                : Text("Sign in with GITAM");
+                                          },
+                                        ),
+                                      ),
+                                    ),
+                                    SizedBox(height: 48),
+                                  ],
+                                ),
                               ),
-                            ),
+                            ],
                           ),
-                          SizedBox(height: 48),
-                        ],
-                      ),
+                        ),
+                      ],
                     ),
-                  ],
-                ),
+                  );
+                },
               )
               : Scaffold(
                 body: Stack(

@@ -48,11 +48,6 @@ fetchResourcesForUnit(
       return null;
     }
   });
-  print(data?["roadmap"] != null);
-  print(data?["videos"] != null);
-  print(data?["cheatsheets"] != null);
-  print(data?["notes"] != null);
-  print(data?["importantQuestions"] != null);
 
   // Map<String, dynamic>? notes = await get(
   //   Uri.parse(
@@ -147,7 +142,7 @@ fetchResourcesForUnit(
   var (roadmap, videos, notes, cheatsheet, impQuestions) = (
     Roadmap(
       roadmapItems:
-          (data?["roadmap"] as List<dynamic>).map((e) {
+          (data?["roadmap"] as List<dynamic>? ?? []).map((e) {
             return RoadmapItem(
               name: e["name"],
               difficulty: e["difficulty"],
@@ -155,7 +150,7 @@ fetchResourcesForUnit(
             );
           }).toList(),
     ),
-    (data?["videos"] as List<dynamic>)
+    (data?["videos"] as List<dynamic>? ?? [])
         .map(
           (e) => Video(
             name: e["name"],
@@ -165,15 +160,15 @@ fetchResourcesForUnit(
           ),
         )
         .toList(),
-    (data?["notes"] as List<dynamic>)
+    (data?["notes"] as List<dynamic>? ?? [])
         .map((e) => Notes(name: e["name"], url: e["url"], id: e["notesId"]))
         .toList(),
-    (data?["cheatsheets"] as List<dynamic>)
+    (data?["cheatsheets"] as List<dynamic>? ?? [])
         .map(
           (e) => Cheatsheet(name: e["name"], url: e["url"], id: e["cheatId"]),
         )
         .toList(),
-    (data?["importantQuestions"] as List<dynamic>).map((e) {
+    (data?["importantQuestions"] as List<dynamic>? ?? []).map((e) {
       return ImportantQuestion(
         id: e["iqId"],
         question: e["question"],
@@ -182,7 +177,7 @@ fetchResourcesForUnit(
       );
     }).toList(),
   );
-  print(roadmap);
+  //TODO: HANDLE ERRORS FROM API LIKE FORBIDDEN
   return (roadmap, videos, notes, cheatsheet, impQuestions);
 }
 

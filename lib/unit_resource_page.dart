@@ -4,8 +4,13 @@ import 'package:chitti/color_filters.dart';
 import 'package:chitti/data/important_questions.dart';
 import 'package:chitti/data/semester.dart';
 import 'package:chitti/domain/fetch_resources.dart';
+import 'package:chitti/injector.dart';
 import 'package:chitti/profile_page.dart';
+import 'package:chitti/watermark_widget.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:pdfrx/pdfrx.dart';
+import 'package:video_player/video_player.dart';
 
 class UnitResourcePage extends StatefulWidget {
   final UnitWithResources unit;
@@ -68,174 +73,208 @@ class _UnitResourcePageState extends State<UnitResourcePage>
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: Colors.white,
-      body: NestedScrollView(
-        controller: _scrollController,
-        headerSliverBuilder: (context, innerBoxIsScrolled) {
-          return [
-            SliverAppBar(
-              snap: true,
-              backgroundColor: Colors.white,
-              foregroundColor: Colors.white,
-              expandedHeight: 448,
-              collapsedHeight: 206,
-              floating: true,
-              pinned: true,
-              flexibleSpace: ValueListenableBuilder(
-                valueListenable: _scrollOffsetNotifier,
-                builder: (context, _scrollOffset, _) {
-                  return Wrap(
-                    clipBehavior: Clip.antiAlias,
-                    children: [
-                      Stack(
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        return Scaffold(
+          backgroundColor: Colors.white,
+          body: NestedScrollView(
+            controller: _scrollController,
+            headerSliverBuilder: (context, innerBoxIsScrolled) {
+              return [
+                SliverAppBar(
+                  backgroundColor: Colors.white,
+                  foregroundColor: Colors.white,
+                  expandedHeight:
+                      500 -
+                      ((AppBar().preferredSize.height +
+                                  MediaQuery.of(context).padding.top +
+                                  MediaQuery.of(context).padding.bottom) >
+                              100
+                          ? 54
+                          : 0),
+                  collapsedHeight:
+                      266 -
+                      ((AppBar().preferredSize.height +
+                                  MediaQuery.of(context).padding.top +
+                                  MediaQuery.of(context).padding.bottom) >
+                              100
+                          ? 54
+                          : 0),
+                  floating: true,
+                  pinned: true,
+                  flexibleSpace: ValueListenableBuilder(
+                    valueListenable: _scrollOffsetNotifier,
+                    builder: (context, _scrollOffset, _) {
+                      return Wrap(
+                        clipBehavior: Clip.antiAlias,
                         children: [
-                          Image.network(
-                            widget.subjectCoverImage,
-                            height: 258,
-                            width: double.infinity,
-                            alignment: Alignment.center,
-                            fit: BoxFit.cover,
-                          ),
-                          Container(
-                            decoration: BoxDecoration(
-                              gradient: LinearGradient(
-                                colors: [
-                                  Colors.black.withValues(alpha: 0.75),
-                                  Colors.black.withAlpha(0),
-                                ],
-                                begin: Alignment.topCenter,
-                                end: Alignment.bottomCenter,
+                          Stack(
+                            children: [
+                              Image.network(
+                                widget.subjectCoverImage,
+                                height: 258,
+                                width: double.infinity,
+                                alignment: Alignment.center,
+                                fit: BoxFit.cover,
                               ),
-                            ),
-                            height: 234,
-                          ),
-                          Opacity(
-                            opacity: _scrollOffset / 140,
-                            child: Container(
-                              margin: EdgeInsets.only(top: 24),
-                              decoration: BoxDecoration(
-                                gradient: LinearGradient(
-                                  colors: [
-                                    Colors.black.withValues(alpha: 0),
-                                    Colors.black.withValues(alpha: 0.75),
-                                  ],
-                                  begin: Alignment.topCenter,
-                                  end: Alignment.bottomCenter,
+                              Container(
+                                decoration: BoxDecoration(
+                                  gradient: LinearGradient(
+                                    colors: [
+                                      Colors.black.withValues(alpha: 0.75),
+                                      Colors.black.withAlpha(0),
+                                    ],
+                                    begin: Alignment.topCenter,
+                                    end: Alignment.bottomCenter,
+                                  ),
+                                ),
+                                height: 234,
+                              ),
+                              Opacity(
+                                opacity: _scrollOffset / 134,
+                                child: Container(
+                                  margin: EdgeInsets.only(top: 24),
+                                  decoration: BoxDecoration(
+                                    gradient: LinearGradient(
+                                      colors: [
+                                        Colors.black.withValues(alpha: 0),
+                                        Colors.black.withValues(alpha: 0.75),
+                                      ],
+                                      begin: Alignment.topCenter,
+                                      end: Alignment.bottomCenter,
+                                    ),
+                                  ),
+                                  height: 234,
                                 ),
                               ),
-                              height: 234,
-                            ),
-                          ),
-                          AppBar(
-                            backgroundColor: Colors.transparent,
-                            foregroundColor: Colors.white,
-                            title: Text(
-                              "CHITTI.",
-                              style: Theme.of(
-                                context,
-                              ).textTheme.titleLarge?.copyWith(
-                                fontWeight: FontWeight.w800,
-                                color: Colors.white,
-                              ),
-                            ),
-                            actions: [
-                              IconButton(
-                                onPressed: () {
-                                  Navigator.of(context).push(
-                                    MaterialPageRoute(
-                                      builder: (context) => ProfilePage(),
-                                    ),
-                                  );
-                                },
-                                icon: Icon(Icons.account_circle_outlined),
+                              AppBar(
+                                backgroundColor: Colors.transparent,
+                                foregroundColor: Colors.white,
+                                title: Text(
+                                  "CHITTI.",
+                                  style: Theme.of(
+                                    context,
+                                  ).textTheme.titleLarge?.copyWith(
+                                    fontWeight: FontWeight.w800,
+                                    color: Colors.white,
+                                  ),
+                                ),
+                                actions: [
+                                  IconButton(
+                                    onPressed: () {
+                                      Navigator.of(context).push(
+                                        MaterialPageRoute(
+                                          builder: (context) => ProfilePage(),
+                                        ),
+                                      );
+                                    },
+                                    icon: Icon(Icons.account_circle_outlined),
+                                  ),
+                                ],
                               ),
                             ],
                           ),
-                        ],
-                      ),
-                      ColorFiltered(
-                        colorFilter: ColorFilters.matrix(
-                          brightness: _scrollOffset * 5 / 140,
-                        ),
-                        child: Transform.translate(
-                          offset: Offset(0, -_scrollOffset),
-                          child: Padding(
-                            padding: const EdgeInsets.all(
-                              16.0,
-                            ).copyWith(top: 32),
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(
-                                  "UNIT ${widget.unitIndex}",
-                                  style: Theme.of(
-                                    context,
-                                  ).textTheme.bodyLarge?.copyWith(
-                                    fontWeight: FontWeight.w800,
-                                    color: Colors.black38,
-                                  ),
+                          ColorFiltered(
+                            colorFilter: ColorFilters.matrix(
+                              brightness: _scrollOffset * 5 / 134,
+                            ),
+                            child: Transform.translate(
+                              offset: Offset(0, -_scrollOffset),
+                              child: Padding(
+                                padding: const EdgeInsets.all(
+                                  16.0,
+                                ).copyWith(top: 32),
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      "UNIT ${widget.unitIndex}",
+                                      style: Theme.of(
+                                        context,
+                                      ).textTheme.bodyLarge?.copyWith(
+                                        fontWeight: FontWeight.w800,
+                                        color: Colors.black38,
+                                        fontSize: 16,
+                                      ),
+                                    ),
+                                    Text(
+                                      widget.unit.name,
+                                      style: Theme.of(
+                                        context,
+                                      ).textTheme.titleLarge?.copyWith(
+                                        fontWeight: FontWeight.bold,
+                                        fontSize: 22,
+                                      ),
+                                    ),
+                                    SizedBox(height: 4),
+                                    Text(
+                                      "${widget.unit.difficulty.split("-").map((e) => "${e[0].toUpperCase()}${e.substring(1).toLowerCase()}").join(" ")} • ${widget.subjectName}",
+                                    ),
+                                    SizedBox(height: 8),
+                                    Opacity(
+                                      opacity: 1 - (_scrollOffset / 134),
+                                      child: Text(
+                                        widget.unit.description,
+                                        maxLines: 3,
+                                        overflow: TextOverflow.ellipsis,
+                                        style: Theme.of(context)
+                                            .textTheme
+                                            .bodyMedium
+                                            ?.copyWith(fontSize: 14),
+                                      ),
+                                    ),
+                                    SizedBox(height: 8),
+                                  ],
                                 ),
-                                Text(
-                                  widget.unit.name,
-                                  style: Theme.of(context).textTheme.titleLarge
-                                      ?.copyWith(fontWeight: FontWeight.bold),
-                                ),
-                                SizedBox(height: 4),
-                                Text(
-                                  "${widget.unit.difficulty.split("-").map((e) => "${e[0].toUpperCase()}${e.substring(1).toLowerCase()}").join(" ")} • ${widget.subjectName}",
-                                ),
-                                SizedBox(height: 8),
-                                Opacity(
-                                  opacity: 1 - (_scrollOffset / 144),
-                                  child: Text(
-                                    widget.unit.description,
-                                    maxLines: 3,
-                                    overflow: TextOverflow.ellipsis,
-                                  ),
-                                ),
-                                SizedBox(height: 8),
-                              ],
+                              ),
                             ),
                           ),
-                        ),
+                        ],
+                      );
+                    },
+                  ),
+                  bottom: PreferredSize(
+                    preferredSize: Size.fromHeight(kTextTabBarHeight),
+                    child: Container(
+                      padding: EdgeInsets.only(top: 8),
+                      color: Colors.white,
+                      child: TabBar(
+                        isScrollable: true,
+                        controller: _tabController,
+                        tabs: [
+                          Tab(text: "Roadmap"),
+                          Tab(text: "Videos"),
+                          Tab(text: "Notes"),
+                          Tab(text: "Cheatsheets"),
+                          Tab(text: "Important Questions"),
+                        ],
                       ),
-                    ],
-                  );
-                },
-              ),
-              bottom: PreferredSize(
-                preferredSize: Size.fromHeight(kTextTabBarHeight),
-                child: Container(
-                  padding: EdgeInsets.only(top: 8),
-                  color: Colors.white,
-                  child: TabBar(
-                    isScrollable: true,
-                    controller: _tabController,
-                    tabs: [
-                      Tab(text: "Roadmap"),
-                      Tab(text: "Videos"),
-                      Tab(text: "Notes"),
-                      Tab(text: "Cheatsheets"),
-                      Tab(text: "Important Questions"),
-                    ],
+                    ),
                   ),
                 ),
+              ];
+            },
+            body: WatermarkWidget(
+              text: FirebaseAuth.instance.currentUser?.uid ?? "Anonymous",
+              opacity: 0.05,
+              fontSize: 18,
+              child: TabBarView(
+                controller: _tabController,
+                children: [
+                  _buildRoadmapView(widget.unit.roadmap),
+                  _buildVideoView(widget.unit.videos, widget.courseId),
+                  _buildNotesView(widget.unit.notes, widget.courseId),
+                  _buildCheatsheetView(
+                    widget.unit.cheatsheets,
+                    widget.courseId,
+                  ),
+                  _buildIQView(widget.unit.importantQuestions, widget.courseId),
+                ],
               ),
             ),
-          ];
-        },
-        body: TabBarView(
-          controller: _tabController,
-          children: [
-            _buildRoadmapView(widget.unit.roadmap),
-            _buildVideoView(widget.unit.videos, widget.courseId),
-            _buildNotesView(widget.unit.notes, widget.courseId),
-            _buildCheatsheetView(widget.unit.cheatsheets, widget.courseId),
-            _buildIQView(widget.unit.importantQuestions, widget.courseId),
-          ],
-        ),
-      ),
+          ),
+        );
+      },
     );
   }
 
@@ -245,18 +284,67 @@ class _UnitResourcePageState extends State<UnitResourcePage>
         : notes.isEmpty
         ? Center(child: Text("No notes available."))
         : ListView.separated(
+          primary: false,
+          physics: NeverScrollableScrollPhysics(),
           padding: EdgeInsets.symmetric(horizontal: 0, vertical: 12),
           itemBuilder: (context, index) {
             final notesItem = notes[index];
             return ListTile(
               onTap: () {
                 //TODO: Show PDF
+
                 addCompletedResource(
                   context,
                   CompletedResources(
                     courseId: courseId,
                     resourceId: notesItem.id,
                     resourceName: notesItem.name,
+                  ),
+                );
+                Navigator.of(context).push(
+                  MaterialPageRoute(
+                    builder:
+                        (context) => Scaffold(
+                          appBar: AppBar(title: Text(notesItem.name)),
+                          body: Center(
+                            child: WatermarkWidget(
+                              text:
+                                  FirebaseAuth.instance.currentUser?.uid ??
+                                  "Anonymous",
+                              opacity: 0.05,
+                              fontSize: 18,
+                              child: Builder(
+                                builder: (context) {
+                                  final viewController = PdfViewerController();
+                                  if (viewController.isReady) {
+                                    return Center(
+                                      child: CircularProgressIndicator(),
+                                    );
+                                  }
+                                  return PdfViewer.uri(
+                                    Uri.tryParse(notesItem.url) ??
+                                        Uri.parse(
+                                          "https://pdfobject.com/pdf/sample.pdf",
+                                        ),
+                                    controller: viewController,
+                                    params: PdfViewerParams(
+                                      enableTextSelection: false,
+                                      loadingBannerBuilder: (
+                                        context,
+                                        bytesDownloaded,
+                                        totalBytes,
+                                      ) {
+                                        return Center(
+                                          child: CircularProgressIndicator(),
+                                        );
+                                      },
+                                    ),
+                                  );
+                                },
+                              ),
+                            ),
+                          ),
+                        ),
                   ),
                 );
               },
@@ -306,24 +394,61 @@ class _UnitResourcePageState extends State<UnitResourcePage>
                           color: Colors.transparent,
                           child: InkWell(
                             onTap: () {
-                              //TODO: Show Video
-
-                              addCompletedResource(
-                                context,
-                                CompletedResources(
-                                  courseId: courseId,
-                                  resourceId: videos[index].id,
-                                  resourceName: videos[index].name,
+                              Navigator.of(context).push(
+                                MaterialPageRoute(
+                                  builder:
+                                      (context) => VideoPlayerWidget(
+                                        video: videos[index],
+                                        onPlayedVideo: () {
+                                          Navigator.of(context).pop();
+                                          addCompletedResource(
+                                            context,
+                                            CompletedResources(
+                                              courseId: courseId,
+                                              resourceId: videos[index].id,
+                                              resourceName: videos[index].name,
+                                            ),
+                                          );
+                                        },
+                                      ),
                                 ),
                               );
                             },
-                            child: Center(
-                              child: Icon(
-                                Icons.play_circle_fill,
-                                size: 48,
-                                color: Colors.white,
-                              ),
-                            ),
+                            child:
+                                (Injector.semesterRepository.semester?.completed
+                                            .contains(
+                                              CompletedResources(
+                                                courseId: widget.courseId,
+                                                resourceId: videos[index].id,
+                                                resourceName:
+                                                    videos[index].name,
+                                              ),
+                                            ) ??
+                                        false)
+                                    ? Container(
+                                      alignment: Alignment.center,
+                                      decoration: BoxDecoration(
+                                        color: Colors.black.withValues(
+                                          alpha: 0.5,
+                                        ),
+                                      ),
+                                      child: Text(
+                                        "Watched",
+                                        style: Theme.of(
+                                          context,
+                                        ).textTheme.bodyMedium?.copyWith(
+                                          color: Colors.white,
+                                          fontWeight: FontWeight.bold,
+                                        ),
+                                      ),
+                                    )
+                                    : Center(
+                                      child: Icon(
+                                        Icons.play_circle_fill,
+                                        size: 48,
+                                        color: Colors.white,
+                                      ),
+                                    ),
                           ),
                         ),
                       ),
@@ -331,6 +456,7 @@ class _UnitResourcePageState extends State<UnitResourcePage>
                   ),
                 ),
                 SizedBox(height: 8),
+
                 Text(
                   videos[index].name,
                   style: Theme.of(context).textTheme.titleMedium?.copyWith(
@@ -520,5 +646,153 @@ class _UnitResourcePageState extends State<UnitResourcePage>
           itemCount: iqs.length,
           shrinkWrap: true,
         );
+  }
+}
+
+class VideoPlayerWidget extends StatefulWidget {
+  final Video video;
+  final onPlayedVideo;
+  const VideoPlayerWidget({
+    super.key,
+    required this.video,
+    required this.onPlayedVideo,
+  });
+
+  @override
+  State<VideoPlayerWidget> createState() => _VideoPlayerWidgetState();
+}
+
+class _VideoPlayerWidgetState extends State<VideoPlayerWidget> {
+  late VideoPlayerController _controller;
+  late Future<void> _initializeVideoPlayerFuture;
+  final ValueNotifier<bool> _isCompletedPlaying = ValueNotifier<bool>(false);
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    _controller = VideoPlayerController.networkUrl(Uri.parse(widget.video.url));
+
+    _initializeVideoPlayerFuture = _controller.initialize();
+    _controller.addListener(() {
+      if (_controller.value.isCompleted) {
+        _isCompletedPlaying.value = true;
+      }
+    });
+  }
+
+  @override
+  void dispose() {
+    // Ensure disposing of the VideoPlayerController to free up resources.
+    _controller.dispose();
+
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      floatingActionButton: ValueListenableBuilder<bool>(
+        valueListenable: _isCompletedPlaying,
+        builder: (context, isCompletedPlaying, child) {
+          return FloatingActionButton(
+            onPressed: () {
+              if (isCompletedPlaying) {
+                _controller.play();
+                setState(() {});
+                return;
+              }
+              // Wrap the play or pause in a call to `setState`. This ensures the
+              // correct icon is shown.
+              setState(() {
+                // If the video is playing, pause it.
+                if (_controller.value.isPlaying) {
+                  _controller.pause();
+                } else {
+                  // If the video is paused, play it.
+                  _controller.play();
+                }
+              });
+            },
+            // Display the correct icon depending on the state of the player.
+            child: Icon(
+              isCompletedPlaying
+                  ? Icons.replay
+                  : _controller.value.isPlaying
+                  ? Icons.pause
+                  : Icons.play_arrow,
+            ),
+          );
+        },
+      ),
+      body: Center(
+        child: Stack(
+          children: [
+            WatermarkWidget(
+              text: FirebaseAuth.instance.currentUser?.uid ?? "Anonymous",
+              opacity: 0.05,
+              fontSize: 18,
+              child: FutureBuilder(
+                future: _initializeVideoPlayerFuture,
+                builder: (context, snapshot) {
+                  if (snapshot.connectionState == ConnectionState.done) {
+                    // If the VideoPlayerController has finished initialization, use
+                    // the data it provides to limit the aspect ratio of the video.
+                    return SizedBox(
+                      width: double.infinity,
+                      height: double.infinity,
+                      child: FittedBox(
+                        fit: BoxFit.cover,
+                        child: SizedBox(
+                          width: _controller.value.size.width,
+                          height: _controller.value.size.height,
+                          child: VideoPlayer(_controller),
+                        ),
+                      ),
+                    );
+                  } else {
+                    // If the VideoPlayerController is still initializing, show a
+                    // loading spinner.
+                    return const Center(child: CircularProgressIndicator());
+                  }
+                },
+              ),
+            ),
+
+            Column(
+              children: [
+                Container(
+                  padding: EdgeInsets.only(top: 24),
+                  height: kToolbarHeight * 2,
+                  decoration: BoxDecoration(
+                    gradient: LinearGradient(
+                      colors: [
+                        Colors.black.withValues(alpha: 0),
+                        Colors.black.withValues(alpha: 0.75),
+                      ],
+                      begin: Alignment.bottomCenter,
+                      end: Alignment.topCenter,
+                    ),
+                  ),
+                  child: AppBar(
+                    automaticallyImplyLeading: false,
+                    leading: IconButton(
+                      onPressed: () {
+                        widget.onPlayedVideo();
+                        Navigator.of(context).pop();
+                      },
+                      icon: Icon(Icons.chevron_left),
+                    ),
+                    foregroundColor: Colors.white,
+                    title: Text(widget.video.name),
+                    backgroundColor: Colors.transparent,
+                    toolbarHeight: kToolbarHeight,
+                  ),
+                ),
+              ],
+            ),
+          ],
+        ),
+      ),
+    );
   }
 }

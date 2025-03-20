@@ -5,12 +5,12 @@ enum WidthSizeClass { compact, large }
 class WindowSizeClass {
   static late double width;
 
-  void init(BuildContext context, BoxConstraints constraints) {
+  void init(BoxConstraints constraints) {
     width = constraints.maxWidth;
   }
 }
 
-getSizeClass() {
+WidthSizeClass getSizeClass() {
   return WindowSizeClass.width < 640
       ? WidthSizeClass.compact
       : WidthSizeClass.large;

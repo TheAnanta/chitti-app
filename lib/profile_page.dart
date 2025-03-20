@@ -4,10 +4,8 @@ import 'package:chitti/data/semester.dart';
 import 'package:chitti/injector.dart';
 import 'package:chitti/splash_screen.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
-import 'package:intl/intl.dart';
 
 class MyClipper extends CustomClipper<Path> {
   @override
@@ -224,7 +222,7 @@ class ProfilePage extends StatelessWidget {
                           shrinkWrap: true,
                           primary: false,
                           separatorBuilder: (_, __) => Divider(),
-                          itemCount: min(5, titles.length ?? 0),
+                          itemCount: min(5, titles.length),
                         );
                       },
                     ),
