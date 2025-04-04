@@ -6,6 +6,7 @@ import 'package:chitti/profile_page.dart';
 import 'package:chitti/size_config.dart';
 import 'package:chitti/subject_page.dart';
 import 'package:chitti/unit_resources_page_large.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
 class MyHomePage extends StatefulWidget {
@@ -143,7 +144,7 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin {
                           return LayoutBuilder(
                             builder: (context, constraints) {
                               WindowSizeClass().init(constraints);
-                              onTap(subject, index) {
+                              onTap(Subject subject, index) {
                                 if (getSizeClass() == WidthSizeClass.large) {
                                   Navigator.of(context).push(
                                     MaterialPageRoute(
@@ -154,6 +155,13 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin {
                                                 context,
                                                 subject.courseId,
                                                 subject.units[0],
+                                                subject
+                                                        .units[0]
+                                                        .roadmap
+                                                        ?.roadmapItems
+                                                        .firstOrNull
+                                                        ?.id ??
+                                                    "",
                                               ),
                                           builder: (context, futureValue) {
                                             if (futureValue.hasData) {

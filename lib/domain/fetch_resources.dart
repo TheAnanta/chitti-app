@@ -19,12 +19,13 @@ fetchResourcesForUnit(
   BuildContext context,
   String subjectId,
   String unitId,
+  String roadmapId,
 ) async {
   final token = await FirebaseAuth.instance.currentUser?.getIdToken(true);
 
   Map<String, dynamic>? data = await get(
     Uri.parse(
-      "https://asia-south1-chitti-ananta.cloudfunctions.net/webApi/unit/$subjectId/$unitId/all",
+      "https://asia-south1-chitti-ananta.cloudfunctions.net/webApi/unit/$subjectId/$unitId/$roadmapId/all",
     ),
     headers: {"Authorization": "Bearer $token"},
   ).then((response) {

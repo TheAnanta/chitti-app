@@ -23,7 +23,6 @@ class SplashScreen extends StatelessWidget {
     } else {
       WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
         FirebaseAuth.instance.currentUser!.getIdToken(true).then((token) {
-          print(token);
           if (token == null) {
             if (context.mounted) {
               ScaffoldMessenger.of(context).showSnackBar(

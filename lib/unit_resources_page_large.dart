@@ -256,11 +256,18 @@ class _UnitResourcePageExtendedState extends State<UnitResourcePageExtended>
                           courseId: widget.subject.courseId,
                           onUnitTap: (selectedUnit) async {
                             _unit.value = null;
+                            //TODO: roadmapItems and expansiontile
                             final newUnit = await Injector.unitRepository
                                 .fetchUnit(
                                   context,
                                   widget.courseId,
                                   selectedUnit,
+                                  selectedUnit
+                                          .roadmap
+                                          ?.roadmapItems
+                                          .firstOrNull
+                                          ?.id ??
+                                      "",
                                 );
                             _unit.value = UnitWithResourcesAndIndex(
                               newUnit,

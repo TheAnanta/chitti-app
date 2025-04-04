@@ -11,6 +11,7 @@ class Unit {
   final String description;
   final bool isUnlocked;
   final int totalResources;
+  final Roadmap? roadmap;
   const Unit({
     required this.unitId,
     required this.name,
@@ -18,6 +19,7 @@ class Unit {
     required this.difficulty,
     this.isUnlocked = false,
     this.totalResources = 0,
+    this.roadmap,
   });
 
   static fromMap(Map<String, dynamic> data) {
@@ -28,6 +30,20 @@ class Unit {
       difficulty: data["difficulty"],
       isUnlocked: data["isUnlocked"],
       totalResources: data["total-resources"] ?? 0,
+      roadmap:
+          data["roadmap"] != null
+              ? Roadmap(
+                roadmapItems: List<RoadmapItem>.from(
+                  data["roadmap"].map((e) {
+                    return RoadmapItem(
+                      id: e["roadId"],
+                      name: e["name"],
+                      difficulty: e["difficulty"],
+                    );
+                  }),
+                ),
+              )
+              : null,
     );
   }
 }

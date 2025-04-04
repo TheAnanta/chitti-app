@@ -43,7 +43,7 @@ class _UnitResourcePageState extends State<UnitResourcePage>
   @override
   void initState() {
     super.initState();
-    _tabController = TabController(length: 5, vsync: this);
+    _tabController = TabController(length: 4, vsync: this);
     _scrollController = ScrollController(
       onAttach: (scrollPosition) {
         _scrollController.addListener(() {
@@ -242,7 +242,7 @@ class _UnitResourcePageState extends State<UnitResourcePage>
                         isScrollable: true,
                         controller: _tabController,
                         tabs: [
-                          Tab(text: "Roadmap"),
+                          // Tab(text: "Roadmap"),
                           Tab(text: "Videos"),
                           Tab(text: "Notes"),
                           Tab(text: "Cheatsheets"),
@@ -261,7 +261,7 @@ class _UnitResourcePageState extends State<UnitResourcePage>
               child: TabBarView(
                 controller: _tabController,
                 children: [
-                  _buildRoadmapView(widget.unit.roadmap),
+                  // _buildRoadmapView(widget.unit.roadmap),
                   _buildVideoView(widget.unit.videos, widget.courseId),
                   _buildNotesView(widget.unit.notes, widget.courseId),
                   _buildCheatsheetView(

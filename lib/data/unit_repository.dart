@@ -9,10 +9,11 @@ class UnitRepository {
     BuildContext context,
     String subjectId,
     Unit unit,
+    String roadmapId,
   ) async {
     // Fetch units from API
-    if (fetchedUnits.containsKey("$subjectId/${unit.unitId}")) {
-      return fetchedUnits["$subjectId/${unit.unitId}"]!;
+    if (fetchedUnits.containsKey("$subjectId/${unit.unitId}/$roadmapId")) {
+      return fetchedUnits["$subjectId/${unit.unitId}/$roadmapId"]!;
     }
     var (
       roadmap,
@@ -20,7 +21,7 @@ class UnitRepository {
       notes,
       cheatsheet,
       impQuestions,
-    ) = await fetchResourcesForUnit(context, subjectId, unit.unitId);
+    ) = await fetchResourcesForUnit(context, subjectId, unit.unitId, roadmapId);
     final unitWithResources = UnitWithResources(
       unitId: unit.unitId,
       name: unit.name,
@@ -33,7 +34,7 @@ class UnitRepository {
       videos: videos,
       cheatsheets: cheatsheet,
     );
-    fetchedUnits["$subjectId/${unit.unitId}"] = unitWithResources;
+    fetchedUnits["$subjectId/${unit.unitId}/$roadmapId"] = unitWithResources;
     return unitWithResources;
   }
 }

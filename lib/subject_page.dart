@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:chitti/data/semester.dart';
 import 'package:chitti/profile_page.dart';
 import 'package:chitti/unit_list_tile.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
 class SubjectPage extends StatelessWidget {
@@ -44,7 +45,7 @@ class SubjectPage extends StatelessWidget {
                 ),
                 Padding(
                   padding:
-                      Platform.isMacOS
+                      kIsWeb || Platform.isMacOS
                           ? const EdgeInsets.only(top: 24.0)
                           : const EdgeInsets.only(top: 0.0),
                   child: AppBar(
