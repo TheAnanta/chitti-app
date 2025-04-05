@@ -468,13 +468,23 @@ class _LoginScreenState extends State<LoginScreen> {
                                                       ".ASPNetCore.Session=${cook1.value}",
                                                 },
                                               ).then((responseData) async {
+                                                final currentSemester =
+                                                    r'<h6>Current Semester - \d+<\/h6>\s*<div class="box-inner">(.*?)<\/div>\s*<\/div>';
                                                 final h4CourseCode =
                                                     r'<h4\s+class="courseCode">\s*([^\s].*[^\s]|[^\s])?\s*</h4>';
 
                                                 final res =
                                                     RegExp(h4CourseCode)
                                                         .allMatches(
-                                                          responseData.body,
+                                                          RegExp(currentSemester)
+                                                                  .allMatches(
+                                                                    responseData
+                                                                        .body,
+                                                                  )
+                                                                  .toList()
+                                                                  .first
+                                                                  .group(0) ??
+                                                              responseData.body,
                                                         )
                                                         .map(
                                                           (element) =>
