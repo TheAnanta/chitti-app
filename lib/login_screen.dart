@@ -31,9 +31,12 @@ class _LoginScreenState extends State<LoginScreen> {
     return response.body
         .replaceAll(
           'id="txtusername"',
-          'id="txtusername" value="${username.toUpperCase()}"',
+          'id="txtusername" value="${username.trim().toUpperCase()}"',
         )
-        .replaceAll('id="password"', 'id="password" value="$password"')
+        .replaceAll(
+          'id="password"',
+          'id="password" value="${password.trimRight()}"',
+        )
         .replaceAll("./Login.aspx", "https://login.gitam.edu/Login.aspx");
   }
 
@@ -469,7 +472,7 @@ class _LoginScreenState extends State<LoginScreen> {
                                                 },
                                               ).then((responseData) async {
                                                 final currentSemester =
-                                                    r'<h6>Current Semester - \d+<\/h6>\s*<div class="box-inner">(.*?)<\/div>\s*<\/div>';
+                                                    r'<h6>Current Semester - \d+<\/h6>\s*<div class="box-inner">[\s\S]*?<h6>';
                                                 final h4CourseCode =
                                                     r'<h4\s+class="courseCode">\s*([^\s].*[^\s]|[^\s])?\s*</h4>';
 

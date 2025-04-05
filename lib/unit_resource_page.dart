@@ -18,6 +18,8 @@ class UnitResourcePage extends StatefulWidget {
   final String subjectName;
   final int unitIndex;
   final String subjectCoverImage;
+  final String roadmapName;
+
   const UnitResourcePage({
     super.key,
     required this.unit,
@@ -25,6 +27,7 @@ class UnitResourcePage extends StatefulWidget {
     required this.unitIndex,
     required this.subjectCoverImage,
     required this.courseId,
+    required this.roadmapName,
   });
 
   @override
@@ -188,17 +191,18 @@ class _UnitResourcePageState extends State<UnitResourcePage>
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
                                     Text(
-                                      "UNIT ${widget.unitIndex}",
+                                      widget.unit.name.toUpperCase(),
                                       style: Theme.of(
                                         context,
-                                      ).textTheme.bodyLarge?.copyWith(
+                                      ).textTheme.bodyMedium?.copyWith(
                                         fontWeight: FontWeight.w800,
                                         color: Colors.black38,
                                         fontSize: 16,
                                       ),
+                                      maxLines: 1,
                                     ),
                                     Text(
-                                      widget.unit.name,
+                                      widget.roadmapName,
                                       style: Theme.of(
                                         context,
                                       ).textTheme.titleLarge?.copyWith(
@@ -526,6 +530,60 @@ class _UnitResourcePageState extends State<UnitResourcePage>
                         ),
                       );
                     }
+                    if (cheatsheet.url.contains(".pdf")) {
+                      Navigator.of(context).push(
+                        MaterialPageRoute(
+                          builder:
+                              (context) => Scaffold(
+                                appBar: AppBar(title: Text(cheatsheet.name)),
+                                body: Center(
+                                  child: WatermarkWidget(
+                                    text:
+                                        FirebaseAuth
+                                            .instance
+                                            .currentUser
+                                            ?.uid ??
+                                        "Anonymous",
+                                    opacity: 0.05,
+                                    fontSize: 18,
+                                    child: Builder(
+                                      builder: (context) {
+                                        final viewController =
+                                            PdfViewerController();
+                                        if (viewController.isReady) {
+                                          return Center(
+                                            child: CircularProgressIndicator(),
+                                          );
+                                        }
+                                        return PdfViewer.uri(
+                                          Uri.tryParse(cheatsheet.url) ??
+                                              Uri.parse(
+                                                "https://pdfobject.com/pdf/sample.pdf",
+                                              ),
+                                          controller: viewController,
+                                          params: PdfViewerParams(
+                                            enableTextSelection: false,
+                                            loadingBannerBuilder: (
+                                              context,
+                                              bytesDownloaded,
+                                              totalBytes,
+                                            ) {
+                                              return Center(
+                                                child:
+                                                    CircularProgressIndicator(),
+                                              );
+                                            },
+                                          ),
+                                        );
+                                      },
+                                    ),
+                                  ),
+                                ),
+                              ),
+                        ),
+                      );
+                      return;
+                    }
                     showCheatsheet = !showCheatsheet;
                     setTileState(() {});
                   },
@@ -633,7 +691,8 @@ class _UnitResourcePageState extends State<UnitResourcePage>
                         SizedBox(height: 8),
                         AnimatedContainer(
                           duration: Duration(milliseconds: 500),
-                          child: showAnswer ? Text(iq.answer) : SizedBox(),
+                          child:
+                              showAnswer ? IQAnswerWidget(iq: iq) : SizedBox(),
                         ),
                       ],
                     ),
@@ -646,6 +705,70 @@ class _UnitResourcePageState extends State<UnitResourcePage>
           itemCount: iqs.length,
           shrinkWrap: true,
         );
+  }
+}
+
+class IQAnswerWidget extends StatelessWidget {
+  const IQAnswerWidget({super.key, required this.iq});
+
+  final ImportantQuestion iq;
+
+  @override
+  Widget build(BuildContext context) {
+    final answer = iq.answer;
+    final regex = RegExp(
+      r"^(.*?)\s*\[(https?:\/\/[^\s\]]+)\].*?\)\s*(.*?)$",
+      multiLine: true,
+    );
+    final matches = regex.allMatches(answer);
+
+    List<Map<String, String>> extractedData = [];
+
+    for (final match in matches) {
+      extractedData.add({
+        "textBefore": match.group(1) ?? "",
+        "url": match.group(2) ?? "",
+        "textAfter": match.group(3) ?? "",
+      });
+    }
+    print(extractedData);
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      mainAxisSize: MainAxisSize.min,
+      children: extractedData
+          .map((e) {
+            return [
+              ...(e["textBefore"] == ""
+                  ? [SizedBox()]
+                  : [
+                    Text(
+                      e["textBefore"] ?? "",
+                      style: Theme.of(
+                        context,
+                      ).textTheme.bodyMedium?.copyWith(fontSize: 14),
+                    ),
+                    SizedBox(height: 4),
+                  ]),
+              Image.network(
+                e["url"] ?? "",
+                height: 200,
+                width: double.infinity,
+                fit: BoxFit.cover,
+              ),
+              SizedBox(height: 4),
+              Text(
+                e["textAfter"] ?? "",
+                style: Theme.of(
+                  context,
+                ).textTheme.bodyMedium?.copyWith(fontSize: 14),
+              ),
+              SizedBox(height: 4),
+            ];
+          })
+          .reduce((value, element) {
+            return [...value, ...element];
+          }),
+    );
   }
 }
 

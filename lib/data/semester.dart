@@ -143,7 +143,11 @@ class Subject {
     return Subject(
       courseId: data["courseId"],
       courseCategory: data["courseCategory"],
-      title: data["title"],
+      title: data["title"]
+          .toString()
+          .split(" ")
+          .map((f) => f[0].toUpperCase() + f.substring(1).toLowerCase())
+          .join(" "),
       description: data["description"],
       icon: IconData(data["icon"], fontFamily: "MaterialIcons"),
       image: data["image"],

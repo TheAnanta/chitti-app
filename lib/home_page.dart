@@ -1,6 +1,7 @@
 import 'package:chitti/animated_image.dart';
 import 'package:chitti/color_filters.dart';
 import 'package:chitti/data/semester.dart';
+import 'package:chitti/ds.dart';
 import 'package:chitti/injector.dart';
 import 'package:chitti/profile_page.dart';
 import 'package:chitti/size_config.dart';
@@ -24,6 +25,8 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin {
   @override
   void initState() {
     super.initState();
+
+    disableScreenshot(context);
     _controller = TabController(
       length: widget.semester.courses.length,
       vsync: this,
@@ -145,134 +148,134 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin {
                             builder: (context, constraints) {
                               WindowSizeClass().init(constraints);
                               onTap(Subject subject, index) {
-                                if (getSizeClass() == WidthSizeClass.large) {
-                                  Navigator.of(context).push(
-                                    MaterialPageRoute(
-                                      builder: (context) {
-                                        return FutureBuilder(
-                                          future: Injector.unitRepository
-                                              .fetchUnit(
-                                                context,
-                                                subject.courseId,
-                                                subject.units[0],
-                                                subject
-                                                        .units[0]
-                                                        .roadmap
-                                                        ?.roadmapItems
-                                                        .firstOrNull
-                                                        ?.id ??
-                                                    "",
-                                              ),
-                                          builder: (context, futureValue) {
-                                            if (futureValue.hasData) {
-                                              final unit = futureValue.data!;
-                                              return UnitResourcePageExtended(
-                                                initialUnit: unit,
-                                                subjectName: subject.title,
-                                                initialUnitIndex: index + 1,
-                                                subjectCoverImage:
-                                                    subject.image,
-                                                courseId: subject.courseId,
-                                                subject: subject,
-                                              );
-                                            }
-                                            return Scaffold(
-                                              body: Center(
-                                                child: Column(
-                                                  mainAxisAlignment:
-                                                      MainAxisAlignment.center,
-                                                  children: [
-                                                    SizedBox(height: 128),
-                                                    CircularProgressIndicator(
-                                                      color:
-                                                          Colors.grey.shade800,
-                                                    ),
-                                                    SizedBox(height: 24),
-                                                    Align(
-                                                      alignment:
-                                                          Alignment.centerLeft,
-                                                      child: AnimatedImageEntry(
-                                                        child: Row(
-                                                          mainAxisSize:
-                                                              MainAxisSize.min,
-                                                          mainAxisAlignment:
-                                                              MainAxisAlignment
-                                                                  .start,
-                                                          children: [
-                                                            Transform.flip(
-                                                              flipX: true,
-                                                              child: Transform.translate(
-                                                                offset: Offset(
-                                                                  0,
-                                                                  48,
-                                                                ),
-                                                                child: ColorFiltered(
-                                                                  colorFilter:
-                                                                      ColorFilters.matrix(
-                                                                        saturation:
-                                                                            -1,
-                                                                        brightness:
-                                                                            0.5,
-                                                                      ),
-                                                                  child: Image.asset(
-                                                                    "assets/images/ghost_blue.png",
-                                                                    height: 180,
-                                                                  ),
-                                                                ),
-                                                              ),
-                                                            ),
-                                                            Container(
-                                                              padding:
-                                                                  EdgeInsets.all(
-                                                                    12,
-                                                                  ),
-                                                              width: 264,
-                                                              decoration: BoxDecoration(
-                                                                borderRadius:
-                                                                    BorderRadius.circular(
-                                                                      8,
-                                                                    ),
-                                                                color:
-                                                                    Colors
-                                                                        .grey
-                                                                        .shade400,
-                                                              ),
-                                                              child: Opacity(
-                                                                opacity: 0.6,
-                                                                child: Text(
-                                                                  "Go grab a break while we sneak into the server.",
-                                                                  textAlign:
-                                                                      TextAlign
-                                                                          .center,
-                                                                  style:
-                                                                      Theme.of(
-                                                                        context,
-                                                                      ).textTheme.titleMedium,
-                                                                ),
-                                                              ),
-                                                            ),
-                                                          ],
-                                                        ),
-                                                      ),
-                                                    ),
-                                                  ],
-                                                ),
-                                              ),
-                                            );
-                                          },
-                                        );
-                                      },
-                                    ),
-                                  );
-                                } else {
-                                  Navigator.of(context).push(
-                                    MaterialPageRoute(
-                                      builder:
-                                          (context) =>
-                                              SubjectPage(subject: subject),
-                                    ),
-                                  );
-                                }
+                                // if (getSizeClass() == WidthSizeClass.large) {
+                                //   Navigator.of(context).push(
+                                //     MaterialPageRoute(
+                                //       builder: (context) {
+                                //         return FutureBuilder(
+                                //           future: Injector.unitRepository
+                                //               .fetchUnit(
+                                //                 context,
+                                //                 subject.courseId,
+                                //                 subject.units[0],
+                                //                 subject
+                                //                         .units[0]
+                                //                         .roadmap
+                                //                         ?.roadmapItems
+                                //                         .firstOrNull
+                                //                         ?.id ??
+                                //                     "",
+                                //               ),
+                                //           builder: (context, futureValue) {
+                                //             if (futureValue.hasData) {
+                                //               final unit = futureValue.data!;
+                                //               return UnitResourcePageExtended(
+                                //                 initialUnit: unit,
+                                //                 subjectName: subject.title,
+                                //                 initialUnitIndex: index + 1,
+                                //                 subjectCoverImage:
+                                //                     subject.image,
+                                //                 courseId: subject.courseId,
+                                //                 subject: subject,
+                                //               );
+                                //             }
+                                //             return Scaffold(
+                                //               body: Center(
+                                //                 child: Column(
+                                //                   mainAxisAlignment:
+                                //                       MainAxisAlignment.center,
+                                //                   children: [
+                                //                     SizedBox(height: 128),
+                                //                     CircularProgressIndicator(
+                                //                       color:
+                                //                           Colors.grey.shade800,
+                                //                     ),
+                                //                     SizedBox(height: 24),
+                                //                     Align(
+                                //                       alignment:
+                                //                           Alignment.centerLeft,
+                                //                       child: AnimatedImageEntry(
+                                //                         child: Row(
+                                //                           mainAxisSize:
+                                //                               MainAxisSize.min,
+                                //                           mainAxisAlignment:
+                                //                               MainAxisAlignment
+                                //                                   .start,
+                                //                           children: [
+                                //                             Transform.flip(
+                                //                               flipX: true,
+                                //                               child: Transform.translate(
+                                //                                 offset: Offset(
+                                //                                   0,
+                                //                                   48,
+                                //                                 ),
+                                //                                 child: ColorFiltered(
+                                //                                   colorFilter:
+                                //                                       ColorFilters.matrix(
+                                //                                         saturation:
+                                //                                             -1,
+                                //                                         brightness:
+                                //                                             0.5,
+                                //                                       ),
+                                //                                   child: Image.asset(
+                                //                                     "assets/images/ghost_blue.png",
+                                //                                     height: 180,
+                                //                                   ),
+                                //                                 ),
+                                //                               ),
+                                //                             ),
+                                //                             Container(
+                                //                               padding:
+                                //                                   EdgeInsets.all(
+                                //                                     12,
+                                //                                   ),
+                                //                               width: 264,
+                                //                               decoration: BoxDecoration(
+                                //                                 borderRadius:
+                                //                                     BorderRadius.circular(
+                                //                                       8,
+                                //                                     ),
+                                //                                 color:
+                                //                                     Colors
+                                //                                         .grey
+                                //                                         .shade400,
+                                //                               ),
+                                //                               child: Opacity(
+                                //                                 opacity: 0.6,
+                                //                                 child: Text(
+                                //                                   "Go grab a break while we sneak into the server.",
+                                //                                   textAlign:
+                                //                                       TextAlign
+                                //                                           .center,
+                                //                                   style:
+                                //                                       Theme.of(
+                                //                                         context,
+                                //                                       ).textTheme.titleMedium,
+                                //                                 ),
+                                //                               ),
+                                //                             ),
+                                //                           ],
+                                //                         ),
+                                //                       ),
+                                //                     ),
+                                //                   ],
+                                //                 ),
+                                //               ),
+                                //             );
+                                //           },
+                                //         );
+                                //       },
+                                //     ),
+                                //   );
+                                // } else {
+                                Navigator.of(context).push(
+                                  MaterialPageRoute(
+                                    builder:
+                                        (context) =>
+                                            SubjectPage(subject: subject),
+                                  ),
+                                );
+                                // }
                               }
 
                               itemBuilder(_, index) {
@@ -312,59 +315,85 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin {
                               }
 
                               return getSizeClass() == WidthSizeClass.large
-                                  ? GridView.builder(
-                                    gridDelegate:
-                                        SliverGridDelegateWithFixedCrossAxisCount(
-                                          crossAxisCount: 3,
-                                          childAspectRatio: 1.8,
-                                        ),
-                                    itemBuilder: (_, index) {
-                                      final subject = subjects[index];
-                                      return Container(
-                                        decoration: BoxDecoration(
-                                          borderRadius: BorderRadius.circular(
-                                            12,
+                                  ? Padding(
+                                    padding: const EdgeInsets.all(16.0),
+                                    child: GridView.builder(
+                                      gridDelegate:
+                                          SliverGridDelegateWithFixedCrossAxisCount(
+                                            crossAxisCount: 3,
+                                            childAspectRatio: 1.8,
+                                            crossAxisSpacing: 16,
+                                            mainAxisSpacing: 16,
                                           ),
-                                          color: Colors.blue.shade100,
-                                        ),
-                                        padding: EdgeInsets.symmetric(
-                                          vertical: 12,
-                                          horizontal: 24,
-                                        ).copyWith(bottom: 0),
-                                        child: InkWell(
-                                          onTap: () => onTap(subject, index),
-                                          child: Column(
-                                            crossAxisAlignment:
-                                                CrossAxisAlignment.start,
-                                            mainAxisSize: MainAxisSize.min,
-                                            children: [
-                                              Icon(subject.icon),
-                                              SizedBox(height: 24),
-                                              Text(
-                                                subject.title,
-                                                style: Theme.of(context)
-                                                    .textTheme
-                                                    .titleMedium
-                                                    ?.copyWith(
-                                                      fontWeight:
-                                                          FontWeight.w600,
-                                                    ),
-                                              ),
-                                              Text(
-                                                subject.description,
-                                                maxLines: 1,
-                                                overflow: TextOverflow.ellipsis,
-                                              ),
-                                              Spacer(),
-                                              LinearProgressIndicator(
-                                                value: subject.progress,
-                                              ),
-                                            ],
+                                      itemBuilder: (_, index) {
+                                        final subject = subjects[index];
+                                        return Container(
+                                          decoration: BoxDecoration(
+                                            borderRadius: BorderRadius.circular(
+                                              12,
+                                            ),
+                                            color: Colors.blue.shade100,
                                           ),
-                                        ),
-                                      );
-                                    },
-                                    itemCount: subjects.length,
+
+                                          child: InkWell(
+                                            onTap: () => onTap(subject, index),
+                                            child: Column(
+                                              crossAxisAlignment:
+                                                  CrossAxisAlignment.start,
+                                              mainAxisSize: MainAxisSize.min,
+                                              children: [
+                                                Padding(
+                                                  padding: const EdgeInsets.all(
+                                                    16.0,
+                                                  ),
+                                                  child: Column(
+                                                    crossAxisAlignment:
+                                                        CrossAxisAlignment
+                                                            .start,
+                                                    mainAxisSize:
+                                                        MainAxisSize.min,
+                                                    children: [
+                                                      Icon(subject.icon),
+                                                      SizedBox(height: 24),
+                                                      Text(
+                                                        subject.title,
+                                                        style: Theme.of(context)
+                                                            .textTheme
+                                                            .titleMedium
+                                                            ?.copyWith(
+                                                              fontWeight:
+                                                                  FontWeight
+                                                                      .w600,
+                                                            ),
+                                                      ),
+                                                      Text(
+                                                        subject.description,
+                                                        maxLines: 2,
+                                                        overflow:
+                                                            TextOverflow
+                                                                .ellipsis,
+                                                      ),
+                                                    ],
+                                                  ),
+                                                ),
+                                                Spacer(),
+                                                LinearProgressIndicator(
+                                                  backgroundColor: Color(
+                                                    0xFF053F5C,
+                                                  ),
+                                                  value: subject.progress,
+                                                  borderRadius:
+                                                      BorderRadius.circular(12),
+                                                  minHeight: 6,
+                                                  color: Color(0xFFF27F0C),
+                                                ),
+                                              ],
+                                            ),
+                                          ),
+                                        );
+                                      },
+                                      itemCount: subjects.length,
+                                    ),
                                   )
                                   : ListView.separated(
                                     itemCount: subjects.length,
