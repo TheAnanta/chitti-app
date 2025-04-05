@@ -1,13 +1,21 @@
+import 'dart:convert';
+
 import 'package:chitti/animated_image.dart';
 import 'package:chitti/color_filters.dart';
 import 'package:chitti/data/semester.dart';
+import 'package:chitti/domain/fetch_semester.dart';
+import 'package:chitti/home_page.dart';
 import 'package:chitti/injector.dart';
 import 'package:chitti/unit_resource_page.dart';
 import 'package:collection/collection.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:http/http.dart';
+import 'package:razorpay_flutter/razorpay_flutter.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class UnitListTile extends StatelessWidget {
-  const UnitListTile({
+  UnitListTile({
     super.key,
     required this.units,
     required this.subjectName,
@@ -22,6 +30,7 @@ class UnitListTile extends StatelessWidget {
   final List<Unit> units;
   final String subjectCoverImage;
   final Function(Unit)? onUnitTap;
+  ValueNotifier<bool> isLoading = ValueNotifier(false);
 
   @override
   Widget build(BuildContext context) {
@@ -41,7 +50,7 @@ class UnitListTile extends StatelessWidget {
             return Divider();
           },
           itemBuilder: (context, index) {
-            onTapUnitTile(String roadmapId) {
+            onTapUnitTile(String roadmapId, String roadmapName) {
               if (units[index].isUnlocked) {
                 final selectedUnit = units[index];
                 if (onUnitTap != null) {
@@ -69,6 +78,7 @@ class UnitListTile extends StatelessWidget {
                               unitIndex: index + 1,
                               subjectCoverImage: subjectCoverImage,
                               courseId: courseId,
+                              roadmapName: roadmapName,
                             );
                           }
                           return Scaffold(
@@ -142,12 +152,12 @@ class UnitListTile extends StatelessWidget {
               } else {
                 showModalBottomSheet(
                   context: context,
-                  builder: (context) {
+                  builder: (sheetContext) {
                     return BottomSheet(
                       onClosing: () {
-                        Navigator.of(context).pop();
+                        Navigator.of(sheetContext).pop();
                       },
-                      builder: (context) {
+                      builder: (sheetContext) {
                         return Padding(
                           padding: const EdgeInsets.all(24.0),
                           child: Column(
@@ -156,7 +166,9 @@ class UnitListTile extends StatelessWidget {
                             children: [
                               Text(
                                 "Subscribe",
-                                style: Theme.of(context).textTheme.headlineSmall
+                                style: Theme.of(sheetContext)
+                                    .textTheme
+                                    .headlineSmall
                                     ?.copyWith(fontWeight: FontWeight.bold),
                               ),
                               Text(
@@ -171,105 +183,305 @@ class UnitListTile extends StatelessWidget {
                                     crossAxisAlignment:
                                         CrossAxisAlignment.start,
                                     children: [
-                                      Row(
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.end,
-                                        children: [
-                                          Opacity(
-                                            opacity: 0.6,
-                                            child: Text(
-                                              "₹",
-                                              style:
-                                                  Theme.of(
-                                                    context,
-                                                  ).textTheme.titleLarge,
-                                            ),
-                                          ),
-                                          SizedBox(width: 2),
-                                          Text(
-                                            "20",
-                                            style: Theme.of(context)
-                                                .textTheme
-                                                .headlineLarge
-                                                ?.copyWith(height: 1),
-                                          ),
-                                        ],
+                                      SizedBox(height: 8),
+                                      Text(
+                                        "What you get",
+                                        style: Theme.of(
+                                          sheetContext,
+                                        ).textTheme.titleMedium?.copyWith(
+                                          fontWeight: FontWeight.bold,
+                                        ),
                                       ),
                                       SizedBox(height: 8),
-                                      Text("Notes"),
-                                    ],
-                                  ),
-                                  Column(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    children: [
-                                      Row(
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.end,
-                                        children: [
-                                          Opacity(
-                                            opacity: 0.6,
-                                            child: Text(
-                                              "₹",
-                                              style:
-                                                  Theme.of(
-                                                    context,
-                                                  ).textTheme.titleLarge,
-                                            ),
-                                          ),
-                                          SizedBox(width: 2),
-                                          Text(
-                                            "70",
-                                            style: Theme.of(context)
-                                                .textTheme
-                                                .headlineLarge
-                                                ?.copyWith(height: 1),
-                                          ),
-                                        ],
+                                      Text(
+                                        "• All Units\n• All Roadmaps\n• All Resources\n• All Videos\n• All Notes\n• All Cheatsheets\n• All Important Questions",
                                       ),
-                                      SizedBox(height: 8),
-                                      Text("Videos"),
-                                    ],
-                                  ),
-                                  Column(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    children: [
-                                      Row(
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.end,
-                                        children: [
-                                          Opacity(
-                                            opacity: 0.6,
-                                            child: Text(
-                                              "₹",
-                                              style:
-                                                  Theme.of(
-                                                    context,
-                                                  ).textTheme.titleLarge,
-                                            ),
-                                          ),
-                                          SizedBox(width: 2),
-                                          Text(
-                                            "120",
-                                            style: Theme.of(context)
-                                                .textTheme
-                                                .headlineLarge
-                                                ?.copyWith(height: 1),
-                                          ),
-                                        ],
-                                      ),
-                                      SizedBox(height: 8),
-                                      Text("All Access"),
                                     ],
                                   ),
                                 ],
                               ),
                               SizedBox(height: 16),
-                              FilledButton(
-                                onPressed: () {},
-                                child: Text("Pay Now"),
+                              Row(
+                                crossAxisAlignment: CrossAxisAlignment.end,
+                                children: [
+                                  Opacity(
+                                    opacity: 0.4,
+                                    child: Text(
+                                      "₹180",
+                                      style: Theme.of(
+                                        sheetContext,
+                                      ).textTheme.headlineMedium?.copyWith(
+                                        decoration: TextDecoration.lineThrough,
+                                      ),
+                                    ),
+                                  ),
+                                  SizedBox(width: 8),
+                                  Opacity(
+                                    opacity: 0.6,
+                                    child: Text(
+                                      "₹",
+                                      style: Theme.of(
+                                        sheetContext,
+                                      ).textTheme.titleLarge?.copyWith(
+                                        color:
+                                            Theme.of(
+                                              sheetContext,
+                                            ).colorScheme.primary,
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                    ),
+                                  ),
+                                  SizedBox(width: 2),
+                                  Text(
+                                    "109",
+                                    style: Theme.of(
+                                      sheetContext,
+                                    ).textTheme.headlineLarge?.copyWith(
+                                      height: 1,
+                                      color:
+                                          Theme.of(
+                                            sheetContext,
+                                          ).colorScheme.primary,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
+                                  Text(
+                                    ".56",
+                                    style: Theme.of(
+                                      sheetContext,
+                                    ).textTheme.titleSmall?.copyWith(
+                                      color:
+                                          Theme.of(
+                                            sheetContext,
+                                          ).colorScheme.primary,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
+                                  Spacer(),
+                                  FilledButton(
+                                    onPressed: () async {
+                                      isLoading.value = true;
+
+                                      //TODO: Change the payment later
+                                      final razorpayAPIRequest = await post(
+                                        Uri.parse(
+                                          "https://asia-south1-chitti-ananta.cloudfunctions.net/createOrder",
+                                        ),
+                                        body: jsonEncode({
+                                          "userId":
+                                              FirebaseAuth
+                                                  .instance
+                                                  .currentUser
+                                                  ?.uid,
+                                          "amount": 100,
+                                        }),
+                                        headers: {
+                                          'Content-Type': 'application/json',
+                                        },
+                                      );
+                                      if (razorpayAPIRequest.statusCode !=
+                                          200) {
+                                        ScaffoldMessenger.of(
+                                          context,
+                                        ).showSnackBar(
+                                          SnackBar(
+                                            behavior: SnackBarBehavior.floating,
+                                            content: Text(
+                                              "Error: ${razorpayAPIRequest.body}",
+                                            ),
+                                          ),
+                                        );
+                                        return;
+                                      }
+                                      final razorpayAPIResponse =
+                                          (json.decode(
+                                            razorpayAPIRequest.body,
+                                          ))["id"];
+                                      var _razorpay = Razorpay();
+                                      var options = {
+                                        'order_id': razorpayAPIResponse,
+                                        'key': 'rzp_live_dXsSgWNlpWQ07d',
+                                        'amount': 100,
+                                        'name': 'Score With CHITTI.',
+                                        'description':
+                                            "Purchasing subscription to study $subjectName",
+                                      };
+                                      _razorpay.on(Razorpay.EVENT_PAYMENT_SUCCESS, (
+                                        PaymentSuccessResponse response,
+                                      ) {
+                                        print("Payment Success");
+                                        print(response);
+                                        Future.delayed(Duration(seconds: 10), () async {
+                                          final oldAuthToken =
+                                              await FirebaseAuth
+                                                  .instance
+                                                  .currentUser
+                                                  ?.getIdToken();
+                                          final loginRequest = await post(
+                                            Uri.parse(
+                                              "https://asia-south1-chitti-ananta.cloudfunctions.net/webApi/reauthenticate",
+                                            ),
+                                            headers: {
+                                              "Content-Type":
+                                                  "application/json",
+                                              "Authorization":
+                                                  "Bearer $oldAuthToken",
+                                            },
+                                            body: json.encode({
+                                              "rollNo":
+                                                  FirebaseAuth
+                                                      .instance
+                                                      .currentUser
+                                                      ?.uid,
+                                            }),
+                                          );
+                                          if (loginRequest.statusCode == 404) {
+                                            // MARK: Alert the user on wrong authentication details
+                                            isLoading.value = false;
+                                            if (sheetContext.mounted) {
+                                              ScaffoldMessenger.of(
+                                                sheetContext,
+                                              ).showSnackBar(
+                                                SnackBar(
+                                                  content: Text(
+                                                    json.decode(
+                                                      loginRequest.body,
+                                                    )["message"],
+                                                  ),
+                                                ),
+                                              );
+                                            }
+                                          } else if (loginRequest.statusCode ==
+                                              403) {
+                                            // MARK: Alert the user on wrong authentication details
+                                            isLoading.value = false;
+                                            if (sheetContext.mounted) {
+                                              ScaffoldMessenger.of(
+                                                sheetContext,
+                                              ).showSnackBar(
+                                                SnackBar(
+                                                  content: Text(
+                                                    json.decode(
+                                                      loginRequest.body,
+                                                    )["message"],
+                                                  ),
+                                                ),
+                                              );
+                                            }
+                                          } else {
+                                            // MARK: Authenticate the user
+                                            final result = json.decode(
+                                              loginRequest.body,
+                                            );
+                                            final userCredential =
+                                                await FirebaseAuth.instance
+                                                    .signInWithCustomToken(
+                                                      result["token"],
+                                                    );
+                                            FirebaseAuth.instance.currentUser!.getIdToken(true).then((
+                                              token,
+                                            ) {
+                                              if (token == null) {
+                                                isLoading.value = false;
+                                                if (sheetContext.mounted) {
+                                                  ScaffoldMessenger.of(
+                                                    sheetContext,
+                                                  ).showSnackBar(
+                                                    SnackBar(
+                                                      content: Text(
+                                                        "Unable to create token.",
+                                                      ),
+                                                    ),
+                                                  );
+                                                }
+                                                return;
+                                              }
+                                              try {
+                                                fetchSemester(token).then((
+                                                  semester,
+                                                ) {
+                                                  SharedPreferences.getInstance().then((
+                                                    sharedPreferences,
+                                                  ) {
+                                                    Navigator.of(context).pop();
+                                                    if (context.mounted) {
+                                                      Navigator.of(
+                                                        context,
+                                                      ).pushReplacement(
+                                                        MaterialPageRoute(
+                                                          builder:
+                                                              (
+                                                                context,
+                                                              ) => MyHomePage(
+                                                                name:
+                                                                    userCredential
+                                                                        .user
+                                                                        ?.displayName
+                                                                        ?.split(
+                                                                          " ",
+                                                                        )[0] ??
+                                                                    "User",
+                                                                semester:
+                                                                    semester,
+                                                              ),
+                                                        ),
+                                                      );
+                                                    }
+                                                  });
+                                                });
+                                              } on Exception catch (e) {
+                                                isLoading.value = false;
+                                                if (sheetContext.mounted) {
+                                                  ScaffoldMessenger.of(
+                                                    sheetContext,
+                                                  ).showSnackBar(
+                                                    SnackBar(
+                                                      content: Text(
+                                                        e.toString(),
+                                                      ),
+                                                    ),
+                                                  );
+                                                }
+                                              }
+                                            });
+                                          }
+                                          isLoading.value = false;
+                                          Navigator.of(sheetContext).pop();
+                                        });
+                                      });
+                                      _razorpay.on(
+                                        Razorpay.EVENT_PAYMENT_ERROR,
+                                        (PaymentFailureResponse response) {
+                                          print("Payment Error");
+                                          print(response);
+                                          Navigator.of(sheetContext).pop();
+                                          ScaffoldMessenger.of(
+                                            sheetContext,
+                                          ).showSnackBar(
+                                            SnackBar(
+                                              behavior:
+                                                  SnackBarBehavior.floating,
+                                              content: Text(
+                                                "Error: ${response.message}",
+                                              ),
+                                            ),
+                                          );
+                                        },
+                                      );
+                                      _razorpay.open(options);
+                                    },
+                                    child: ValueListenableBuilder<bool>(
+                                      valueListenable: isLoading,
+                                      builder: (sheetContext, value, child) {
+                                        return value
+                                            ? CircularProgressIndicator()
+                                            : Text("Pay Now");
+                                      },
+                                    ),
+                                  ),
+                                ],
                               ),
+
                               SizedBox(height: 16),
                             ],
                           ),
@@ -295,15 +507,15 @@ class UnitListTile extends StatelessWidget {
                   final roadmapItem =
                       (units[index].roadmap?.roadmapItems ?? []).sorted((a, b) {
                         final strengthA =
-                            a.difficulty == "Easy"
+                            a.difficulty == "beginner"
                                 ? 1
-                                : a.difficulty == "Medium"
+                                : a.difficulty == "intermediate"
                                 ? 2
                                 : 3;
                         final strengthB =
-                            b.difficulty == "Easy"
+                            b.difficulty == "beginner"
                                 ? 1
-                                : b.difficulty == "Medium"
+                                : b.difficulty == "intermediate"
                                 ? 2
                                 : 3;
                         return strengthB.compareTo(strengthA);
@@ -312,6 +524,8 @@ class UnitListTile extends StatelessWidget {
                     onTap: () {
                       onTapUnitTile(
                         units[index].roadmap?.roadmapItems[topicIndex].id ?? "",
+                        units[index].roadmap?.roadmapItems[topicIndex].name ??
+                            "",
                       );
                     },
                     title: Text(
@@ -330,9 +544,9 @@ class UnitListTile extends StatelessWidget {
                         Builder(
                           builder: (context) {
                             final strength =
-                                roadmapItem.difficulty == "Easy"
+                                roadmapItem.difficulty == "beginner"
                                     ? 1
-                                    : roadmapItem.difficulty == "Medium"
+                                    : roadmapItem.difficulty == "intermediate"
                                     ? 2
                                     : 3;
                             return Row(

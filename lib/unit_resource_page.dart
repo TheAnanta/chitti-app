@@ -18,6 +18,8 @@ class UnitResourcePage extends StatefulWidget {
   final String subjectName;
   final int unitIndex;
   final String subjectCoverImage;
+  final String roadmapName;
+
   const UnitResourcePage({
     super.key,
     required this.unit,
@@ -25,6 +27,7 @@ class UnitResourcePage extends StatefulWidget {
     required this.unitIndex,
     required this.subjectCoverImage,
     required this.courseId,
+    required this.roadmapName,
   });
 
   @override
@@ -188,17 +191,18 @@ class _UnitResourcePageState extends State<UnitResourcePage>
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
                                     Text(
-                                      "UNIT ${widget.unitIndex}",
+                                      widget.unit.name.toUpperCase(),
                                       style: Theme.of(
                                         context,
-                                      ).textTheme.bodyLarge?.copyWith(
+                                      ).textTheme.bodyMedium?.copyWith(
                                         fontWeight: FontWeight.w800,
                                         color: Colors.black38,
                                         fontSize: 16,
                                       ),
+                                      maxLines: 1,
                                     ),
                                     Text(
-                                      widget.unit.name,
+                                      widget.roadmapName,
                                       style: Theme.of(
                                         context,
                                       ).textTheme.titleLarge?.copyWith(
