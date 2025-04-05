@@ -49,6 +49,7 @@ dependencies:
   pdfrx: ^1.1.13
   video_player: ^2.9.3
   razorpay_flutter: ^1.4.0
+  no_screenshot: ^0.3.1
 
 dev_dependencies:
   flutter_test:

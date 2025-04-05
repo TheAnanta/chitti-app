@@ -9,6 +9,7 @@ import 'package:chitti/injector.dart';
 import 'package:chitti/unit_resource_page.dart';
 import 'package:collection/collection.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart';
 import 'package:razorpay_flutter/razorpay_flutter.dart';
@@ -51,7 +52,40 @@ class UnitListTile extends StatelessWidget {
           },
           itemBuilder: (context, index) {
             onTapUnitTile(String roadmapId, String roadmapName) {
-              if (units[index].isUnlocked) {
+              if (index != 0 && kIsWeb) {
+                showModalBottomSheet(
+                  context: context,
+                  builder: (sheetContext) {
+                    return BottomSheet(
+                      onClosing: () {
+                        Navigator.of(sheetContext).pop();
+                      },
+                      builder: (sheetContext) {
+                        return Padding(
+                          padding: const EdgeInsets.all(24.0),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Text(
+                                "Download the App",
+                                style: Theme.of(sheetContext)
+                                    .textTheme
+                                    .headlineSmall
+                                    ?.copyWith(fontWeight: FontWeight.bold),
+                              ),
+                              Text(
+                                "Sorry, we currently don't support accessing all units from our web app. Instead, download our mobile app from the Play Store/App Store.\n\nUnlock a wide range of features and units that we offer.",
+                              ),
+                              SizedBox(height: 16),
+                            ],
+                          ),
+                        );
+                      },
+                    );
+                  },
+                );
+              } else if (units[index].isUnlocked) {
                 final selectedUnit = units[index];
                 if (onUnitTap != null) {
                   onUnitTap!(selectedUnit);

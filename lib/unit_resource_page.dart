@@ -530,6 +530,60 @@ class _UnitResourcePageState extends State<UnitResourcePage>
                         ),
                       );
                     }
+                    if (cheatsheet.url.contains(".pdf")) {
+                      Navigator.of(context).push(
+                        MaterialPageRoute(
+                          builder:
+                              (context) => Scaffold(
+                                appBar: AppBar(title: Text(cheatsheet.name)),
+                                body: Center(
+                                  child: WatermarkWidget(
+                                    text:
+                                        FirebaseAuth
+                                            .instance
+                                            .currentUser
+                                            ?.uid ??
+                                        "Anonymous",
+                                    opacity: 0.05,
+                                    fontSize: 18,
+                                    child: Builder(
+                                      builder: (context) {
+                                        final viewController =
+                                            PdfViewerController();
+                                        if (viewController.isReady) {
+                                          return Center(
+                                            child: CircularProgressIndicator(),
+                                          );
+                                        }
+                                        return PdfViewer.uri(
+                                          Uri.tryParse(cheatsheet.url) ??
+                                              Uri.parse(
+                                                "https://pdfobject.com/pdf/sample.pdf",
+                                              ),
+                                          controller: viewController,
+                                          params: PdfViewerParams(
+                                            enableTextSelection: false,
+                                            loadingBannerBuilder: (
+                                              context,
+                                              bytesDownloaded,
+                                              totalBytes,
+                                            ) {
+                                              return Center(
+                                                child:
+                                                    CircularProgressIndicator(),
+                                              );
+                                            },
+                                          ),
+                                        );
+                                      },
+                                    ),
+                                  ),
+                                ),
+                              ),
+                        ),
+                      );
+                      return;
+                    }
                     showCheatsheet = !showCheatsheet;
                     setTileState(() {});
                   },
