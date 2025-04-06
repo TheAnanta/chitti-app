@@ -329,25 +329,30 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin {
                               return getSizeClass() == WidthSizeClass.large
                                   ? Padding(
                                     padding: const EdgeInsets.all(16.0),
-                                    child: Wrap(
-                                      children:
-                                          subjects.mapIndexed((index, subject) {
-                                            return ConstrainedBox(
-                                              constraints: BoxConstraints(
-                                                maxWidth: 300,
-                                                minWidth: 200,
-                                              ),
-                                              child: AspectRatio(
-                                                aspectRatio: 1.1,
-                                                child: SubjectCardExpanded(
-                                                  subject: subject,
-                                                  onTap: (subject) {
-                                                    onTap(subject, index);
-                                                  },
+                                    child: SingleChildScrollView(
+                                      child: Wrap(
+                                        children:
+                                            subjects.mapIndexed((
+                                              index,
+                                              subject,
+                                            ) {
+                                              return ConstrainedBox(
+                                                constraints: BoxConstraints(
+                                                  maxWidth: 300,
+                                                  minWidth: 200,
                                                 ),
-                                              ),
-                                            );
-                                          }).toList(),
+                                                child: AspectRatio(
+                                                  aspectRatio: 1.1,
+                                                  child: SubjectCardExpanded(
+                                                    subject: subject,
+                                                    onTap: (subject) {
+                                                      onTap(subject, index);
+                                                    },
+                                                  ),
+                                                ),
+                                              );
+                                            }).toList(),
+                                      ),
                                     ),
                                   )
                                   : ListView.separated(
@@ -408,6 +413,8 @@ class SubjectCardExpanded extends StatelessWidget {
                     style: Theme.of(context).textTheme.titleMedium?.copyWith(
                       fontWeight: FontWeight.w800,
                     ),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
                   ),
                   Opacity(
                     opacity: 0.7,

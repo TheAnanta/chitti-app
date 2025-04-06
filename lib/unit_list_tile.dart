@@ -3,15 +3,19 @@ import 'dart:convert';
 import 'package:chitti/animated_image.dart';
 import 'package:chitti/color_filters.dart';
 import 'package:chitti/data/semester.dart';
+import 'package:chitti/domain/fetch_resources.dart';
 import 'package:chitti/domain/fetch_semester.dart';
 import 'package:chitti/home_page.dart';
 import 'package:chitti/injector.dart';
+import 'package:chitti/pdf_doc/pdf_main.dart';
 import 'package:chitti/unit_resource_page.dart';
+import 'package:chitti/watermark_widget.dart';
 import 'package:collection/collection.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart';
+import 'package:pdfrx/pdfrx.dart';
 import 'package:razorpay_flutter/razorpay_flutter.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -85,7 +89,7 @@ class UnitListTile extends StatelessWidget {
                     );
                   },
                 );
-              } else if (units[index].isUnlocked) {
+              } else if (units[index].isUnlocked && roadmapId != "IMPQUES") {
                 final selectedUnit = units[index];
                 if (onUnitTap != null) {
                   onUnitTap!(selectedUnit);
@@ -181,6 +185,49 @@ class UnitListTile extends StatelessWidget {
                         },
                       );
                     },
+                  ),
+                );
+              } else if (roadmapId == "IMPQUES") {
+                //TODO: Fetch the PDF url
+                addCompletedResource(
+                  context,
+                  CompletedResources(
+                    courseId: courseId,
+                    resourceId: units[index].importantQuestions!.id,
+                    resourceName: units[index].name,
+                  ),
+                );
+                Navigator.of(context).push(
+                  MaterialPageRoute(
+                    builder:
+                        (context) => Scaffold(
+                          body: Center(
+                            child: WatermarkWidget(
+                              text:
+                                  FirebaseAuth.instance.currentUser?.uid ??
+                                  "Anonymous",
+                              opacity: 0.05,
+                              fontSize: 18,
+                              child: Builder(
+                                builder: (context) {
+                                  final uri =
+                                      Uri.tryParse(
+                                        units[index].importantQuestions!.url,
+                                      ) ??
+                                      Uri.parse(
+                                        "https://pdfobject.com/pdf/sample.pdf",
+                                      );
+                                  final pdfDocumentRef = PdfDocumentRefUri(uri);
+                                  return PDFViewPage(
+                                    documentRef: pdfDocumentRef,
+                                    pdfName:
+                                        '${units[index].name} - Important Questions',
+                                  );
+                                },
+                              ),
+                            ),
+                          ),
+                        ),
                   ),
                 );
               } else {
@@ -527,90 +574,129 @@ class UnitListTile extends StatelessWidget {
               }
             }
 
-            return ExpansionTile(
-              title: Text(
-                "${index + 1}. ${units[index].name}",
-                style: Theme.of(
-                  context,
-                ).textTheme.bodyLarge?.copyWith(fontWeight: FontWeight.bold),
-              ),
-              shape: Border(),
-              children: List.generate(
-                units[index].roadmap?.roadmapItems.length ?? 0,
-                (topicIndex) {
-                  final roadmapItem =
-                      (units[index].roadmap?.roadmapItems ?? []).sorted((a, b) {
-                        final strengthA =
-                            a.difficulty == "beginner"
-                                ? 1
-                                : a.difficulty == "intermediate"
-                                ? 2
-                                : 3;
-                        final strengthB =
-                            b.difficulty == "beginner"
-                                ? 1
-                                : b.difficulty == "intermediate"
-                                ? 2
-                                : 3;
-                        return strengthB.compareTo(strengthA);
-                      }).toList()[topicIndex];
-                  return ListTile(
-                    onTap: () {
-                      onTapUnitTile(
-                        units[index].roadmap?.roadmapItems[topicIndex].id ?? "",
-                        units[index].roadmap?.roadmapItems[topicIndex].name ??
-                            "",
-                      );
-                    },
-                    title: Text(
-                      units[index].roadmap?.roadmapItems[topicIndex].name ?? "",
-                      style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                        fontWeight: FontWeight.w500,
-                        color:
-                            units[index].isUnlocked
-                                ? Colors.grey.shade800
-                                : Colors.grey.shade400,
-                      ),
-                    ),
-                    trailing: Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Builder(
-                          builder: (context) {
-                            final strength =
-                                roadmapItem.difficulty == "beginner"
-                                    ? 1
-                                    : roadmapItem.difficulty == "intermediate"
-                                    ? 2
-                                    : 3;
-                            return Row(
-                              children:
-                                  List.generate(
-                                    strength,
-                                    (index) => Icon(
-                                      Icons.star,
-                                      color: Colors.amber,
-                                      size: 16,
-                                    ),
-                                  ).toList(),
-                            );
-                          },
+            return InkWell(
+              onTap: () {
+                if (!units[index].isUnlocked) {
+                  onTapUnitTile("PAYMENT", "PAYMENT");
+                }
+              },
+              child: ExpansionTile(
+                title: Text(
+                  "${index + 1}. ${units[index].name}",
+                  style: Theme.of(
+                    context,
+                  ).textTheme.bodyLarge?.copyWith(fontWeight: FontWeight.bold),
+                ),
+                shape: Border(),
+                enabled: units[index].isUnlocked,
+                children: List.generate(
+                  (units[index].roadmap?.roadmapItems.length ?? 0) +
+                      (units[index].importantQuestions != null ? 1 : 0),
+                  (topicIndex) {
+                    if (topicIndex ==
+                        units[index].roadmap?.roadmapItems.length) {
+                      return ListTile(
+                        title: Text(
+                          "Important Questions",
+                          style: Theme.of(
+                            context,
+                          ).textTheme.bodyLarge?.copyWith(
+                            fontWeight: FontWeight.w500,
+                            color:
+                                units[index].isUnlocked
+                                    ? Colors.grey.shade800
+                                    : Colors.grey.shade400,
+                          ),
                         ),
-                        Icon(
+                        onTap: () {
+                          onTapUnitTile("IMPQUES", "IMPQUES");
+                        },
+                        trailing: Icon(
                           units[index].isUnlocked
                               ? Icons.chevron_right_outlined
                               : Icons.lock_outline,
                         ),
-                      ],
-                    ),
-                  );
-                },
+                      );
+                    }
+                    final roadmapItem =
+                        (units[index].roadmap?.roadmapItems ?? []).sorted((
+                          a,
+                          b,
+                        ) {
+                          final strengthA =
+                              a.difficulty == "beginner"
+                                  ? 1
+                                  : a.difficulty == "intermediate"
+                                  ? 2
+                                  : 3;
+                          final strengthB =
+                              b.difficulty == "beginner"
+                                  ? 1
+                                  : b.difficulty == "intermediate"
+                                  ? 2
+                                  : 3;
+                          return strengthB.compareTo(strengthA);
+                        }).toList()[topicIndex];
+                    return ListTile(
+                      onTap: () {
+                        onTapUnitTile(
+                          units[index].roadmap?.roadmapItems[topicIndex].id ??
+                              "",
+                          units[index].roadmap?.roadmapItems[topicIndex].name ??
+                              "",
+                        );
+                      },
+                      title: Text(
+                        units[index].roadmap?.roadmapItems[topicIndex].name ??
+                            "",
+                        style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                          fontWeight: FontWeight.w500,
+                          color:
+                              units[index].isUnlocked
+                                  ? Colors.grey.shade800
+                                  : Colors.grey.shade400,
+                        ),
+                      ),
+                      trailing: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Builder(
+                            builder: (context) {
+                              final strength =
+                                  roadmapItem.difficulty == "beginner"
+                                      ? 1
+                                      : roadmapItem.difficulty == "intermediate"
+                                      ? 2
+                                      : 3;
+                              return Row(
+                                children:
+                                    List.generate(
+                                      strength,
+                                      (index) => Icon(
+                                        Icons.star,
+                                        color: Colors.amber,
+                                        size: 16,
+                                      ),
+                                    ).toList(),
+                              );
+                            },
+                          ),
+                          Icon(
+                            units[index].isUnlocked
+                                ? Icons.chevron_right_outlined
+                                : Icons.lock_outline,
+                          ),
+                        ],
+                      ),
+                    );
+                  },
+                ),
+                // trailing: Icon(
+                //   units[index].isUnlocked
+                //       ? Icons.chevron_right_outlined
+                //       : Icons.lock_outline,
+                // ),
               ),
-              // trailing: Icon(
-              //   units[index].isUnlocked
-              //       ? Icons.chevron_right_outlined
-              //       : Icons.lock_outline,
-              // ),
             );
           },
           itemCount: units.length,

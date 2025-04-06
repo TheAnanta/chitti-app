@@ -12,7 +12,6 @@ Future<
     List<Video>?,
     List<Notes>?,
     List<Cheatsheet>?,
-    List<ImportantQuestion>?,
   )
 >
 fetchResourcesForUnit(
@@ -140,7 +139,7 @@ fetchResourcesForUnit(
   // });
   // print(roadmap);
   // return (roadmap, video, notes, cheatsheet);
-  var (roadmap, videos, notes, cheatsheet, impQuestions) = (
+  var (roadmap, videos, notes, cheatsheet) = (
     Roadmap(
       roadmapItems:
           (data?["roadmap"] as List<dynamic>? ?? []).map((e) {
@@ -169,17 +168,9 @@ fetchResourcesForUnit(
           (e) => Cheatsheet(name: e["name"], url: e["url"], id: e["cheatId"]),
         )
         .toList(),
-    (data?["importantQuestions"] as List<dynamic>? ?? []).map((e) {
-      return ImportantQuestion(
-        id: e["iqId"],
-        question: e["question"],
-        answer: e["answer"],
-        tag: e["tag"],
-      );
-    }).toList(),
   );
   //TODO: HANDLE ERRORS FROM API LIKE FORBIDDEN
-  return (roadmap, videos, notes, cheatsheet, impQuestions);
+  return (roadmap, videos, notes, cheatsheet);
 }
 
 Future<String> addCompletedResource(
