@@ -21,13 +21,13 @@ class _LoginScreenState extends State<LoginScreen> {
   Map<String, dynamic>? payload;
   var username = "";
   var password = "";
+  var gitamPageDetails = "";
   final _usernameController = TextEditingController();
   final _passwordController = TextEditingController();
   final isLoading = ValueNotifier<bool>(false);
   getGITAMLoginPage() async {
-    final response = await get(Uri.parse('https://login.gitam.edu/Login.aspx'));
     // print(response.body);
-    return response.body
+    return gitamPageDetails
         .replaceAll(
           'id="txtusername"',
           'id="txtusername" value="${username.trim().toUpperCase()}"',
@@ -185,6 +185,10 @@ class _LoginScreenState extends State<LoginScreen> {
                                             );
                                             if (loginRequest.statusCode ==
                                                 404) {
+                                              gitamPageDetails =
+                                                  (json.decode(
+                                                    loginRequest.body,
+                                                  ))["webpage"];
                                               setState(() {});
                                             } else if (loginRequest
                                                     .statusCode ==
