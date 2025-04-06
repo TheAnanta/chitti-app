@@ -11,6 +11,7 @@ import 'package:collection/collection.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class MyHomePage extends StatefulWidget {
   final String name;
@@ -51,6 +52,21 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin {
               ),
             ),
             actions: [
+              IconButton(
+                onPressed: () {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text(
+                        "Report a bug or issue to us at scorewithchitti@gmail.com",
+                      ),
+                      duration: Duration(seconds: 2),
+                    ),
+                  );
+                  launchUrl(Uri.parse("mailto:scorewithchitti@gmail.com"));
+                },
+                icon: Icon(Icons.bug_report_outlined),
+              ),
+              SizedBox(width: 8),
               IconButton(
                 onPressed: () {
                   Navigator.of(context).push(
@@ -342,7 +358,7 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin {
                                                   minWidth: 200,
                                                 ),
                                                 child: AspectRatio(
-                                                  aspectRatio: 1.1,
+                                                  aspectRatio: 0.98,
                                                   child: SubjectCardExpanded(
                                                     subject: subject,
                                                     onTap: (subject) {
@@ -426,6 +442,24 @@ class SubjectCardExpanded extends StatelessWidget {
                         fontWeight: FontWeight.w300,
                       ),
                     ),
+                  ),
+                  SizedBox(height: 16),
+                  Row(
+                    children: [
+                      Text(
+                        "Start Learning",
+                        style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                          fontWeight: FontWeight.w800,
+                          color: Color(0xFF053F5C),
+                        ),
+                      ),
+                      SizedBox(width: 8),
+                      Icon(
+                        Icons.chevron_right_outlined,
+                        color: Color(0xFF053F5C),
+                        size: 16,
+                      ),
+                    ],
                   ),
                 ],
               ),
