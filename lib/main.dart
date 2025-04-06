@@ -6,10 +6,11 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:pdfrx/pdfrx.dart';
+import 'package:fvp/fvp.dart' as fvp;
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
-
+  fvp.registerWith();
   Pdfrx.webRuntimeType = PdfrxWebRuntimeType.pdfiumWasm;
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
   runApp(const MyApp());

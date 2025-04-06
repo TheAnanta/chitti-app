@@ -354,7 +354,7 @@ class UnitListTile extends StatelessWidget {
                                                   .instance
                                                   .currentUser
                                                   ?.uid,
-                                          "amount": 100,
+                                          "amount": 10956,
                                         }),
                                         headers: {
                                           'Content-Type': 'application/json',
@@ -382,7 +382,7 @@ class UnitListTile extends StatelessWidget {
                                       var options = {
                                         'order_id': razorpayAPIResponse,
                                         'key': 'rzp_live_dXsSgWNlpWQ07d',
-                                        'amount': 100,
+                                        'amount': 10956,
                                         'name': 'Score With CHITTI.',
                                         'description':
                                             "Purchasing subscription to study $subjectName",
