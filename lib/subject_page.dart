@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:chitti/data/semester.dart';
 import 'package:chitti/profile_page.dart';
 import 'package:chitti/unit_list_tile.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
@@ -67,7 +68,17 @@ class SubjectPage extends StatelessWidget {
                             ),
                           );
                         },
-                        icon: Icon(Icons.account_circle_outlined),
+                        icon: ClipOval(
+                          child: CircleAvatar(
+                            child: Image.network(
+                              "https://doeresults.gitam.edu/photo/img.aspx?id=${FirebaseAuth.instance.currentUser!.uid}",
+                              fit: BoxFit.cover,
+                              width: double.infinity,
+                              height: double.infinity,
+                              alignment: Alignment.topCenter,
+                            ),
+                          ),
+                        ),
                       ),
                     ],
                   ),
@@ -98,7 +109,7 @@ class SubjectPage extends StatelessWidget {
                         SizedBox(height: 8),
                         Text(
                           subject.description,
-                          maxLines: 3,
+                          maxLines: 2,
                           overflow: TextOverflow.ellipsis,
                         ),
                         SizedBox(height: 20),

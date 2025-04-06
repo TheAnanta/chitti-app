@@ -5,6 +5,7 @@ import 'package:chitti/data/important_questions.dart';
 import 'package:chitti/data/semester.dart';
 import 'package:chitti/domain/fetch_resources.dart';
 import 'package:chitti/injector.dart';
+import 'package:chitti/pdf_doc/pdf_main.dart';
 import 'package:chitti/profile_page.dart';
 import 'package:chitti/watermark_widget.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -171,7 +172,17 @@ class _UnitResourcePageState extends State<UnitResourcePage>
                                         ),
                                       );
                                     },
-                                    icon: Icon(Icons.account_circle_outlined),
+                                    icon: ClipOval(
+                                      child: CircleAvatar(
+                                        child: Image.network(
+                                          "https://doeresults.gitam.edu/photo/img.aspx?id=${FirebaseAuth.instance.currentUser!.uid}",
+                                          fit: BoxFit.cover,
+                                          width: double.infinity,
+                                          height: double.infinity,
+                                          alignment: Alignment.topCenter,
+                                        ),
+                                      ),
+                                    ),
                                   ),
                                 ],
                               ),
@@ -219,7 +230,7 @@ class _UnitResourcePageState extends State<UnitResourcePage>
                                       opacity: 1 - (_scrollOffset / 134),
                                       child: Text(
                                         widget.unit.description,
-                                        maxLines: 3,
+                                        maxLines: 2,
                                         overflow: TextOverflow.ellipsis,
                                         style: Theme.of(context)
                                             .textTheme
@@ -309,7 +320,6 @@ class _UnitResourcePageState extends State<UnitResourcePage>
                   MaterialPageRoute(
                     builder:
                         (context) => Scaffold(
-                          appBar: AppBar(title: Text(notesItem.name)),
                           body: Center(
                             child: WatermarkWidget(
                               text:
@@ -319,30 +329,15 @@ class _UnitResourcePageState extends State<UnitResourcePage>
                               fontSize: 18,
                               child: Builder(
                                 builder: (context) {
-                                  final viewController = PdfViewerController();
-                                  if (viewController.isReady) {
-                                    return Center(
-                                      child: CircularProgressIndicator(),
-                                    );
-                                  }
-                                  return PdfViewer.uri(
-                                    Uri.tryParse(notesItem.url) ??
-                                        Uri.parse(
-                                          "https://pdfobject.com/pdf/sample.pdf",
-                                        ),
-                                    controller: viewController,
-                                    params: PdfViewerParams(
-                                      enableTextSelection: false,
-                                      loadingBannerBuilder: (
-                                        context,
-                                        bytesDownloaded,
-                                        totalBytes,
-                                      ) {
-                                        return Center(
-                                          child: CircularProgressIndicator(),
-                                        );
-                                      },
-                                    ),
+                                  final uri =
+                                      Uri.tryParse(notesItem.url) ??
+                                      Uri.parse(
+                                        "https://pdfobject.com/pdf/sample.pdf",
+                                      );
+                                  final pdfDocumentRef = PdfDocumentRefUri(uri);
+                                  return PDFViewPage(
+                                    documentRef: pdfDocumentRef,
+                                    pdfName: notesItem.name,
                                   );
                                 },
                               ),
@@ -467,11 +462,11 @@ class _UnitResourcePageState extends State<UnitResourcePage>
                     fontWeight: FontWeight.bold,
                   ),
                 ),
-                Text(
-                  "Compiler design is a complex process that involves multiple stages and requires a deep understanding of both the programming language and the target platform.",
-                  maxLines: 2,
-                  style: Theme.of(context).textTheme.bodySmall,
-                ),
+                // Text(
+                //   // videos[index].,
+                //   maxLines: 2,
+                //   style: Theme.of(context).textTheme.bodySmall,
+                // ),
               ],
             );
           },
@@ -535,7 +530,6 @@ class _UnitResourcePageState extends State<UnitResourcePage>
                         MaterialPageRoute(
                           builder:
                               (context) => Scaffold(
-                                appBar: AppBar(title: Text(cheatsheet.name)),
                                 body: Center(
                                   child: WatermarkWidget(
                                     text:
@@ -548,32 +542,16 @@ class _UnitResourcePageState extends State<UnitResourcePage>
                                     fontSize: 18,
                                     child: Builder(
                                       builder: (context) {
-                                        final viewController =
-                                            PdfViewerController();
-                                        if (viewController.isReady) {
-                                          return Center(
-                                            child: CircularProgressIndicator(),
-                                          );
-                                        }
-                                        return PdfViewer.uri(
-                                          Uri.tryParse(cheatsheet.url) ??
-                                              Uri.parse(
-                                                "https://pdfobject.com/pdf/sample.pdf",
-                                              ),
-                                          controller: viewController,
-                                          params: PdfViewerParams(
-                                            enableTextSelection: false,
-                                            loadingBannerBuilder: (
-                                              context,
-                                              bytesDownloaded,
-                                              totalBytes,
-                                            ) {
-                                              return Center(
-                                                child:
-                                                    CircularProgressIndicator(),
-                                              );
-                                            },
-                                          ),
+                                        final uri =
+                                            Uri.tryParse(cheatsheet.url) ??
+                                            Uri.parse(
+                                              "https://pdfobject.com/pdf/sample.pdf",
+                                            );
+                                        final pdfDocumentRef =
+                                            PdfDocumentRefUri(uri);
+                                        return PDFViewPage(
+                                          documentRef: pdfDocumentRef,
+                                          pdfName: cheatsheet.name,
                                         );
                                       },
                                     ),
@@ -691,8 +669,7 @@ class _UnitResourcePageState extends State<UnitResourcePage>
                         SizedBox(height: 8),
                         AnimatedContainer(
                           duration: Duration(milliseconds: 500),
-                          child:
-                              showAnswer ? IQAnswerWidget(iq: iq) : SizedBox(),
+                          child: showAnswer ? (Text(iq.answer)) : SizedBox(),
                         ),
                       ],
                     ),

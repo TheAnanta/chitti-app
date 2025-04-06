@@ -160,7 +160,17 @@ class _UnitResourcePageExtendedState extends State<UnitResourcePageExtended>
                               ),
                             );
                           },
-                          icon: Icon(Icons.account_circle_outlined),
+                          icon: ClipOval(
+                            child: CircleAvatar(
+                              child: Image.network(
+                                "https://doeresults.gitam.edu/photo/img.aspx?id=${FirebaseAuth.instance.currentUser!.uid}",
+                                fit: BoxFit.cover,
+                                width: double.infinity,
+                                height: double.infinity,
+                                alignment: Alignment.topCenter,
+                              ),
+                            ),
+                          ),
                         ),
                       ],
                     ),
@@ -435,7 +445,7 @@ class _UnitResourcePageExtendedState extends State<UnitResourcePageExtended>
                                                           (_scrollOffset / 134),
                                                       child: Text(
                                                         unit.description,
-                                                        maxLines: 3,
+                                                        maxLines: 2,
                                                         overflow:
                                                             TextOverflow
                                                                 .ellipsis,
@@ -702,11 +712,11 @@ class _UnitResourcePageExtendedState extends State<UnitResourcePageExtended>
                     fontWeight: FontWeight.bold,
                   ),
                 ),
-                Text(
-                  "Compiler design is a complex process that involves multiple stages and requires a deep understanding of both the programming language and the target platform.",
-                  maxLines: 2,
-                  style: Theme.of(context).textTheme.bodySmall,
-                ),
+                // Text(
+                //   "Compiler design is a complex process that involves multiple stages and requires a deep understanding of both the programming language and the target platform.",
+                //   maxLines: 2,
+                //   style: Theme.of(context).textTheme.bodySmall,
+                // ),
               ],
             );
           },

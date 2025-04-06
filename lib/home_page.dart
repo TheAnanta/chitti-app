@@ -7,7 +7,9 @@ import 'package:chitti/profile_page.dart';
 import 'package:chitti/size_config.dart';
 import 'package:chitti/subject_page.dart';
 import 'package:chitti/unit_resources_page_large.dart';
+import 'package:collection/collection.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 
 class MyHomePage extends StatefulWidget {
@@ -55,7 +57,17 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin {
                     MaterialPageRoute(builder: (context) => ProfilePage()),
                   );
                 },
-                icon: Icon(Icons.account_circle_outlined),
+                icon: ClipOval(
+                  child: CircleAvatar(
+                    child: Image.network(
+                      "https://doeresults.gitam.edu/photo/img.aspx?id=${FirebaseAuth.instance.currentUser!.uid}",
+                      fit: BoxFit.cover,
+                      width: double.infinity,
+                      height: double.infinity,
+                      alignment: Alignment.topCenter,
+                    ),
+                  ),
+                ),
               ),
             ],
           ),
@@ -81,7 +93,7 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            "Just checking up on you.",
+                            "All the best!",
                             style: Theme.of(
                               context,
                             ).textTheme.titleLarge?.copyWith(
@@ -98,21 +110,21 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin {
                               color: Colors.white.withValues(alpha: 0.6),
                             ),
                           ),
-                          TextButton(
-                            onPressed: () {},
-                            style: TextButton.styleFrom(
-                              overlayColor: Color(0xFF053F5C),
-                            ),
-                            child: Text(
-                              "Explore More".toUpperCase(),
-                              style: Theme.of(
-                                context,
-                              ).textTheme.bodyLarge?.copyWith(
-                                fontWeight: FontWeight.w800,
-                                color: Color(0xFF053F5C),
-                              ),
-                            ),
-                          ),
+                          // TextButton(
+                          //   onPressed: () {},
+                          //   style: TextButton.styleFrom(
+                          //     overlayColor: Color(0xFF053F5C),
+                          //   ),
+                          //   child: Text(
+                          //     "Explore More".toUpperCase(),
+                          //     style: Theme.of(
+                          //       context,
+                          //     ).textTheme.bodyLarge?.copyWith(
+                          //       fontWeight: FontWeight.w800,
+                          //       color: Color(0xFF053F5C),
+                          //     ),
+                          //   ),
+                          // ),
                         ],
                       ),
                     ),
@@ -317,82 +329,25 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin {
                               return getSizeClass() == WidthSizeClass.large
                                   ? Padding(
                                     padding: const EdgeInsets.all(16.0),
-                                    child: GridView.builder(
-                                      gridDelegate:
-                                          SliverGridDelegateWithFixedCrossAxisCount(
-                                            crossAxisCount: 3,
-                                            childAspectRatio: 1.8,
-                                            crossAxisSpacing: 16,
-                                            mainAxisSpacing: 16,
-                                          ),
-                                      itemBuilder: (_, index) {
-                                        final subject = subjects[index];
-                                        return Container(
-                                          decoration: BoxDecoration(
-                                            borderRadius: BorderRadius.circular(
-                                              12,
-                                            ),
-                                            color: Colors.blue.shade100,
-                                          ),
-
-                                          child: InkWell(
-                                            onTap: () => onTap(subject, index),
-                                            child: Column(
-                                              crossAxisAlignment:
-                                                  CrossAxisAlignment.start,
-                                              mainAxisSize: MainAxisSize.min,
-                                              children: [
-                                                Padding(
-                                                  padding: const EdgeInsets.all(
-                                                    16.0,
-                                                  ),
-                                                  child: Column(
-                                                    crossAxisAlignment:
-                                                        CrossAxisAlignment
-                                                            .start,
-                                                    mainAxisSize:
-                                                        MainAxisSize.min,
-                                                    children: [
-                                                      Icon(subject.icon),
-                                                      SizedBox(height: 24),
-                                                      Text(
-                                                        subject.title,
-                                                        style: Theme.of(context)
-                                                            .textTheme
-                                                            .titleMedium
-                                                            ?.copyWith(
-                                                              fontWeight:
-                                                                  FontWeight
-                                                                      .w600,
-                                                            ),
-                                                      ),
-                                                      Text(
-                                                        subject.description,
-                                                        maxLines: 2,
-                                                        overflow:
-                                                            TextOverflow
-                                                                .ellipsis,
-                                                      ),
-                                                    ],
-                                                  ),
+                                    child: Wrap(
+                                      children:
+                                          subjects.mapIndexed((index, subject) {
+                                            return ConstrainedBox(
+                                              constraints: BoxConstraints(
+                                                maxWidth: 300,
+                                                minWidth: 200,
+                                              ),
+                                              child: AspectRatio(
+                                                aspectRatio: 1.1,
+                                                child: SubjectCardExpanded(
+                                                  subject: subject,
+                                                  onTap: (subject) {
+                                                    onTap(subject, index);
+                                                  },
                                                 ),
-                                                Spacer(),
-                                                LinearProgressIndicator(
-                                                  backgroundColor: Color(
-                                                    0xFF053F5C,
-                                                  ),
-                                                  value: subject.progress,
-                                                  borderRadius:
-                                                      BorderRadius.circular(12),
-                                                  minHeight: 6,
-                                                  color: Color(0xFFF27F0C),
-                                                ),
-                                              ],
-                                            ),
-                                          ),
-                                        );
-                                      },
-                                      itemCount: subjects.length,
+                                              ),
+                                            );
+                                          }).toList(),
                                     ),
                                   )
                                   : ListView.separated(
@@ -412,6 +367,73 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin {
           ),
         );
       },
+    );
+  }
+}
+
+class SubjectCardExpanded extends StatelessWidget {
+  const SubjectCardExpanded({
+    super.key,
+    required this.subject,
+    required this.onTap,
+  });
+
+  final Subject subject;
+  final Function(Subject subject) onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    return Card.outlined(
+      clipBehavior: Clip.hardEdge,
+      child: InkWell(
+        onTap: () => onTap(subject),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Image.network(
+              subject.image,
+              height: 160,
+              width: double.infinity,
+              fit: BoxFit.cover,
+            ),
+            Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Text(
+                    subject.title,
+                    style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                      fontWeight: FontWeight.w800,
+                    ),
+                  ),
+                  Opacity(
+                    opacity: 0.7,
+                    child: Text(
+                      subject.description,
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
+                      style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                        fontWeight: FontWeight.w300,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            Spacer(),
+            LinearProgressIndicator(
+              backgroundColor: Color(0xFF053F5C),
+              value: subject.progress,
+              borderRadius: BorderRadius.circular(12),
+              minHeight: 6,
+              color: Color(0xFFF27F0C),
+            ),
+          ],
+        ),
+      ),
     );
   }
 }
