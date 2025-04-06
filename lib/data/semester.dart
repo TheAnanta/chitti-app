@@ -12,11 +12,13 @@ class Unit {
   final bool isUnlocked;
   final int totalResources;
   final Roadmap? roadmap;
+  final ImportantQuestion? importantQuestions;
   const Unit({
     required this.unitId,
     required this.name,
     required this.description,
     required this.difficulty,
+    required this.importantQuestions,
     this.isUnlocked = false,
     this.totalResources = 0,
     this.roadmap,
@@ -30,6 +32,14 @@ class Unit {
       difficulty: data["difficulty"],
       isUnlocked: data["isUnlocked"],
       totalResources: data["total-resources"] ?? 0,
+      importantQuestions:
+          data["importantQuestions"] != null
+              ? List<ImportantQuestion>.from(
+                data["importantQuestions"].map((e) {
+                  return ImportantQuestion(id: e["iqId"], url: e["url"]);
+                }),
+              ).firstOrNull
+              : null,
       roadmap:
           data["roadmap"] != null
               ? Roadmap(
@@ -97,7 +107,6 @@ class UnitWithResources {
   final String difficulty;
   final String description;
   final bool isUnlocked;
-  final List<ImportantQuestion>? importantQuestions;
   final Roadmap? roadmap;
   final List<Video>? videos;
   final List<Notes>? notes;
@@ -109,7 +118,6 @@ class UnitWithResources {
     required this.description,
     required this.difficulty,
     this.isUnlocked = false,
-    this.importantQuestions,
     this.roadmap,
     this.notes,
     this.videos,

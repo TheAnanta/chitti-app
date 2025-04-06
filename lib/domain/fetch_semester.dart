@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:chitti/data/semester.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:http/http.dart';
 
 Future<Semester> fetchSemester(String token) async {
@@ -22,6 +23,7 @@ Future<Semester> fetchSemester(String token) async {
       final message = response["message"];
       throw Exception(message);
     } catch (e) {
+      await FirebaseAuth.instance.signOut();
       throw Exception("Unable to fetch semester, $e");
     }
   }

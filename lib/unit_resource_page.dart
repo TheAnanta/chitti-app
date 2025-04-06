@@ -1,7 +1,7 @@
 import 'dart:math' show max, min;
 
+import 'package:chewie/chewie.dart';
 import 'package:chitti/color_filters.dart';
-import 'package:chitti/data/important_questions.dart';
 import 'package:chitti/data/semester.dart';
 import 'package:chitti/domain/fetch_resources.dart';
 import 'package:chitti/injector.dart';
@@ -47,7 +47,7 @@ class _UnitResourcePageState extends State<UnitResourcePage>
   @override
   void initState() {
     super.initState();
-    _tabController = TabController(length: 4, vsync: this);
+    _tabController = TabController(length: 3, vsync: this);
     _scrollController = ScrollController(
       onAttach: (scrollPosition) {
         _scrollController.addListener(() {
@@ -261,7 +261,6 @@ class _UnitResourcePageState extends State<UnitResourcePage>
                           Tab(text: "Videos"),
                           Tab(text: "Notes"),
                           Tab(text: "Cheatsheets"),
-                          Tab(text: "Important Questions"),
                         ],
                       ),
                     ),
@@ -283,7 +282,6 @@ class _UnitResourcePageState extends State<UnitResourcePage>
                     widget.unit.cheatsheets,
                     widget.courseId,
                   ),
-                  _buildIQView(widget.unit.importantQuestions, widget.courseId),
                 ],
               ),
             ),
@@ -608,146 +606,146 @@ class _UnitResourcePageState extends State<UnitResourcePage>
         );
   }
 
-  Widget _buildIQView(List<ImportantQuestion>? iqs, String courseId) {
-    return iqs == null
-        ? Center(child: Text("You haven't purchased a valid subscription."))
-        : iqs.isEmpty
-        ? Center(child: Text("No important questions available."))
-        : ListView.separated(
-          padding: EdgeInsets.all(0),
-          itemBuilder: (context, index) {
-            final iq = iqs[index];
-            var showAnswer = false;
-            return StatefulBuilder(
-              builder: (context, setTileState) {
-                return InkWell(
-                  onTap: () {
-                    if (!showAnswer) {
-                      addCompletedResource(
-                        context,
-                        CompletedResources(
-                          courseId: courseId,
-                          resourceId: iq.id,
-                          resourceName: iq.question,
-                        ),
-                      );
-                    }
-                    showAnswer = !showAnswer;
-                    setTileState(() {});
-                  },
-                  child: Padding(
-                    padding: const EdgeInsets.all(16.0),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Opacity(
-                          opacity: 0.5,
-                          child: Text(
-                            iq.tag.toUpperCase(),
-                            style: Theme.of(context).textTheme.bodySmall
-                                ?.copyWith(fontWeight: FontWeight.bold),
-                          ),
-                        ),
-                        SizedBox(height: 4),
-                        Row(
-                          children: [
-                            Expanded(
-                              child: Text(
-                                iq.question,
-                                style: Theme.of(context).textTheme.bodyLarge
-                                    ?.copyWith(fontWeight: FontWeight.w600),
-                              ),
-                            ),
-                            SizedBox(width: 24),
-                            AnimatedRotation(
-                              turns: showAnswer ? 0.25 : 0,
-                              duration: Duration(milliseconds: 500),
-                              child: Icon(Icons.chevron_right),
-                            ),
-                          ],
-                        ),
-                        SizedBox(height: 8),
-                        AnimatedContainer(
-                          duration: Duration(milliseconds: 500),
-                          child: showAnswer ? (Text(iq.answer)) : SizedBox(),
-                        ),
-                      ],
-                    ),
-                  ),
-                );
-              },
-            );
-          },
-          separatorBuilder: (_, __) => Divider(),
-          itemCount: iqs.length,
-          shrinkWrap: true,
-        );
-  }
+  //   Widget _buildIQView(List<ImportantQuestion>? iqs, String courseId) {
+  //     return iqs == null
+  //         ? Center(child: Text("You haven't purchased a valid subscription."))
+  //         : iqs.isEmpty
+  //         ? Center(child: Text("No important questions available."))
+  //         : ListView.separated(
+  //           padding: EdgeInsets.all(0),
+  //           itemBuilder: (context, index) {
+  //             final iq = iqs[index];
+  //             var showAnswer = false;
+  //             return StatefulBuilder(
+  //               builder: (context, setTileState) {
+  //                 return InkWell(
+  //                   onTap: () {
+  //                     if (!showAnswer) {
+  //                       addCompletedResource(
+  //                         context,
+  //                         CompletedResources(
+  //                           courseId: courseId,
+  //                           resourceId: iq.id,
+  //                           resourceName: iq.question,
+  //                         ),
+  //                       );
+  //                     }
+  //                     showAnswer = !showAnswer;
+  //                     setTileState(() {});
+  //                   },
+  //                   child: Padding(
+  //                     padding: const EdgeInsets.all(16.0),
+  //                     child: Column(
+  //                       crossAxisAlignment: CrossAxisAlignment.start,
+  //                       children: [
+  //                         Opacity(
+  //                           opacity: 0.5,
+  //                           child: Text(
+  //                             iq.tag.toUpperCase(),
+  //                             style: Theme.of(context).textTheme.bodySmall
+  //                                 ?.copyWith(fontWeight: FontWeight.bold),
+  //                           ),
+  //                         ),
+  //                         SizedBox(height: 4),
+  //                         Row(
+  //                           children: [
+  //                             Expanded(
+  //                               child: Text(
+  //                                 iq.question,
+  //                                 style: Theme.of(context).textTheme.bodyLarge
+  //                                     ?.copyWith(fontWeight: FontWeight.w600),
+  //                               ),
+  //                             ),
+  //                             SizedBox(width: 24),
+  //                             AnimatedRotation(
+  //                               turns: showAnswer ? 0.25 : 0,
+  //                               duration: Duration(milliseconds: 500),
+  //                               child: Icon(Icons.chevron_right),
+  //                             ),
+  //                           ],
+  //                         ),
+  //                         SizedBox(height: 8),
+  //                         AnimatedContainer(
+  //                           duration: Duration(milliseconds: 500),
+  //                           child: showAnswer ? (Text(iq.answer)) : SizedBox(),
+  //                         ),
+  //                       ],
+  //                     ),
+  //                   ),
+  //                 );
+  //               },
+  //             );
+  //           },
+  //           separatorBuilder: (_, __) => Divider(),
+  //           itemCount: iqs.length,
+  //           shrinkWrap: true,
+  //         );
+  //   }
 }
 
-class IQAnswerWidget extends StatelessWidget {
-  const IQAnswerWidget({super.key, required this.iq});
+// class IQAnswerWidget extends StatelessWidget {
+//   const IQAnswerWidget({super.key, required this.iq});
 
-  final ImportantQuestion iq;
+//   final ImportantQuestion iq;
 
-  @override
-  Widget build(BuildContext context) {
-    final answer = iq.answer;
-    final regex = RegExp(
-      r"^(.*?)\s*\[(https?:\/\/[^\s\]]+)\].*?\)\s*(.*?)$",
-      multiLine: true,
-    );
-    final matches = regex.allMatches(answer);
+//   @override
+//   Widget build(BuildContext context) {
+//     final answer = iq.answer;
+//     final regex = RegExp(
+//       r"^(.*?)\s*\[(https?:\/\/[^\s\]]+)\].*?\)\s*(.*?)$",
+//       multiLine: true,
+//     );
+//     final matches = regex.allMatches(answer);
 
-    List<Map<String, String>> extractedData = [];
+//     List<Map<String, String>> extractedData = [];
 
-    for (final match in matches) {
-      extractedData.add({
-        "textBefore": match.group(1) ?? "",
-        "url": match.group(2) ?? "",
-        "textAfter": match.group(3) ?? "",
-      });
-    }
-    print(extractedData);
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      mainAxisSize: MainAxisSize.min,
-      children: extractedData
-          .map((e) {
-            return [
-              ...(e["textBefore"] == ""
-                  ? [SizedBox()]
-                  : [
-                    Text(
-                      e["textBefore"] ?? "",
-                      style: Theme.of(
-                        context,
-                      ).textTheme.bodyMedium?.copyWith(fontSize: 14),
-                    ),
-                    SizedBox(height: 4),
-                  ]),
-              Image.network(
-                e["url"] ?? "",
-                height: 200,
-                width: double.infinity,
-                fit: BoxFit.cover,
-              ),
-              SizedBox(height: 4),
-              Text(
-                e["textAfter"] ?? "",
-                style: Theme.of(
-                  context,
-                ).textTheme.bodyMedium?.copyWith(fontSize: 14),
-              ),
-              SizedBox(height: 4),
-            ];
-          })
-          .reduce((value, element) {
-            return [...value, ...element];
-          }),
-    );
-  }
-}
+//     for (final match in matches) {
+//       extractedData.add({
+//         "textBefore": match.group(1) ?? "",
+//         "url": match.group(2) ?? "",
+//         "textAfter": match.group(3) ?? "",
+//       });
+//     }
+//     print(extractedData);
+//     return Column(
+//       crossAxisAlignment: CrossAxisAlignment.start,
+//       mainAxisSize: MainAxisSize.min,
+//       children: extractedData
+//           .map((e) {
+//             return [
+//               ...(e["textBefore"] == ""
+//                   ? [SizedBox()]
+//                   : [
+//                     Text(
+//                       e["textBefore"] ?? "",
+//                       style: Theme.of(
+//                         context,
+//                       ).textTheme.bodyMedium?.copyWith(fontSize: 14),
+//                     ),
+//                     SizedBox(height: 4),
+//                   ]),
+//               Image.network(
+//                 e["url"] ?? "",
+//                 height: 200,
+//                 width: double.infinity,
+//                 fit: BoxFit.cover,
+//               ),
+//               SizedBox(height: 4),
+//               Text(
+//                 e["textAfter"] ?? "",
+//                 style: Theme.of(
+//                   context,
+//                 ).textTheme.bodyMedium?.copyWith(fontSize: 14),
+//               ),
+//               SizedBox(height: 4),
+//             ];
+//           })
+//           .reduce((value, element) {
+//             return [...value, ...element];
+//           }),
+//     );
+//   }
+// }
 
 class VideoPlayerWidget extends StatefulWidget {
   final Video video;
@@ -791,39 +789,6 @@ class _VideoPlayerWidgetState extends State<VideoPlayerWidget> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      floatingActionButton: ValueListenableBuilder<bool>(
-        valueListenable: _isCompletedPlaying,
-        builder: (context, isCompletedPlaying, child) {
-          return FloatingActionButton(
-            onPressed: () {
-              if (isCompletedPlaying) {
-                _controller.play();
-                setState(() {});
-                return;
-              }
-              // Wrap the play or pause in a call to `setState`. This ensures the
-              // correct icon is shown.
-              setState(() {
-                // If the video is playing, pause it.
-                if (_controller.value.isPlaying) {
-                  _controller.pause();
-                } else {
-                  // If the video is paused, play it.
-                  _controller.play();
-                }
-              });
-            },
-            // Display the correct icon depending on the state of the player.
-            child: Icon(
-              isCompletedPlaying
-                  ? Icons.replay
-                  : _controller.value.isPlaying
-                  ? Icons.pause
-                  : Icons.play_arrow,
-            ),
-          );
-        },
-      ),
       body: Center(
         child: Stack(
           children: [
@@ -845,7 +810,11 @@ class _VideoPlayerWidgetState extends State<VideoPlayerWidget> {
                         child: SizedBox(
                           width: _controller.value.size.width,
                           height: _controller.value.size.height,
-                          child: VideoPlayer(_controller),
+                          child: Chewie(
+                            controller: ChewieController(
+                              videoPlayerController: _controller,
+                            ),
+                          ),
                         ),
                       ),
                     );
