@@ -314,7 +314,7 @@ class UnitListTile extends StatelessWidget {
                                   ),
                                   SizedBox(width: 2),
                                   Text(
-                                    "109",
+                                    "99",
                                     style: Theme.of(
                                       sheetContext,
                                     ).textTheme.headlineLarge?.copyWith(
@@ -337,6 +337,13 @@ class UnitListTile extends StatelessWidget {
                                           ).colorScheme.primary,
                                       fontWeight: FontWeight.bold,
                                     ),
+                                  ),
+                                  Text(
+                                    " (exc. of taxes)",
+                                    style:
+                                        Theme.of(
+                                          sheetContext,
+                                        ).textTheme.bodySmall?.copyWith(),
                                   ),
                                   Spacer(),
                                   FilledButton(
@@ -623,19 +630,19 @@ class UnitListTile extends StatelessWidget {
                           a,
                           b,
                         ) {
-                          final strengthA =
-                              a.difficulty == "beginner"
-                                  ? 1
-                                  : a.difficulty == "intermediate"
-                                  ? 2
-                                  : 3;
-                          final strengthB =
-                              b.difficulty == "beginner"
-                                  ? 1
-                                  : b.difficulty == "intermediate"
-                                  ? 2
-                                  : 3;
-                          return strengthB.compareTo(strengthA);
+                          // final strengthA =
+                          //     a.difficulty == "beginner"
+                          //         ? 1
+                          //         : a.difficulty == "intermediate"
+                          //         ? 2
+                          //         : 3;
+                          // final strengthB =
+                          //     b.difficulty == "beginner"
+                          //         ? 1
+                          //         : b.difficulty == "intermediate"
+                          //         ? 2
+                          //         : 3;
+                          return a.name.compareTo(b.name);
                         }).toList()[topicIndex];
                     return ListTile(
                       onTap: () {

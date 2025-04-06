@@ -3,24 +3,28 @@ PODS:
     - FlutterMacOS
     - OrderedSet (~> 6.0.3)
   - FlutterMacOS (1.0.0)
+  - fvp (0.31.0):
+    - Flutter
+    - FlutterMacOS
+    - mdk (~> 0.32.0)
+  - mdk (0.32.0)
   - no_screenshot (0.3.2-beta.3):
     - FlutterMacOS
   - OrderedSet (6.0.3)
   - pdfrx (0.0.3):
     - Flutter
     - FlutterMacOS
-  - wakelock_plus (0.0.1):
-    - FlutterMacOS
 
 DEPENDENCIES:
   - flutter_inappwebview_macos (from `Flutter/ephemeral/.symlinks/plugins/flutter_inappwebview_macos/macos`)
   - FlutterMacOS (from `Flutter/ephemeral`)
+  - fvp (from `Flutter/ephemeral/.symlinks/plugins/fvp/darwin`)
   - no_screenshot (from `Flutter/ephemeral/.symlinks/plugins/no_screenshot/macos`)
   - pdfrx (from `Flutter/ephemeral/.symlinks/plugins/pdfrx/darwin`)
-  - wakelock_plus (from `Flutter/ephemeral/.symlinks/plugins/wakelock_plus/macos`)
 
 SPEC REPOS:
   trunk:
+    - mdk
     - OrderedSet
 
 EXTERNAL SOURCES:
@@ -28,20 +32,21 @@ EXTERNAL SOURCES:
     :path: Flutter/ephemeral/.symlinks/plugins/flutter_inappwebview_macos/macos
   FlutterMacOS:
     :path: Flutter/ephemeral
+  fvp:
+    :path: Flutter/ephemeral/.symlinks/plugins/fvp/darwin
   no_screenshot:
     :path: Flutter/ephemeral/.symlinks/plugins/no_screenshot/macos
   pdfrx:
     :path: Flutter/ephemeral/.symlinks/plugins/pdfrx/darwin
-  wakelock_plus:
-    :path: Flutter/ephemeral/.symlinks/plugins/wakelock_plus/macos
 
 SPEC CHECKSUMS:
   flutter_inappwebview_macos: bdf207b8f4ebd58e86ae06cd96b147de99a67c9b
   FlutterMacOS: 8f6f14fa908a6fb3fba0cd85dbd81ec4b251fb24
+  fvp: fa4420e9229df45e821a2ee555abcf00220cc8a4
+  mdk: a726c85fd49c002b83d586b278d452f387750889
   no_screenshot: 6b7ccfe089b21d25fecd43e90bea2f0523c96e3b
   OrderedSet: e539b66b644ff081c73a262d24ad552a69be3a94
   pdfrx: 07fc287c47ea8d027c4ed56457f8a1aa74d73594
-  wakelock_plus: 4783562c9a43d209c458cb9b30692134af456269
 
 PODFILE CHECKSUM: 7eb978b976557c8c1cd717d8185ec483fd090a82
 

@@ -762,7 +762,19 @@ class VideoPlayerWidget extends StatefulWidget {
 class _VideoPlayerWidgetState extends State<VideoPlayerWidget> {
   late VideoPlayerController _controller;
   late Future<void> _initializeVideoPlayerFuture;
+  ValueNotifier<bool> isVolumeOn = ValueNotifier<bool>(
+    true,
+  ); // Use ValueNotifier to hold volume state
+  // valuenotifiers for 2x, normal and 1x
+  ValueNotifier<double> currentSpeed = ValueNotifier<double>(1);
+  // show appbar or not
+  ValueNotifier<bool> showAppBar = ValueNotifier<bool>(true);
+  ValueNotifier<bool> showControls = ValueNotifier<bool>(true);
   final ValueNotifier<bool> _isCompletedPlaying = ValueNotifier<bool>(false);
+
+  ValueNotifier<double> zoomScale = ValueNotifier<double>(1.0);
+  ValueNotifier<Offset> panOffset = ValueNotifier<Offset>(Offset(0, 0));
+
   @override
   void initState() {
     // TODO: implement initState
@@ -823,104 +835,233 @@ class _VideoPlayerWidgetState extends State<VideoPlayerWidget> {
                             child: SizedBox(
                               width: _controller.value.size.width,
                               height: _controller.value.size.height,
-                              child: VideoPlayer(_controller),
+                              child: GestureDetector(
+                                onScaleUpdate: (details) {
+                                  if (details.scale < 1) {
+                                    zoomScale.value = 1;
+                                  } else {
+                                    zoomScale.value = details.scale;
+                                  }
+                                },
+                                // onPanUpdate: (details) {
+                                //   panOffset.value = Offset(
+                                //     panOffset.value.dx + details.delta.dx,
+                                //     panOffset.value.dy + details.delta.dy,
+                                //   );
+                                // },
+                                child: InkWell(
+                                  onTap: () {
+                                    showAppBar.value = !showAppBar.value;
+                                    showControls.value = !showControls.value;
+                                  },
+                                  child: ValueListenableBuilder<double>(
+                                    valueListenable: zoomScale,
+                                    builder: (context, _zoomScale, child) {
+                                      return Transform.scale(
+                                        scale: _zoomScale,
+                                        child: VideoPlayer(_controller),
+                                      );
+                                    },
+                                  ),
+                                ),
+                              ),
                             ),
                           ),
                         ),
-                        Row(
-                          children: [
-                            //Add minus10 plus10 and seekbar
-                            IconButton(
-                              onPressed: () {
-                                _controller.seekTo(
-                                  _controller.value.position -
-                                      Duration(seconds: 10),
-                                );
-                              },
-                              icon: Icon(Icons.replay_10),
-                            ),
-                            ValueListenableBuilder<bool>(
-                              valueListenable: _isCompletedPlaying,
-                              builder: (context, isCompletedPlaying, child) {
-                                return IconButton(
-                                  onPressed: () {
-                                    if (isCompletedPlaying) {
-                                      _controller.play();
-                                      setState(() {});
-                                      return;
-                                    }
-                                    // Wrap the play or pause in a call to `setState`. This ensures the
-                                    // correct icon is shown.
-                                    setState(() {
-                                      // If the video is playing, pause it.
-                                      if (_controller.value.isPlaying) {
-                                        _controller.pause();
-                                      } else {
-                                        // If the video is paused, play it.
-                                        _controller.play();
-                                      }
-                                    });
-                                  },
-                                  // Display the correct icon depending on the state of the player.
-                                  icon: Icon(
-                                    isCompletedPlaying
-                                        ? Icons.replay
-                                        : _controller.value.isPlaying
-                                        ? Icons.pause
-                                        : Icons.play_arrow,
+                        ValueListenableBuilder<bool>(
+                          valueListenable: showAppBar,
+                          builder: (context, showControlsValue, child) {
+                            return AnimatedOpacity(
+                              opacity: showControlsValue ? 1 : 0,
+                              duration: Duration(milliseconds: 500),
+                              child: DecoratedBox(
+                                decoration: BoxDecoration(
+                                  gradient: LinearGradient(
+                                    colors: [
+                                      Colors.black.withValues(alpha: 0.75),
+                                      Colors.black.withValues(alpha: 0),
+                                    ],
+                                    begin: Alignment.bottomCenter,
+                                    end: Alignment.topCenter,
                                   ),
-                                );
-                              },
-                            ),
+                                ),
+                                child: Padding(
+                                  padding: const EdgeInsets.all(16.0),
+                                  child: Row(
+                                    children: [
+                                      //Add minus10 plus10 and seekbar
+                                      IconButton(
+                                        color: Colors.white,
+                                        onPressed: () {
+                                          _controller.seekTo(
+                                            _controller.value.position -
+                                                Duration(seconds: 10),
+                                          );
+                                        },
+                                        icon: Icon(Icons.replay_10),
+                                      ),
+                                      ValueListenableBuilder<bool>(
+                                        valueListenable: _isCompletedPlaying,
+                                        builder: (
+                                          context,
+                                          isCompletedPlaying,
+                                          child,
+                                        ) {
+                                          return IconButton(
+                                            color: Colors.white,
+                                            onPressed: () {
+                                              if (isCompletedPlaying) {
+                                                _controller.play();
+                                                setState(() {});
+                                                return;
+                                              }
+                                              // Wrap the play or pause in a call to `setState`. This ensures the
+                                              // correct icon is shown.
+                                              setState(() {
+                                                // If the video is playing, pause it.
+                                                if (_controller
+                                                    .value
+                                                    .isPlaying) {
+                                                  _controller.pause();
+                                                  showAppBar.value = true;
+                                                  showControls.value = true;
+                                                } else {
+                                                  // If the video is paused, play it.
+                                                  _controller.play();
+                                                  // Hide the app bar after 3 seconds
+                                                  Future.delayed(
+                                                    Duration(seconds: 3),
+                                                    () {
+                                                      showAppBar.value = false;
+                                                      showControls.value =
+                                                          false;
+                                                    },
+                                                  );
+                                                }
+                                              });
+                                            },
+                                            // Display the correct icon depending on the state of the player.
+                                            icon: Icon(
+                                              isCompletedPlaying
+                                                  ? Icons.replay
+                                                  : _controller.value.isPlaying
+                                                  ? Icons.pause
+                                                  : Icons.play_arrow,
+                                            ),
+                                          );
+                                        },
+                                      ),
 
-                            Expanded(
-                              child: VideoProgressIndicator(
-                                _controller,
-                                allowScrubbing: true,
-                                padding: EdgeInsets.only(left: 8, right: 8),
+                                      Expanded(
+                                        child: VideoProgressIndicator(
+                                          _controller,
+                                          allowScrubbing: true,
+                                          padding: EdgeInsets.only(
+                                            left: 8,
+                                            right: 8,
+                                          ),
+                                        ),
+                                      ),
+                                      IconButton(
+                                        color: Colors.white,
+                                        onPressed: () {
+                                          _controller.seekTo(
+                                            _controller.value.position +
+                                                Duration(seconds: 10),
+                                          );
+                                        },
+                                        icon: Icon(Icons.forward_10),
+                                      ),
+                                      ValueListenableBuilder<bool>(
+                                        valueListenable: isVolumeOn,
+                                        builder: (context, _isVolumeOn, child) {
+                                          return IconButton(
+                                            color: Colors.white,
+                                            onPressed: () {
+                                              _controller.setVolume(
+                                                _controller.value.volume == 0
+                                                    ? 1
+                                                    : 0,
+                                              );
+                                              isVolumeOn.value =
+                                                  !isVolumeOn.value;
+                                            },
+                                            icon: Icon(
+                                              !_isVolumeOn
+                                                  ? Icons.volume_off
+                                                  : Icons.volume_up,
+                                            ),
+                                          );
+                                        },
+                                      ),
+                                      ValueListenableBuilder<double>(
+                                        valueListenable: currentSpeed,
+                                        builder: (context, _speed, child) {
+                                          return IconButton(
+                                            color:
+                                                _speed == 0.5
+                                                    ? Colors.amber
+                                                    : Colors.white,
+                                            onPressed: () {
+                                              _controller.setPlaybackSpeed(0.5);
+                                              currentSpeed.value = 0.5;
+                                            },
+                                            icon: Icon(
+                                              Icons.slow_motion_video_outlined,
+                                            ),
+                                          );
+                                        },
+                                      ),
+                                      ValueListenableBuilder<double>(
+                                        valueListenable: currentSpeed,
+                                        builder: (context, _speed, child) {
+                                          return IconButton(
+                                            color:
+                                                _speed == 1.0
+                                                    ? Colors.amber
+                                                    : Colors.white,
+                                            onPressed: () {
+                                              _controller.setPlaybackSpeed(1);
+                                              currentSpeed.value = 1.0;
+                                            },
+                                            icon: Text(
+                                              "1X",
+                                              style: TextStyle(
+                                                fontSize: 16,
+                                                fontWeight: FontWeight.w900,
+                                                color:
+                                                    _speed == 1.0
+                                                        ? Colors.amber
+                                                        : Colors.white,
+                                              ),
+                                            ),
+                                          );
+                                        },
+                                      ),
+                                      ValueListenableBuilder<double>(
+                                        valueListenable: currentSpeed,
+                                        builder: (context, _speed, child) {
+                                          return IconButton(
+                                            color:
+                                                _speed == 2.0
+                                                    ? Colors.amber
+                                                    : Colors.white,
+                                            onPressed: () {
+                                              _controller.setPlaybackSpeed(2.0);
+                                              currentSpeed.value = 2.0;
+                                            },
+                                            icon: Icon(
+                                              Icons.rocket_launch_outlined,
+                                            ),
+                                          );
+                                        },
+                                      ),
+                                    ],
+                                  ),
+                                ),
                               ),
-                            ),
-                            IconButton(
-                              onPressed: () {
-                                _controller.seekTo(
-                                  _controller.value.position +
-                                      Duration(seconds: 10),
-                                );
-                              },
-                              icon: Icon(Icons.forward_10),
-                            ),
-                            IconButton(
-                              onPressed: () {
-                                _controller.setVolume(
-                                  _controller.value.volume == 0 ? 1 : 0,
-                                );
-                              },
-                              icon: Icon(
-                                _controller.value.volume == 0
-                                    ? Icons.volume_off
-                                    : Icons.volume_up,
-                              ),
-                            ),
-                            IconButton(
-                              onPressed: () {
-                                _controller.setPlaybackSpeed(2);
-                              },
-                              icon: Icon(Icons.rocket_launch_outlined),
-                            ),
-
-                            IconButton(
-                              onPressed: () {
-                                _controller.setPlaybackSpeed(0.5);
-                              },
-                              icon: Icon(Icons.slow_motion_video),
-                            ),
-                            IconButton(
-                              onPressed: () {
-                                _controller.setPlaybackSpeed(1);
-                              },
-                              icon: Icon(Icons.speed),
-                            ),
-                          ],
+                            );
+                          },
                         ),
                       ],
                     );
@@ -933,37 +1074,46 @@ class _VideoPlayerWidgetState extends State<VideoPlayerWidget> {
               ),
             ),
 
-            Column(
-              children: [
-                Container(
-                  padding: EdgeInsets.only(top: 24),
-                  height: kToolbarHeight * 2,
-                  decoration: BoxDecoration(
-                    gradient: LinearGradient(
-                      colors: [
-                        Colors.black.withValues(alpha: 0),
-                        Colors.black.withValues(alpha: 0.75),
-                      ],
-                      begin: Alignment.bottomCenter,
-                      end: Alignment.topCenter,
-                    ),
+            ValueListenableBuilder<bool>(
+              valueListenable: showAppBar,
+              builder: (context, showAppBarValue, child) {
+                return AnimatedOpacity(
+                  opacity: showAppBarValue ? 1 : 0,
+                  duration: Duration(milliseconds: 500),
+                  child: Column(
+                    children: [
+                      Container(
+                        padding: EdgeInsets.only(top: 24),
+                        height: kToolbarHeight * 2,
+                        decoration: BoxDecoration(
+                          gradient: LinearGradient(
+                            colors: [
+                              Colors.black.withValues(alpha: 0),
+                              Colors.black.withValues(alpha: 0.75),
+                            ],
+                            begin: Alignment.bottomCenter,
+                            end: Alignment.topCenter,
+                          ),
+                        ),
+                        child: AppBar(
+                          automaticallyImplyLeading: false,
+                          leading: IconButton(
+                            onPressed: () {
+                              widget.onPlayedVideo();
+                              Navigator.of(context).pop();
+                            },
+                            icon: Icon(Icons.chevron_left),
+                          ),
+                          foregroundColor: Colors.white,
+                          title: Text(widget.video.name),
+                          backgroundColor: Colors.transparent,
+                          toolbarHeight: kToolbarHeight,
+                        ),
+                      ),
+                    ],
                   ),
-                  child: AppBar(
-                    automaticallyImplyLeading: false,
-                    leading: IconButton(
-                      onPressed: () {
-                        widget.onPlayedVideo();
-                        Navigator.of(context).pop();
-                      },
-                      icon: Icon(Icons.chevron_left),
-                    ),
-                    foregroundColor: Colors.white,
-                    title: Text(widget.video.name),
-                    backgroundColor: Colors.transparent,
-                    toolbarHeight: kToolbarHeight,
-                  ),
-                ),
-              ],
+                );
+              },
             ),
           ],
         ),
