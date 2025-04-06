@@ -6,10 +6,9 @@ import 'package:chitti/home_page.dart';
 import 'package:chitti/size_config.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 import 'package:http/http.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:webview_cookie_manager/webview_cookie_manager.dart';
-import 'package:webview_flutter/webview_flutter.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -330,326 +329,284 @@ class _LoginScreenState extends State<LoginScreen> {
                         }
 
                         var htmlString = futurePayload.data.toString();
-                        var controller = WebViewController();
+                        var cookieObj = CookieManager.instance();
                         int? semester;
                         String? name;
-                        return WebViewWidget(
-                          controller:
-                              controller
-                                ..setJavaScriptMode(JavaScriptMode.unrestricted)
-                                ..setNavigationDelegate(
-                                  NavigationDelegate(
-                                    onPageFinished: (url) {
-                                      if (url == "about:blank") {
-                                        //Hit submit
-                                        controller.runJavaScript(
-                                          "document.getElementById('Submit').click();",
-                                        );
-                                      } else if (url.contains(
-                                        "https://login.gitam.edu",
-                                      )) {
-                                        (controller.runJavaScriptReturningResult(
-                                          'document.body.innerHTML.search("Invalid User ID / Password. Please try again. !")',
-                                        )).then((isError) {
-                                          if (int.parse(isError.toString()) >
-                                              0) {
-                                            _passwordController.clear();
-                                            password = "";
-                                            setState(() {
-                                              ScaffoldMessenger.of(
-                                                context,
-                                              ).showSnackBar(
-                                                SnackBar(
-                                                  content: Text(
-                                                    "Invalid roll number/password. Please try again.",
-                                                  ),
-                                                ),
-                                              );
-                                            });
-                                          }
-                                        });
-                                      } else if (url ==
-                                              "https://gstudent.gitam.edu/Home" &&
-                                          payload == null) {
-                                        WebviewCookieManager()
-                                            .getCookies(
-                                              "https://gstudent.gitam.edu",
-                                            )
-                                            .then(
-                                              (c1) =>
-                                                  c1
-                                                      .where(
-                                                        (e) =>
-                                                            e.name ==
-                                                            "ASP.NET_SessionId",
-                                                      )
-                                                      .first,
-                                            )
-                                            .then((cookie) {
-                                              get(
-                                                Uri.parse(
-                                                  "https://gstudent.gitam.edu/Home/GetStudentData",
-                                                ),
-                                                headers: {
-                                                  "Cookie":
-                                                      "ASP.NET_SessionId=${cookie.value}",
-                                                },
-                                              ).then((response) {
-                                                // developer.log(response.body);
-                                                final tag =
-                                                    RegExp(
-                                                          r'<input\s+class="form-control"\s+id="curr_sem"\s+name="curr_sem"\s+onkeydown="return ValidateSpecialText\(event\);"\s+readonly="readonly"\s+type="text"\s+value="[0-9]*"\s*/>',
-                                                        )
-                                                        .firstMatch(
-                                                          response.body,
-                                                        )
-                                                        ?.group(0)
-                                                        .toString() ??
-                                                    "No value";
-                                                final nameTag =
-                                                    RegExp(
-                                                          r'<input\s+class="form-control"\s+id="name"\s+name="name"\s+onkeydown="return ValidateSpecialText\(event\);"\s+readonly="readonly"\s+type="text"\s+value="([^"]*)"\s*/>',
-                                                        )
-                                                        .firstMatch(
-                                                          response.body,
-                                                        )
-                                                        ?.group(0)
-                                                        .toString() ??
-                                                    "No value";
-                                                semester = int.tryParse(
-                                                  tag
-                                                      .split('value="')[1]
-                                                      .split('"')[0],
-                                                );
-                                                name = nameTag
-                                                    .split('value="')[1]
-                                                    .split('"')[0]
-                                                    .split(" ")
-                                                    .reversed
-                                                    .map((f) {
-                                                      return f[0] +
-                                                          f
-                                                              .substring(1)
-                                                              .toLowerCase();
-                                                    })
-                                                    .join(" ");
-                                                developer.log(
-                                                  semester.toString(),
-                                                );
-                                                developer.log(
-                                                  name ?? "No Name",
-                                                );
-                                                controller.runJavaScript(
-                                                  'document.getElementsByClassName("course")[0].click();',
-                                                );
-                                              });
-                                            });
-                                      } else if (url.contains(
-                                        "https://glearn.gitam.edu",
-                                      )) {
-                                        WebviewCookieManager()
-                                            .getCookies(
-                                              "https://glearn.gitam.edu",
-                                            )
-                                            .then(
-                                              (c2) =>
-                                                  c2
-                                                      .where(
-                                                        (f) =>
-                                                            f.name ==
-                                                            ".AspNetCore.Session",
-                                                      )
-                                                      .first,
-                                            )
-                                            .then((cook1) {
-                                              get(
-                                                Uri.parse(
-                                                  "https://glearn.gitam.edu/student/my_courses",
-                                                ),
-                                                headers: {
-                                                  "Cookie":
-                                                      ".ASPNetCore.Session=${cook1.value}",
-                                                },
-                                              ).then((responseData) async {
-                                                final currentSemester =
-                                                    r'<h6>Current Semester - \d+<\/h6>\s*<div class="box-inner">[\s\S]*?<h6>';
-                                                final h4CourseCode =
-                                                    r'<h4\s+class="courseCode">\s*([^\s].*[^\s]|[^\s])?\s*</h4>';
 
-                                                final res =
-                                                    RegExp(h4CourseCode)
+                        return InAppWebView(
+                          initialSettings: InAppWebViewSettings(
+                            sharedCookiesEnabled: true,
+                            incognito: false,
+                          ),
+                          initialData: InAppWebViewInitialData(
+                            data: htmlString,
+                          ),
+                          onLoadStop: (controller, url) {
+                            if (url.toString() == "about:blank") {
+                              controller.evaluateJavascript(
+                                source:
+                                    "document.getElementById('Submit').click();",
+                              );
+                            } else if (url.toString().contains(
+                              "https://login.gitam.edu",
+                            )) {
+                              (controller.evaluateJavascript(
+                                source:
+                                    'document.body.innerHTML.search("Invalid User ID / Password. Please try again. !")',
+                              )).then((isError) {
+                                print(isError);
+                                if (double.parse(isError.toString()) > 0) {
+                                  _passwordController.clear();
+                                  password = "";
+                                  setState(() {
+                                    isLoading.value = false;
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                      SnackBar(
+                                        content: Text(
+                                          "Invalid roll number/password. Please try again.",
+                                        ),
+                                      ),
+                                    );
+                                  });
+                                }
+                              });
+                            } else if (url.toString() ==
+                                    "https://gstudent.gitam.edu/Home" &&
+                                payload == null) {
+                              cookieObj
+                                  .getCookie(
+                                    url: WebUri.uri(
+                                      Uri.parse("https://gstudent.gitam.edu"),
+                                    ),
+                                    name: "ASP.NET_SessionId",
+                                  )
+                                  .then((cookie) {
+                                    print(cookie?.value);
+                                    get(
+                                      Uri.parse(
+                                        "https://gstudent.gitam.edu/Home/GetStudentData",
+                                      ),
+                                      headers: {
+                                        "Cookie":
+                                            "ASP.NET_SessionId=${cookie?.value}",
+                                      },
+                                    ).then((response) {
+                                      print(response.body);
+                                      final tag =
+                                          RegExp(
+                                                r'<input\s+class="form-control"\s+id="curr_sem"\s+name="curr_sem"\s+onkeydown="return ValidateSpecialText\(event\);"\s+readonly="readonly"\s+type="text"\s+value="[0-9]*"\s*/>',
+                                              )
+                                              .firstMatch(response.body)
+                                              ?.group(0)
+                                              .toString() ??
+                                          "No value";
+                                      final nameTag =
+                                          RegExp(
+                                                r'<input\s+class="form-control"\s+id="name"\s+name="name"\s+onkeydown="return ValidateSpecialText\(event\);"\s+readonly="readonly"\s+type="text"\s+value="([^"]*)"\s*/>',
+                                              )
+                                              .firstMatch(response.body)
+                                              ?.group(0)
+                                              .toString() ??
+                                          "No value";
+                                      semester = int.tryParse(
+                                        tag.split('value="')[1].split('"')[0],
+                                      );
+                                      name = nameTag
+                                          .split('value="')[1]
+                                          .split('"')[0]
+                                          .split(" ")
+                                          .reversed
+                                          .map((f) {
+                                            return f[0] +
+                                                f.substring(1).toLowerCase();
+                                          })
+                                          .join(" ");
+                                      developer.log(semester.toString());
+                                      developer.log(name ?? "No Name");
+                                      controller.evaluateJavascript(
+                                        source:
+                                            'document.getElementsByClassName("course")[0].click();',
+                                      );
+                                    });
+                                  });
+                            } else if (url.toString().contains(
+                              "https://glearn.gitam.edu",
+                            )) {
+                              cookieObj
+                                  .getCookie(
+                                    url: WebUri.uri(
+                                      Uri.parse("https://glearn.gitam.edu"),
+                                    ),
+                                    name: ".AspNetCore.Session",
+                                  )
+                                  .then((cook1) {
+                                    get(
+                                      Uri.parse(
+                                        "https://glearn.gitam.edu/student/my_courses",
+                                      ),
+                                      headers: {
+                                        "Cookie":
+                                            ".ASPNetCore.Session=${cook1?.value}",
+                                      },
+                                    ).then((responseData) async {
+                                      final currentSemester =
+                                          r'<h6>Current Semester - \d+<\/h6>\s*<div class="box-inner">[\s\S]*?<h6>';
+                                      final h4CourseCode =
+                                          r'<h4\s+class="courseCode">\s*([^\s].*[^\s]|[^\s])?\s*</h4>';
+
+                                      final res =
+                                          RegExp(h4CourseCode)
+                                              .allMatches(
+                                                RegExp(currentSemester)
                                                         .allMatches(
-                                                          RegExp(currentSemester)
-                                                                  .allMatches(
-                                                                    responseData
-                                                                        .body,
-                                                                  )
-                                                                  .toList()
-                                                                  .first
-                                                                  .group(0) ??
-                                                              responseData.body,
+                                                          responseData.body,
                                                         )
-                                                        .map(
-                                                          (element) =>
-                                                              element
-                                                                  .group(0)
-                                                                  ?.split(
-                                                                    '">',
-                                                                  )[1]
-                                                                  .split(
-                                                                    "</h4",
-                                                                  )[0] ??
-                                                              "No Data",
-                                                        )
-                                                        .toList();
-                                                if (res.length > 1) {
-                                                  payload = {
-                                                    "rollNo": username,
-                                                    "pass": password,
-                                                    "schedule": "",
-                                                    "subId": 0,
-                                                    "semester": semester,
-                                                    "name": name,
-                                                    "courses":
-                                                        res.toSet().toList(),
-                                                  };
-                                                  final signupRequest = await post(
-                                                    Uri.parse(
-                                                      "https://asia-south1-chitti-ananta.cloudfunctions.net/webApi/signup",
-                                                    ),
-                                                    headers: {
-                                                      "Content-Type":
-                                                          "application/json",
-                                                    },
-                                                    body: json.encode(payload),
-                                                  );
-                                                  if (signupRequest
-                                                          .statusCode ==
-                                                      200) {
-                                                    //MARK: Successful creating the auth
-                                                    final result = json.decode(
-                                                      signupRequest.body,
+                                                        .toList()
+                                                        .first
+                                                        .group(0) ??
+                                                    responseData.body,
+                                              )
+                                              .map(
+                                                (element) =>
+                                                    element
+                                                        .group(0)
+                                                        ?.split('">')[1]
+                                                        .split("</h4")[0] ??
+                                                    "No Data",
+                                              )
+                                              .toList();
+                                      if (res.length > 1) {
+                                        payload = {
+                                          "rollNo": username,
+                                          "pass": password,
+                                          "schedule": "",
+                                          "subId": 0,
+                                          "semester": semester,
+                                          "name": name,
+                                          "courses": res.toSet().toList(),
+                                        };
+                                        final signupRequest = await post(
+                                          Uri.parse(
+                                            "https://asia-south1-chitti-ananta.cloudfunctions.net/webApi/signup",
+                                          ),
+                                          headers: {
+                                            "Content-Type": "application/json",
+                                          },
+                                          body: json.encode(payload),
+                                        );
+                                        if (signupRequest.statusCode == 200) {
+                                          //MARK: Successful creating the auth
+                                          final result = json.decode(
+                                            signupRequest.body,
+                                          );
+                                          final token = result["token"];
+                                          final userCredential =
+                                              await FirebaseAuth.instance
+                                                  .signInWithCustomToken(token);
+                                          await userCredential.user
+                                              ?.updateDisplayName(name);
+                                          FirebaseAuth.instance.currentUser!
+                                              .getIdToken(true)
+                                              .then((token) {
+                                                if (token == null) {
+                                                  if (context.mounted) {
+                                                    isLoading.value = false;
+                                                    ScaffoldMessenger.of(
+                                                      context,
+                                                    ).showSnackBar(
+                                                      SnackBar(
+                                                        content: Text(
+                                                          "Unable to create token.",
+                                                        ),
+                                                      ),
                                                     );
-                                                    final token =
-                                                        result["token"];
-                                                    final userCredential =
-                                                        await FirebaseAuth
-                                                            .instance
-                                                            .signInWithCustomToken(
-                                                              token,
-                                                            );
-                                                    await userCredential.user
-                                                        ?.updateDisplayName(
-                                                          name,
-                                                        );
-                                                    FirebaseAuth.instance.currentUser!.getIdToken(true).then((
-                                                      token,
+                                                    setState(() {});
+                                                  }
+                                                  return;
+                                                }
+                                                try {
+                                                  fetchSemester(token).then((
+                                                    semester,
+                                                  ) {
+                                                    SharedPreferences.getInstance().then((
+                                                      sharedPreferences,
                                                     ) {
-                                                      if (token == null) {
-                                                        if (context.mounted) {
-                                                          ScaffoldMessenger.of(
-                                                            context,
-                                                          ).showSnackBar(
-                                                            SnackBar(
-                                                              content: Text(
-                                                                "Unable to create token.",
-                                                              ),
-                                                            ),
-                                                          );
-                                                        }
-                                                        return;
-                                                      }
-                                                      try {
-                                                        fetchSemester(
-                                                          token,
-                                                        ).then((semester) {
-                                                          SharedPreferences.getInstance().then((
-                                                            sharedPreferences,
-                                                          ) {
-                                                            final name =
-                                                                FirebaseAuth
-                                                                    .instance
-                                                                    .currentUser
-                                                                    ?.displayName
-                                                                    ?.split(
-                                                                      " ",
-                                                                    )[0];
-                                                            if (context
-                                                                .mounted) {
-                                                              Navigator.of(
-                                                                context,
-                                                              ).pushReplacement(
-                                                                MaterialPageRoute(
-                                                                  builder:
-                                                                      (
-                                                                        context,
-                                                                      ) => MyHomePage(
-                                                                        name:
-                                                                            name?.split(
-                                                                              " ",
-                                                                            )[0] ??
-                                                                            "User",
-                                                                        semester:
-                                                                            semester,
-                                                                      ),
+                                                      final name =
+                                                          FirebaseAuth
+                                                              .instance
+                                                              .currentUser
+                                                              ?.displayName
+                                                              ?.split(" ")[0];
+                                                      if (context.mounted) {
+                                                        Navigator.of(
+                                                          context,
+                                                        ).pushReplacement(
+                                                          MaterialPageRoute(
+                                                            builder:
+                                                                (
+                                                                  context,
+                                                                ) => MyHomePage(
+                                                                  name:
+                                                                      name?.split(
+                                                                        " ",
+                                                                      )[0] ??
+                                                                      "User",
+                                                                  semester:
+                                                                      semester,
                                                                 ),
-                                                              );
-                                                            }
-                                                          });
-                                                        });
-                                                      } on Exception catch (e) {
-                                                        if (context.mounted) {
-                                                          ScaffoldMessenger.of(
-                                                            context,
-                                                          ).showSnackBar(
-                                                            SnackBar(
-                                                              content: Text(
-                                                                e.toString(),
-                                                              ),
-                                                            ),
-                                                          );
-                                                        }
+                                                          ),
+                                                        );
                                                       }
                                                     });
-                                                  } else {
-                                                    final result = json.decode(
-                                                      signupRequest.body,
-                                                    );
-                                                    if (context.mounted) {
-                                                      ScaffoldMessenger.of(
-                                                        context,
-                                                      ).showSnackBar(
-                                                        SnackBar(
-                                                          content: Text(
-                                                            result["theError"] ??
-                                                                result["message"],
-                                                          ),
+                                                  });
+                                                } on Exception catch (e) {
+                                                  if (context.mounted) {
+                                                    isLoading.value = false;
+                                                    ScaffoldMessenger.of(
+                                                      context,
+                                                    ).showSnackBar(
+                                                      SnackBar(
+                                                        content: Text(
+                                                          e.toString(),
                                                         ),
-                                                      );
-                                                    }
+                                                      ),
+                                                    );
                                                   }
-                                                  SharedPreferences.getInstance()
-                                                      .then((
-                                                        sharedPreferences,
-                                                      ) {
-                                                        sharedPreferences
-                                                            .setString(
-                                                              "userdata",
-                                                              json.encode(
-                                                                payload,
-                                                              ),
-                                                            );
-
-                                                        setState(() {});
-                                                      });
                                                 }
                                               });
-                                            });
+                                        } else {
+                                          final result = json.decode(
+                                            signupRequest.body,
+                                          );
+                                          if (context.mounted) {
+                                            isLoading.value = false;
+                                            ScaffoldMessenger.of(
+                                              context,
+                                            ).showSnackBar(
+                                              SnackBar(
+                                                content: Text(
+                                                  result["theError"] ??
+                                                      result["message"],
+                                                ),
+                                              ),
+                                            );
+                                          }
+                                        }
+                                        SharedPreferences.getInstance().then((
+                                          sharedPreferences,
+                                        ) {
+                                          sharedPreferences.setString(
+                                            "userdata",
+                                            json.encode(payload),
+                                          );
+
+                                          setState(() {});
+                                        });
                                       }
-                                    },
-                                  ),
-                                )
-                                ..loadHtmlString(htmlString),
+                                    });
+                                  });
+                            }
+                          },
                         );
                       },
                     ),

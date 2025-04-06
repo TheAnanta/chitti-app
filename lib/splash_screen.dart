@@ -74,7 +74,7 @@ class SplashScreen extends StatelessWidget {
                 children: [
                   SizedBox(height: 48),
                   Text(
-                    "Chitti.",
+                    "Chitti.".toUpperCase(),
                     style: Theme.of(context).textTheme.displayLarge?.copyWith(
                       fontWeight: FontWeight.w800,
                       color: Color(0xFFF26E0C),
