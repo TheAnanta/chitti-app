@@ -1,6 +1,4 @@
 import 'dart:math' show max, min;
-
-import 'package:chewie/chewie.dart';
 import 'package:chitti/color_filters.dart';
 import 'package:chitti/data/semester.dart';
 import 'package:chitti/domain/fetch_resources.dart';
@@ -10,6 +8,7 @@ import 'package:chitti/profile_page.dart';
 import 'package:chitti/watermark_widget.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:pdfrx/pdfrx.dart';
 import 'package:video_player/video_player.dart';
 
@@ -768,6 +767,10 @@ class _VideoPlayerWidgetState extends State<VideoPlayerWidget> {
   void initState() {
     // TODO: implement initState
     super.initState();
+    SystemChrome.setPreferredOrientations([
+      DeviceOrientation.landscapeRight,
+      DeviceOrientation.landscapeLeft,
+    ]);
     _controller = VideoPlayerController.networkUrl(Uri.parse(widget.video.url));
 
     _initializeVideoPlayerFuture = _controller.initialize();
@@ -781,6 +784,12 @@ class _VideoPlayerWidgetState extends State<VideoPlayerWidget> {
   @override
   void dispose() {
     // Ensure disposing of the VideoPlayerController to free up resources.
+    SystemChrome.setPreferredOrientations([
+      DeviceOrientation.landscapeRight,
+      DeviceOrientation.landscapeLeft,
+      DeviceOrientation.portraitUp,
+      DeviceOrientation.portraitDown,
+    ]);
     _controller.dispose();
 
     super.dispose();
@@ -800,23 +809,120 @@ class _VideoPlayerWidgetState extends State<VideoPlayerWidget> {
                 future: _initializeVideoPlayerFuture,
                 builder: (context, snapshot) {
                   if (snapshot.connectionState == ConnectionState.done) {
+                    // _controller.play();
                     // If the VideoPlayerController has finished initialization, use
                     // the data it provides to limit the aspect ratio of the video.
-                    return SizedBox(
-                      width: double.infinity,
-                      height: double.infinity,
-                      child: FittedBox(
-                        fit: BoxFit.cover,
-                        child: SizedBox(
-                          width: _controller.value.size.width,
-                          height: _controller.value.size.height,
-                          child: Chewie(
-                            controller: ChewieController(
-                              videoPlayerController: _controller,
+                    return Stack(
+                      alignment: Alignment.bottomCenter,
+                      children: [
+                        SizedBox(
+                          width: double.infinity,
+                          height: double.infinity,
+                          child: FittedBox(
+                            fit: BoxFit.cover,
+                            child: SizedBox(
+                              width: _controller.value.size.width,
+                              height: _controller.value.size.height,
+                              child: VideoPlayer(_controller),
                             ),
                           ),
                         ),
-                      ),
+                        Row(
+                          children: [
+                            //Add minus10 plus10 and seekbar
+                            IconButton(
+                              onPressed: () {
+                                _controller.seekTo(
+                                  _controller.value.position -
+                                      Duration(seconds: 10),
+                                );
+                              },
+                              icon: Icon(Icons.replay_10),
+                            ),
+                            ValueListenableBuilder<bool>(
+                              valueListenable: _isCompletedPlaying,
+                              builder: (context, isCompletedPlaying, child) {
+                                return IconButton(
+                                  onPressed: () {
+                                    if (isCompletedPlaying) {
+                                      _controller.play();
+                                      setState(() {});
+                                      return;
+                                    }
+                                    // Wrap the play or pause in a call to `setState`. This ensures the
+                                    // correct icon is shown.
+                                    setState(() {
+                                      // If the video is playing, pause it.
+                                      if (_controller.value.isPlaying) {
+                                        _controller.pause();
+                                      } else {
+                                        // If the video is paused, play it.
+                                        _controller.play();
+                                      }
+                                    });
+                                  },
+                                  // Display the correct icon depending on the state of the player.
+                                  icon: Icon(
+                                    isCompletedPlaying
+                                        ? Icons.replay
+                                        : _controller.value.isPlaying
+                                        ? Icons.pause
+                                        : Icons.play_arrow,
+                                  ),
+                                );
+                              },
+                            ),
+
+                            Expanded(
+                              child: VideoProgressIndicator(
+                                _controller,
+                                allowScrubbing: true,
+                                padding: EdgeInsets.only(left: 8, right: 8),
+                              ),
+                            ),
+                            IconButton(
+                              onPressed: () {
+                                _controller.seekTo(
+                                  _controller.value.position +
+                                      Duration(seconds: 10),
+                                );
+                              },
+                              icon: Icon(Icons.forward_10),
+                            ),
+                            IconButton(
+                              onPressed: () {
+                                _controller.setVolume(
+                                  _controller.value.volume == 0 ? 1 : 0,
+                                );
+                              },
+                              icon: Icon(
+                                _controller.value.volume == 0
+                                    ? Icons.volume_off
+                                    : Icons.volume_up,
+                              ),
+                            ),
+                            IconButton(
+                              onPressed: () {
+                                _controller.setPlaybackSpeed(2);
+                              },
+                              icon: Icon(Icons.rocket_launch_outlined),
+                            ),
+
+                            IconButton(
+                              onPressed: () {
+                                _controller.setPlaybackSpeed(0.5);
+                              },
+                              icon: Icon(Icons.slow_motion_video),
+                            ),
+                            IconButton(
+                              onPressed: () {
+                                _controller.setPlaybackSpeed(1);
+                              },
+                              icon: Icon(Icons.speed),
+                            ),
+                          ],
+                        ),
+                      ],
                     );
                   } else {
                     // If the VideoPlayerController is still initializing, show a
