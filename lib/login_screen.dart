@@ -1,10 +1,12 @@
 import 'dart:convert';
 import 'dart:developer' as developer show log;
-
+import 'dart:io';
 import 'package:chitti/domain/fetch_semester.dart';
 import 'package:chitti/home_page.dart';
 import 'package:chitti/size_config.dart';
+import 'package:device_info_plus/device_info_plus.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 import 'package:http/http.dart';
@@ -181,6 +183,8 @@ class _LoginScreenState extends State<LoginScreen> {
                                               body: json.encode({
                                                 "rollNo": username,
                                                 "pass": password,
+                                                "deviceId":
+                                                    await fetchDeviceId(),
                                               }),
                                             );
                                             if (loginRequest.statusCode ==
@@ -488,6 +492,7 @@ class _LoginScreenState extends State<LoginScreen> {
                                         payload = {
                                           "rollNo": username,
                                           "pass": password,
+                                          "deviceId": await fetchDeviceId(),
                                           "schedule": "",
                                           "subId": 0,
                                           "semester": semester,
@@ -629,5 +634,19 @@ class _LoginScreenState extends State<LoginScreen> {
                 ),
               ),
     );
+  }
+
+  Future<String> fetchDeviceId() async {
+    if (Platform.isMacOS || Platform.isIOS) {
+      final deviceData = DeviceInfoPlugin();
+      final macOSData = await deviceData.macOsInfo;
+      return macOSData.systemGUID ?? "revoked";
+    } else if (Platform.isWindows) {
+      final deviceData = DeviceInfoPlugin();
+      final windowsData = await deviceData.windowsInfo;
+      return windowsData.deviceId;
+    } else {
+      return await FirebaseMessaging.instance.getToken() ?? "revoked";
+    }
   }
 }

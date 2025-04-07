@@ -351,13 +351,14 @@ class UnitListTile extends StatelessWidget {
                                   FilledButton(
                                     onPressed: () async {
                                       isLoading.value = true;
-
                                       if (Platform.isMacOS ||
                                           Platform.isWindows) {
                                         Navigator.of(context).push(
                                           MaterialPageRoute(
                                             builder: (context) {
-                                              return PaymentWebView();
+                                              return PaymentWebView(
+                                                courseId: courseId,
+                                              );
                                             },
                                           ),
                                         );
@@ -375,6 +376,7 @@ class UnitListTile extends StatelessWidget {
                                                   .instance
                                                   .currentUser
                                                   ?.uid,
+                                          "courseId": courseId,
                                           "amount": 10956,
                                         }),
                                         headers: {

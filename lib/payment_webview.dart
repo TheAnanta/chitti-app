@@ -10,7 +10,8 @@ import 'package:http/http.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class PaymentWebView extends StatelessWidget {
-  const PaymentWebView({super.key});
+  final String courseId;
+  const PaymentWebView({super.key, required this.courseId});
 
   @override
   Widget build(BuildContext context) {
@@ -23,7 +24,7 @@ class PaymentWebView extends StatelessWidget {
         initialUrlRequest: URLRequest(
           url: WebUri.uri(
             Uri.parse(
-              "https://app.scorewithchitti.in/payments?userid=${FirebaseAuth.instance.currentUser!.uid}",
+              "https://app.scorewithchitti.in/payments?userid=${FirebaseAuth.instance.currentUser!.uid}&courseid=$courseId",
             ),
           ),
         ),
