@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Payment Page</title>
+    <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+    <style>
+        body {
+            font-family: sans-serif;
+            background-color: #f3f4f6;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            margin: 0;
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            margin-bottom: 1.5rem;
+        }
+
+        button {
+            background-color: #2563eb;
+            color: white;
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: 0.5rem;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        button:hover {
+            background-color: #1e40af;
+        }
+
+        button:disabled {
+            background-color: #9ca3af;
+            cursor: not-allowed;
+        }
+    </style>
+</head>
+
+<body>
+
+    <h1>Payment Page</h1>
+    <button id="payButton">Pay Now</button>
+
+    <script>
+        const payButton = document.getElementById('payButton');
+
+        payButton.addEventListener('click', async function () {
+            payButton.disabled = true;
+            payButton.textContent = 'Redirecting...';
+
+            const userId = ""; // You can dynamically set this if needed
+
+            try {
+                // Step 1: Create Razorpay order from backend
+                const response = await fetch("https://asia-south1-chitti-ananta.cloudfunctions.net/createOrder", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                    },
+                    body: JSON.stringify({
+                        userId: userId,
+                        amount: 100, // in paisa: ₹1.00
+                    }),
+                });
+
+                if (!response.ok) {
+                    throw new Error("Failed to create order");
+                }
+
+                const data = await response.json();
+                const orderId = data["id"];
+                console.log("Order ID:", orderId);
+
+                // Step 2: Setup Razorpay payment options
+                const options = {
+                    key: "rzp_live_dXsSgWNlpWQ07d", // Replace with your key
+                    amount: 100,
+                    currency: "INR",
+                    name: "Score With CHITTI.",
+                    description: "Purchasing subscription to study with CHITTI.",
+                    order_id: orderId,
+                    callback_url: "/payment-successful", // Update according to your routes
+                    theme: {
+                        color: "#3399cc",
+                    },
+                    retry: {
+                        enabled: false,
+                    },
+                    timeout: 300,
+                    handler: function (response) {
+                        // Optional: handle success on frontend
+                        console.log('Payment successful!', response);
+                    },
+                    modal: {
+                        ondismiss: function () {
+                            window.location.href = "/payment-failed";
+                        }
+                    }
+                };
+
+                const paymentObject = new Razorpay(options);
+
+                paymentObject.on("payment.failed", function (response) {
+                    console.error("Payment Failed:", response.error);
+                    window.location.href = "/payment-failed";
+                });
+
+                paymentObject.open();
+
+            } catch (err) {
+                console.error("Error during payment setup:", err);
+                alert("Something went wrong. Please try again.");
+            } finally {
+                payButton.disabled = false;
+                payButton.textContent = 'Pay Now';
+            }
+        });
+    </script>
+
+</body>
+
+</html>
