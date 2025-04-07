@@ -51,12 +51,13 @@
 
     <script>
         const payButton = document.getElementById('payButton');
+        const searchParams = new URLSearchParams(window.location.search);
 
         payButton.addEventListener('click', async function () {
             payButton.disabled = true;
             payButton.textContent = 'Redirecting...';
 
-            const userId = ""; // You can dynamically set this if needed
+            const userId = console.log(searchParams.get('userid')); // price_descendi; // You can dynamically set this if needed
 
             try {
                 // Step 1: Create Razorpay order from backend
