@@ -99,6 +99,7 @@
                     handler: function (response) {
                         // Optional: handle success on frontend
                         console.log('Payment successful!', response);
+                        window.location.href = "/payment-successful";
                     },
                     modal: {
                         ondismiss: function () {
