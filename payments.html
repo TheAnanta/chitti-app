@@ -58,6 +58,7 @@
             payButton.textContent = 'Redirecting...';
 
             const userId = searchParams.get('userid'); // price_descendi; // You can dynamically set this if needed
+            const courseId = searchParams.get('courseid');
 
             try {
                 // Step 1: Create Razorpay order from backend
@@ -68,6 +69,7 @@
                     },
                     body: JSON.stringify({
                         userId: userId,
+                        courseId: courseId,
                         amount: 100, // in paisa: ₹1.00
                     }),
                 });
