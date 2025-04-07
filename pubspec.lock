@@ -379,10 +379,11 @@ packages:
   no_screenshot:
     dependency: "direct main"
     description:
-      name: no_screenshot
-      sha256: e6ceb29e2587af67ace35d0cbfda3656dfa3e4b4c3225ffb1cb214db9b84c420
-      url: "https://pub.dev"
-    source: hosted
+      path: "."
+      ref: HEAD
+      resolved-ref: "1f27b8370afd017f2ade667097f01342f4b78ecc"
+      url: "https://github.com/TheAnanta/no_screenshot.git"
+    source: git
     version: "0.3.2-beta.3"
   path:
     dependency: transitive
@@ -452,10 +453,10 @@ packages:
     dependency: "direct main"
     description:
       name: pdfrx
-      sha256: d2ee4889365ed6486de8438c3017ee466d8f27125c1f025f3791f09793ece181
+      sha256: a2244c4cd13cc170ef3cbd65ae23de35824dbcb90354cb40e86e7fb03e5b91d5
       url: "https://pub.dev"
     source: hosted
-    version: "1.1.13"
+    version: "1.1.20"
   pdfrx_wasm:
     dependency: "direct main"
     description:
@@ -772,7 +773,7 @@ packages:
       sha256: "0968250880a6c5fe7edc067ed0a13d4bae1577fe2771dcf3010d52c4a9d3ca14"
       url: "https://pub.dev"
     source: hosted
-    version: "15.0.0"
+    version: "14.3.1"
   web:
     dependency: transitive
     description:

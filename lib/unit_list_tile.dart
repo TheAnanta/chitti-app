@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:io';
 
 import 'package:chitti/animated_image.dart';
 import 'package:chitti/color_filters.dart';
@@ -7,6 +8,7 @@ import 'package:chitti/domain/fetch_resources.dart';
 import 'package:chitti/domain/fetch_semester.dart';
 import 'package:chitti/home_page.dart';
 import 'package:chitti/injector.dart';
+import 'package:chitti/payment_webview.dart';
 import 'package:chitti/pdf_doc/pdf_main.dart';
 import 'package:chitti/unit_resource_page.dart';
 import 'package:chitti/watermark_widget.dart';
@@ -349,6 +351,18 @@ class UnitListTile extends StatelessWidget {
                                   FilledButton(
                                     onPressed: () async {
                                       isLoading.value = true;
+
+                                      if (Platform.isMacOS ||
+                                          Platform.isWindows) {
+                                        Navigator.of(context).push(
+                                          MaterialPageRoute(
+                                            builder: (context) {
+                                              return PaymentWebView();
+                                            },
+                                          ),
+                                        );
+                                        return;
+                                      }
 
                                       //TODO: Change the payment later
                                       final razorpayAPIRequest = await post(

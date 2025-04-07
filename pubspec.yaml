@@ -45,7 +45,8 @@ dependencies:
   pdfrx: ^1.1.13
   video_player: ^2.9.3
   razorpay_flutter: ^1.4.0
-  no_screenshot: ^0.3.2-beta.3
+  no_screenshot:
+    git: https://github.com/TheAnanta/no_screenshot.git
   flutter_inappwebview: ^6.0.0
   pdfrx_wasm: ^1.1.7
   url_launcher: ^6.3.1

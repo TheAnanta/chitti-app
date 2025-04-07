@@ -346,11 +346,16 @@ class _LoginScreenState extends State<LoginScreen> {
                             data: htmlString,
                           ),
                           onLoadStop: (controller, url) {
-                            if (url.toString() == "about:blank") {
-                              controller.evaluateJavascript(
-                                source:
-                                    "document.getElementById('Submit').click();",
-                              );
+                            print(url.toString());
+                            if (url.toString() == "") {
+                              try {
+                                controller.evaluateJavascript(
+                                  source:
+                                      "document.getElementById('Submit').click();",
+                                );
+                              } on Exception catch (e) {
+                                print(e);
+                              }
                             } else if (url.toString().contains(
                               "https://login.gitam.edu",
                             )) {
