@@ -351,7 +351,9 @@ class _LoginScreenState extends State<LoginScreen> {
                           ),
                           onLoadStop: (controller, url) {
                             print(url.toString());
-                            if (url.toString() == "") {
+                            if (Platform.isWindows
+                                ? url.toString() == ""
+                                : url.toString() == "about:blank") {
                               try {
                                 controller.evaluateJavascript(
                                   source:
