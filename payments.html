@@ -88,7 +88,7 @@
                     name: "Score With CHITTI.",
                     description: "Purchasing subscription to study with CHITTI.",
                     order_id: orderId,
-                    callback_url: "/payment-successful", // Update according to your routes
+                    callback_url: "https://app.scorewithchitti.in/payment-successful", // Update according to your routes
                     theme: {
                         color: "#3399cc",
                     },
@@ -102,7 +102,7 @@
                     },
                     modal: {
                         ondismiss: function () {
-                            window.location.href = "/payment-failed";
+                            window.location.href = "https://app.scorewithchitti.in/payment-failed";
                         }
                     }
                 };
