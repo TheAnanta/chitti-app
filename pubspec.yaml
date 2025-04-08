@@ -64,9 +64,18 @@ dev_dependencies:
   # package. See that file for information about deactivating specific lint
   # rules and activating additional ones.
   flutter_lints: ^5.0.0
+  msix: ^3.16.8
 
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec
+
+msix_config:
+  display_name: CHITTI
+  publisher_display_name: Chitti
+  identity_name: dev.theananta.chitti
+  msix_version: 1.0.0.0
+  logo_path: D:\Learning\Projects\the-ananta\CHITTI\chitti_ghost_orange.png
+  capabilities: internetClient
 
 # The following section is specific to Flutter packages.
 flutter:
@@ -80,6 +89,8 @@ flutter:
   assets:
     - assets/images/
   #   - images/a_dot_ham.jpeg
+
+  
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/to/resolution-aware-images
