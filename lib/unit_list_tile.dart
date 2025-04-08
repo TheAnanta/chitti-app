@@ -10,6 +10,7 @@ import 'package:chitti/home_page.dart';
 import 'package:chitti/injector.dart';
 import 'package:chitti/payment_webview.dart';
 import 'package:chitti/pdf_doc/pdf_main.dart';
+import 'package:chitti/splash_screen.dart';
 import 'package:chitti/unit_resource_page.dart';
 import 'package:chitti/watermark_widget.dart';
 import 'package:collection/collection.dart';
@@ -501,7 +502,19 @@ class UnitListTile extends StatelessWidget {
                                                 return;
                                               }
                                               try {
-                                                fetchSemester(token).then((
+                                                fetchSemester(token, (){
+                                                   ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(
+                          content: Text("Session expired, please login again."),
+                        ),
+                      );
+                      Navigator.of(context).pushReplacement(
+                                                      MaterialPageRoute(
+                                                        builder: (context) =>
+                                                            SplashScreen(),
+                                                      ),
+                                                    );
+                                                }).then((
                                                   semester,
                                                 ) {
                                                   SharedPreferences.getInstance().then((

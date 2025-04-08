@@ -66,37 +66,35 @@ class _LoginScreenState extends State<LoginScreen> {
                                 ),
                                 child: Stack(
                                   children: [
-                                    Expanded(
-                                      child: Column(
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.center,
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.start,
-                                        children: [
-                                          Text(
-                                            "Hack through your schedules",
-                                            style: Theme.of(context)
-                                                .textTheme
-                                                .headlineMedium
-                                                ?.copyWith(
-                                                  fontWeight: FontWeight.bold,
-                                                  color: Colors.white,
-                                                ),
-                                          ),
-                                          SizedBox(height: 12),
-                                          Opacity(
-                                            opacity: 0.7,
-                                            child: Text(
-                                              "Chitti is your go-to exam prep platform, offering curated resources like notes, cheat sheets, and videos crafted by top students for stress-free studying. We provide clear roadmaps for each subject, guiding you to focus on what matters most as exams approach.",
-                                              style: Theme.of(
-                                                context,
-                                              ).textTheme.bodyMedium?.copyWith(
+                                    Column(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.center,
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        Text(
+                                          "Hack through your schedules",
+                                          style: Theme.of(context)
+                                              .textTheme
+                                              .headlineMedium
+                                              ?.copyWith(
+                                                fontWeight: FontWeight.bold,
                                                 color: Colors.white,
                                               ),
+                                        ),
+                                        SizedBox(height: 12),
+                                        Opacity(
+                                          opacity: 0.7,
+                                          child: Text(
+                                            "Chitti is your go-to exam prep platform, offering curated resources like notes, cheat sheets, and videos crafted by top students for stress-free studying. We provide clear roadmaps for each subject, guiding you to focus on what matters most as exams approach.",
+                                            style: Theme.of(
+                                              context,
+                                            ).textTheme.bodyMedium?.copyWith(
+                                              color: Colors.white,
                                             ),
                                           ),
-                                        ],
-                                      ),
+                                        ),
+                                      ],
                                     ),
                                     SizedBox(width: 16),
                                     Transform.translate(
@@ -346,7 +344,14 @@ class _LoginScreenState extends State<LoginScreen> {
                                                   return;
                                                 }
                                                 try {
-                                                  fetchSemester(token).then((
+                                                  fetchSemester(token, (){
+                                                    Navigator.of(context).pushReplacement(
+                                                      MaterialPageRoute(
+                                                        builder: (context) =>
+                                                            LoginScreen(),
+                                                      ),
+                                                    );
+                                                  }).then((
                                                     semester,
                                                   ) {
                                                     SharedPreferences.getInstance().then((
@@ -649,7 +654,14 @@ class _LoginScreenState extends State<LoginScreen> {
                                                   return;
                                                 }
                                                 try {
-                                                  fetchSemester(token).then((
+                                                  fetchSemester(token, (){
+                                                    Navigator.of(context).pushReplacement(
+                                                      MaterialPageRoute(
+                                                        builder: (context) =>
+                                                            LoginScreen(),
+                                                      ),
+                                                    );
+                                                  }).then((
                                                     semester,
                                                   ) {
                                                     SharedPreferences.getInstance().then((

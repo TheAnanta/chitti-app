@@ -34,7 +34,19 @@ class SplashScreen extends StatelessWidget {
             return;
           }
           try {
-            Injector.semesterRepository.fetchSemester(token).then((semester) {
+            Injector.semesterRepository.fetchSemester(token, (){
+               ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(
+                          content: Text("Session expired, please login again."),
+                        ),
+                      );
+                      Navigator.of(context).pushReplacement(
+                                                      MaterialPageRoute(
+                                                        builder: (context) =>
+                                                            SplashScreen(),
+                                                      ),
+                                                    );
+            }).then((semester) {
               SharedPreferences.getInstance().then((sharedPreferences) {
                 final name =
                     FirebaseAuth.instance.currentUser?.displayName?.split(

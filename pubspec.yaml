@@ -76,6 +76,8 @@ msix_config:
   msix_version: 1.0.0.0
   logo_path: D:\Learning\Projects\the-ananta\CHITTI\chitti_ghost_orange.png
   capabilities: internetClient
+  certificate_path: C:\Users\jayad\CHITTICERTIFICATE.pfx
+  certificate_password: Girish@092005
 
 # The following section is specific to Flutter packages.
 flutter:
