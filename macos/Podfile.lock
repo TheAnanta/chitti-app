@@ -9,7 +9,7 @@ PODS:
   - Firebase/Messaging (11.10.0):
     - Firebase/CoreOnly
     - FirebaseMessaging (~> 11.10.0)
-  - firebase_auth (5.5.1):
+  - firebase_auth (5.5.2):
     - Firebase/Auth (~> 11.10.0)
     - Firebase/CoreOnly (~> 11.10.0)
     - firebase_core
@@ -181,7 +181,7 @@ EXTERNAL SOURCES:
 SPEC CHECKSUMS:
   device_info_plus: 1b14eed9bf95428983aed283a8d51cce3d8c4215
   Firebase: 1fe1c0a7d9aaea32efe01fbea5f0ebd8d70e53a2
-  firebase_auth: 7fca5736a9b24182819dbd506872d8600744a9ce
+  firebase_auth: 2271b9240513461dfcdcf7cfa0121893acdb2de7
   firebase_core: bb06473757206589a00a36920cbf0f33646e19cc
   firebase_messaging: d8432f91a6c317d280ab5acde5a59b88f9034185
   FirebaseAppCheckInterop: f23709c9ce92d810aa53ff4ce12ad3e666a3c7be

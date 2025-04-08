@@ -415,7 +415,7 @@ class UnitListTile extends StatelessWidget {
                                       ) {
                                         print("Payment Success");
                                         print(response);
-                                        Future.delayed(Duration(seconds: 10), () async {
+                                        Future.delayed(Duration(seconds: 1), () async {
                                           final oldAuthToken =
                                               await FirebaseAuth
                                                   .instance
@@ -558,6 +558,7 @@ class UnitListTile extends StatelessWidget {
                                         (PaymentFailureResponse response) {
                                           print("Payment Error");
                                           print(response);
+                                          isLoading.value = false;
                                           Navigator.of(sheetContext).pop();
                                           ScaffoldMessenger.of(
                                             sheetContext,

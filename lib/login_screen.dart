@@ -59,6 +59,58 @@ class _LoginScreenState extends State<LoginScreen> {
                               child: Container(
                                 color: Color(0xFFF26E0C),
                                 width: double.infinity,
+                                padding: EdgeInsets.only(
+                                  top: 48,
+                                  left: 24,
+                                  right: 24,
+                                ),
+                                child: Stack(
+                                  children: [
+                                    Expanded(
+                                      child: Column(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.center,
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
+                                        children: [
+                                          Text(
+                                            "Hack through your schedules",
+                                            style: Theme.of(context)
+                                                .textTheme
+                                                .headlineMedium
+                                                ?.copyWith(
+                                                  fontWeight: FontWeight.bold,
+                                                  color: Colors.white,
+                                                ),
+                                          ),
+                                          SizedBox(height: 12),
+                                          Opacity(
+                                            opacity: 0.7,
+                                            child: Text(
+                                              "Chitti is your go-to exam prep platform, offering curated resources like notes, cheat sheets, and videos crafted by top students for stress-free studying. We provide clear roadmaps for each subject, guiding you to focus on what matters most as exams approach.",
+                                              style: Theme.of(
+                                                context,
+                                              ).textTheme.bodyMedium?.copyWith(
+                                                color: Colors.white,
+                                              ),
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                    SizedBox(width: 16),
+                                    Transform.translate(
+                                      offset: Offset(24, 0),
+                                      child: Align(
+                                        alignment: Alignment.bottomRight,
+                                        child: Image.asset(
+                                          "assets/images/ghost-launch.png",
+                                          height: 200,
+                                        ),
+                                      ),
+                                    ),
+                                  ],
+                                ),
                               ),
                             )
                             : SizedBox(),
@@ -72,6 +124,58 @@ class _LoginScreenState extends State<LoginScreen> {
                                     child: Container(
                                       color: Color(0xFFF26E0C),
                                       width: double.infinity,
+                                      padding: EdgeInsets.only(
+                                        top: 48,
+                                        left: 24,
+                                        right: 24,
+                                      ),
+                                      child: Stack(
+                                        children: [
+                                          Expanded(
+                                            child: Column(
+                                              crossAxisAlignment:
+                                                  CrossAxisAlignment.start,
+                                              children: [
+                                                Text(
+                                                  "Hack through your schedules",
+                                                  style: Theme.of(context)
+                                                      .textTheme
+                                                      .headlineSmall
+                                                      ?.copyWith(
+                                                        fontWeight:
+                                                            FontWeight.bold,
+                                                        color: Colors.white,
+                                                      ),
+                                                ),
+                                                SizedBox(height: 12),
+                                                Opacity(
+                                                  opacity: 0.7,
+                                                  child: Text(
+                                                    "Chitti is your go-to exam prep platform, offering curated resources like notes, cheat sheets, and videos crafted by top students for stress-free studying. We provide clear roadmaps for each subject, guiding you to focus on what matters most as exams approach.",
+                                                    style: Theme.of(context)
+                                                        .textTheme
+                                                        .bodySmall
+                                                        ?.copyWith(
+                                                          color: Colors.white,
+                                                        ),
+                                                  ),
+                                                ),
+                                              ],
+                                            ),
+                                          ),
+                                          SizedBox(width: 16),
+                                          Transform.translate(
+                                            offset: Offset(24, 0),
+                                            child: Align(
+                                              alignment: Alignment.bottomRight,
+                                              child: Image.asset(
+                                                "assets/images/ghost-launch.png",
+                                                height: 150,
+                                              ),
+                                            ),
+                                          ),
+                                        ],
+                                      ),
                                     ),
                                   ),
                               Padding(
@@ -193,6 +297,7 @@ class _LoginScreenState extends State<LoginScreen> {
                                                   (json.decode(
                                                     loginRequest.body,
                                                   ))["webpage"];
+                                              isLoading.value = false;
                                               setState(() {});
                                             } else if (loginRequest
                                                     .statusCode ==
@@ -317,6 +422,9 @@ class _LoginScreenState extends State<LoginScreen> {
                                   ],
                                 ),
                               ),
+                              getSizeClass() == WidthSizeClass.large
+                                  ? Spacer()
+                                  : SizedBox(),
                             ],
                           ),
                         ),
