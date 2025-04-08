@@ -64,7 +64,10 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin {
                   );
                   launchUrl(Uri.parse("mailto:scorewithchitti@gmail.com"));
                 },
-                icon: Icon(Icons.bug_report_outlined),
+                icon: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [Icon(Icons.bug_report_outlined), Text("Help")],
+                ),
               ),
               SizedBox(width: 8),
               IconButton(
