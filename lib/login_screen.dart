@@ -73,7 +73,7 @@ class _LoginScreenState extends State<LoginScreen> {
                                           CrossAxisAlignment.start,
                                       children: [
                                         Text(
-                                          "Hack through your schedules",
+                                          "Hack through your exam prep",
                                           style: Theme.of(context)
                                               .textTheme
                                               .headlineMedium
@@ -135,7 +135,7 @@ class _LoginScreenState extends State<LoginScreen> {
                                                   CrossAxisAlignment.start,
                                               children: [
                                                 Text(
-                                                  "Hack through your schedules",
+                                                  "Hack through your exam prep",
                                                   style: Theme.of(context)
                                                       .textTheme
                                                       .headlineSmall
