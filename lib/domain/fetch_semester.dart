@@ -6,19 +6,21 @@ import 'package:device_info_plus/device_info_plus.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:http/http.dart';
+
 Future<String> fetchDeviceId() async {
-    if (Platform.isMacOS || Platform.isIOS) {
-      final deviceData = DeviceInfoPlugin();
-      final macOSData = await deviceData.macOsInfo;
-      return macOSData.systemGUID ?? "revoked";
-    } else if (Platform.isWindows) {
-      final deviceData = DeviceInfoPlugin();
-      final windowsData = await deviceData.windowsInfo;
-      return windowsData.deviceId;
-    } else {
-      return await FirebaseMessaging.instance.getToken() ?? "revoked";
-    }
+  if (Platform.isMacOS || Platform.isIOS) {
+    final deviceData = DeviceInfoPlugin();
+    final macOSData = await deviceData.macOsInfo;
+    return macOSData.systemGUID ?? "revoked";
+  } else if (Platform.isWindows) {
+    final deviceData = DeviceInfoPlugin();
+    final windowsData = await deviceData.windowsInfo;
+    return windowsData.deviceId;
+  } else {
+    return await FirebaseMessaging.instance.getToken() ?? "revoked";
   }
+}
+
 Future<Semester> fetchSemester(String token, Function onSignOut) async {
   final request = await get(
     Uri.parse(
@@ -32,7 +34,7 @@ Future<Semester> fetchSemester(String token, Function onSignOut) async {
   if (request.statusCode == 200) {
     final response = json.decode(request.body);
     return Semester.fromMap(response);
-  }else if(request.statusCode == 401){
+  } else if (request.statusCode == 401) {
     // MARK: Alert the user on wrong authentication details
     await FirebaseAuth.instance.signOut();
     onSignOut();

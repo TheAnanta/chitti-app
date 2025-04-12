@@ -43,6 +43,7 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin {
         WindowSizeClass().init(constraints);
         return Scaffold(
           appBar: AppBar(
+            automaticallyImplyLeading: false,
             backgroundColor: Theme.of(context).colorScheme.surface,
             title: Text(
               "CHITTI.",

@@ -129,6 +129,7 @@ class _LoginScreenState extends State<LoginScreen> {
                                       ),
                                       child: Stack(
                                         children: [
+<<<<<<< HEAD
                                           Expanded(
                                             child: Column(
                                               crossAxisAlignment:
@@ -136,30 +137,37 @@ class _LoginScreenState extends State<LoginScreen> {
                                               children: [
                                                 Text(
                                                   "Hack through your exam prep",
+=======
+                                          Column(
+                                            crossAxisAlignment:
+                                                CrossAxisAlignment.start,
+                                            children: [
+                                              Text(
+                                                "Hack through your schedules",
+                                                style: Theme.of(context)
+                                                    .textTheme
+                                                    .headlineSmall
+                                                    ?.copyWith(
+                                                      fontWeight:
+                                                          FontWeight.bold,
+                                                      color: Colors.white,
+                                                    ),
+                                              ),
+                                              SizedBox(height: 12),
+                                              Opacity(
+                                                opacity: 0.7,
+                                                child: Text(
+                                                  "Chitti is your go-to exam prep platform, offering curated resources like notes, cheat sheets, and videos crafted by top students for stress-free studying. We provide clear roadmaps for each subject, guiding you to focus on what matters most as exams approach.",
+>>>>>>> 029458b (added all latest changes)
                                                   style: Theme.of(context)
                                                       .textTheme
-                                                      .headlineSmall
+                                                      .bodySmall
                                                       ?.copyWith(
-                                                        fontWeight:
-                                                            FontWeight.bold,
                                                         color: Colors.white,
                                                       ),
                                                 ),
-                                                SizedBox(height: 12),
-                                                Opacity(
-                                                  opacity: 0.7,
-                                                  child: Text(
-                                                    "Chitti is your go-to exam prep platform, offering curated resources like notes, cheat sheets, and videos crafted by top students for stress-free studying. We provide clear roadmaps for each subject, guiding you to focus on what matters most as exams approach.",
-                                                    style: Theme.of(context)
-                                                        .textTheme
-                                                        .bodySmall
-                                                        ?.copyWith(
-                                                          color: Colors.white,
-                                                        ),
-                                                  ),
-                                                ),
-                                              ],
-                                            ),
+                                              ),
+                                            ],
                                           ),
                                           SizedBox(width: 16),
                                           Transform.translate(
@@ -344,16 +352,17 @@ class _LoginScreenState extends State<LoginScreen> {
                                                   return;
                                                 }
                                                 try {
-                                                  fetchSemester(token, (){
-                                                    Navigator.of(context).pushReplacement(
+                                                  fetchSemester(token, () {
+                                                    Navigator.of(
+                                                      context,
+                                                    ).pushReplacement(
                                                       MaterialPageRoute(
-                                                        builder: (context) =>
-                                                            LoginScreen(),
+                                                        builder:
+                                                            (context) =>
+                                                                LoginScreen(),
                                                       ),
                                                     );
-                                                  }).then((
-                                                    semester,
-                                                  ) {
+                                                  }).then((semester) {
                                                     SharedPreferences.getInstance().then((
                                                       sharedPreferences,
                                                     ) {
@@ -654,16 +663,17 @@ class _LoginScreenState extends State<LoginScreen> {
                                                   return;
                                                 }
                                                 try {
-                                                  fetchSemester(token, (){
-                                                    Navigator.of(context).pushReplacement(
+                                                  fetchSemester(token, () {
+                                                    Navigator.of(
+                                                      context,
+                                                    ).pushReplacement(
                                                       MaterialPageRoute(
-                                                        builder: (context) =>
-                                                            LoginScreen(),
+                                                        builder:
+                                                            (context) =>
+                                                                LoginScreen(),
                                                       ),
                                                     );
-                                                  }).then((
-                                                    semester,
-                                                  ) {
+                                                  }).then((semester) {
                                                     SharedPreferences.getInstance().then((
                                                       sharedPreferences,
                                                     ) {
