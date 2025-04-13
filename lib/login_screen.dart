@@ -129,21 +129,13 @@ class _LoginScreenState extends State<LoginScreen> {
                                       ),
                                       child: Stack(
                                         children: [
-<<<<<<< HEAD
-                                          Expanded(
-                                            child: Column(
+Column(
                                               crossAxisAlignment:
                                                   CrossAxisAlignment.start,
                                               children: [
                                                 Text(
                                                   "Hack through your exam prep",
-=======
-                                          Column(
-                                            crossAxisAlignment:
-                                                CrossAxisAlignment.start,
-                                            children: [
-                                              Text(
-                                                "Hack through your schedules",
+
                                                 style: Theme.of(context)
                                                     .textTheme
                                                     .headlineSmall
