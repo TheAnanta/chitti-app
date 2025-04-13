@@ -37,7 +37,7 @@ class UnitListTile extends StatelessWidget {
   final String courseId;
   final List<Unit> units;
   final String subjectCoverImage;
-  final Function(Unit)? onUnitTap;
+  final Function(Unit, String roadmapId, String roadmapName)? onUnitTap;
   ValueNotifier<bool> isLoading = ValueNotifier(false);
 
   @override
@@ -95,7 +95,7 @@ class UnitListTile extends StatelessWidget {
               } else if (units[index].isUnlocked && roadmapId != "IMPQUES") {
                 final selectedUnit = units[index];
                 if (onUnitTap != null) {
-                  onUnitTap!(selectedUnit);
+                  onUnitTap!(selectedUnit, roadmapId, roadmapName);
                   return;
                 }
                 // Fetch all the data

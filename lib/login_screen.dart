@@ -74,24 +74,22 @@ class _LoginScreenState extends State<LoginScreen> {
                                       children: [
                                         Text(
                                           "Hack through your exam prep",
-                                          style: Theme.of(context)
-                                              .textTheme
-                                              .headlineMedium
-                                              ?.copyWith(
-                                                fontWeight: FontWeight.bold,
-                                                color: Colors.white,
-                                              ),
+                                          style: Theme.of(
+                                            context,
+                                          ).textTheme.headlineMedium?.copyWith(
+                                            fontWeight: FontWeight.bold,
+                                            color: Colors.white,
+                                          ),
                                         ),
                                         SizedBox(height: 12),
                                         Opacity(
                                           opacity: 0.7,
                                           child: Text(
                                             "Chitti is your go-to exam prep platform, offering curated resources like notes, cheat sheets, and videos crafted by top students for stress-free studying. We provide clear roadmaps for each subject, guiding you to focus on what matters most as exams approach.",
-                                            style: Theme.of(
-                                              context,
-                                            ).textTheme.bodyMedium?.copyWith(
-                                              color: Colors.white,
-                                            ),
+                                            style: Theme.of(context)
+                                                .textTheme
+                                                .bodyMedium
+                                                ?.copyWith(color: Colors.white),
                                           ),
                                         ),
                                       ],
@@ -129,12 +127,12 @@ class _LoginScreenState extends State<LoginScreen> {
                                       ),
                                       child: Stack(
                                         children: [
-Column(
-                                              crossAxisAlignment:
-                                                  CrossAxisAlignment.start,
-                                              children: [
-                                                Text(
-                                                  "Hack through your exam prep",
+                                          Column(
+                                            crossAxisAlignment:
+                                                CrossAxisAlignment.start,
+                                            children: [
+                                              Text(
+                                                "Hack through your exam prep",
 
                                                 style: Theme.of(context)
                                                     .textTheme
@@ -150,7 +148,6 @@ Column(
                                                 opacity: 0.7,
                                                 child: Text(
                                                   "Chitti is your go-to exam prep platform, offering curated resources like notes, cheat sheets, and videos crafted by top students for stress-free studying. We provide clear roadmaps for each subject, guiding you to focus on what matters most as exams approach.",
->>>>>>> 029458b (added all latest changes)
                                                   style: Theme.of(context)
                                                       .textTheme
                                                       .bodySmall

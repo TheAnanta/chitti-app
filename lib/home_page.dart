@@ -180,134 +180,123 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin {
                             builder: (context, constraints) {
                               WindowSizeClass().init(constraints);
                               onTap(Subject subject, index) {
-                                // if (getSizeClass() == WidthSizeClass.large) {
-                                //   Navigator.of(context).push(
-                                //     MaterialPageRoute(
-                                //       builder: (context) {
-                                //         return FutureBuilder(
-                                //           future: Injector.unitRepository
-                                //               .fetchUnit(
-                                //                 context,
-                                //                 subject.courseId,
-                                //                 subject.units[0],
-                                //                 subject
-                                //                         .units[0]
-                                //                         .roadmap
-                                //                         ?.roadmapItems
-                                //                         .firstOrNull
-                                //                         ?.id ??
-                                //                     "",
-                                //               ),
-                                //           builder: (context, futureValue) {
-                                //             if (futureValue.hasData) {
-                                //               final unit = futureValue.data!;
-                                //               return UnitResourcePageExtended(
-                                //                 initialUnit: unit,
-                                //                 subjectName: subject.title,
-                                //                 initialUnitIndex: index + 1,
-                                //                 subjectCoverImage:
-                                //                     subject.image,
-                                //                 courseId: subject.courseId,
-                                //                 subject: subject,
-                                //               );
-                                //             }
-                                //             return Scaffold(
-                                //               body: Center(
-                                //                 child: Column(
-                                //                   mainAxisAlignment:
-                                //                       MainAxisAlignment.center,
-                                //                   children: [
-                                //                     SizedBox(height: 128),
-                                //                     CircularProgressIndicator(
-                                //                       color:
-                                //                           Colors.grey.shade800,
-                                //                     ),
-                                //                     SizedBox(height: 24),
-                                //                     Align(
-                                //                       alignment:
-                                //                           Alignment.centerLeft,
-                                //                       child: AnimatedImageEntry(
-                                //                         child: Row(
-                                //                           mainAxisSize:
-                                //                               MainAxisSize.min,
-                                //                           mainAxisAlignment:
-                                //                               MainAxisAlignment
-                                //                                   .start,
-                                //                           children: [
-                                //                             Transform.flip(
-                                //                               flipX: true,
-                                //                               child: Transform.translate(
-                                //                                 offset: Offset(
-                                //                                   0,
-                                //                                   48,
-                                //                                 ),
-                                //                                 child: ColorFiltered(
-                                //                                   colorFilter:
-                                //                                       ColorFilters.matrix(
-                                //                                         saturation:
-                                //                                             -1,
-                                //                                         brightness:
-                                //                                             0.5,
-                                //                                       ),
-                                //                                   child: Image.asset(
-                                //                                     "assets/images/ghost_blue.png",
-                                //                                     height: 180,
-                                //                                   ),
-                                //                                 ),
-                                //                               ),
-                                //                             ),
-                                //                             Container(
-                                //                               padding:
-                                //                                   EdgeInsets.all(
-                                //                                     12,
-                                //                                   ),
-                                //                               width: 264,
-                                //                               decoration: BoxDecoration(
-                                //                                 borderRadius:
-                                //                                     BorderRadius.circular(
-                                //                                       8,
-                                //                                     ),
-                                //                                 color:
-                                //                                     Colors
-                                //                                         .grey
-                                //                                         .shade400,
-                                //                               ),
-                                //                               child: Opacity(
-                                //                                 opacity: 0.6,
-                                //                                 child: Text(
-                                //                                   "Go grab a break while we sneak into the server.",
-                                //                                   textAlign:
-                                //                                       TextAlign
-                                //                                           .center,
-                                //                                   style:
-                                //                                       Theme.of(
-                                //                                         context,
-                                //                                       ).textTheme.titleMedium,
-                                //                                 ),
-                                //                               ),
-                                //                             ),
-                                //                           ],
-                                //                         ),
-                                //                       ),
-                                //                     ),
-                                //                   ],
-                                //                 ),
-                                //               ),
-                                //             );
-                                //           },
-                                //         );
-                                //       },
-                                //     ),
-                                //   );
-                                // } else {
-                                Navigator.of(context).push(
-                                  MaterialPageRoute(
-                                    builder:
-                                        (context) =>
-                                            SubjectPage(subject: subject),
-                                  ),
-                                );
-                                // }
+                                if (getSizeClass() == WidthSizeClass.large) {
+                                  Navigator.of(context).push(
+                                    MaterialPageRoute(
+                                      builder: (context) {
+                                        return FutureBuilder(
+                                          future: fetchSubjectForExtended(
+                                            context,
+                                            subject,
+                                          ),
+                                          builder: (context, futureValue) {
+                                            if (futureValue.connectionState ==
+                                                ConnectionState.done) {
+                                              return UnitResourcePageExtended(
+                                                subjectName: subject.title,
+                                                subjectCoverImage:
+                                                    subject.image,
+                                                courseId: subject.courseId,
+                                                subject: subject,
+                                              );
+                                            }
+                                            return Scaffold(
+                                              body: Center(
+                                                child: Column(
+                                                  mainAxisAlignment:
+                                                      MainAxisAlignment.center,
+                                                  children: [
+                                                    SizedBox(height: 128),
+                                                    CircularProgressIndicator(
+                                                      color:
+                                                          Colors.grey.shade800,
+                                                    ),
+                                                    SizedBox(height: 24),
+                                                    Align(
+                                                      alignment:
+                                                          Alignment.centerLeft,
+                                                      child: AnimatedImageEntry(
+                                                        child: Row(
+                                                          mainAxisSize:
+                                                              MainAxisSize.min,
+                                                          mainAxisAlignment:
+                                                              MainAxisAlignment
+                                                                  .start,
+                                                          children: [
+                                                            Transform.flip(
+                                                              flipX: true,
+                                                              child: Transform.translate(
+                                                                offset: Offset(
+                                                                  0,
+                                                                  48,
+                                                                ),
+                                                                child: ColorFiltered(
+                                                                  colorFilter:
+                                                                      ColorFilters.matrix(
+                                                                        saturation:
+                                                                            -1,
+                                                                        brightness:
+                                                                            0.5,
+                                                                      ),
+                                                                  child: Image.asset(
+                                                                    "assets/images/ghost_blue.png",
+                                                                    height: 180,
+                                                                  ),
+                                                                ),
+                                                              ),
+                                                            ),
+                                                            Container(
+                                                              padding:
+                                                                  EdgeInsets.all(
+                                                                    12,
+                                                                  ),
+                                                              width: 264,
+                                                              decoration: BoxDecoration(
+                                                                borderRadius:
+                                                                    BorderRadius.circular(
+                                                                      8,
+                                                                    ),
+                                                                color:
+                                                                    Colors
+                                                                        .grey
+                                                                        .shade400,
+                                                              ),
+                                                              child: Opacity(
+                                                                opacity: 0.6,
+                                                                child: Text(
+                                                                  "Go grab a break while we sneak into the server.",
+                                                                  textAlign:
+                                                                      TextAlign
+                                                                          .center,
+                                                                  style:
+                                                                      Theme.of(
+                                                                        context,
+                                                                      ).textTheme.titleMedium,
+                                                                ),
+                                                              ),
+                                                            ),
+                                                          ],
+                                                        ),
+                                                      ),
+                                                    ),
+                                                  ],
+                                                ),
+                                              ),
+                                            );
+                                          },
+                                        );
+                                      },
+                                    ),
+                                  );
+                                } else {
+                                  Navigator.of(context).push(
+                                    MaterialPageRoute(
+                                      builder:
+                                          (context) =>
+                                              SubjectPage(subject: subject),
+                                    ),
+                                  );
+                                }
                               }
 
                               itemBuilder(_, index) {
@@ -393,6 +382,23 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin {
         );
       },
     );
+  }
+
+  Future<void> fetchSubjectForExtended(
+    BuildContext context,
+    Subject subject,
+  ) async {
+    for (var unit in subject.units) {
+      for (var roadmap
+          in (unit.roadmap?.roadmapItems ?? List<Roadmap>.empty())) {
+        await Injector.unitRepository.fetchUnit(
+          context,
+          subject.courseId,
+          unit,
+          (roadmap as RoadmapItem).id,
+        );
+      }
+    }
   }
 }
 
