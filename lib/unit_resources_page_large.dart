@@ -1,8 +1,6 @@
 import 'dart:math' show max, min;
 
-import 'package:chitti/animated_image.dart';
 import 'package:chitti/color_filters.dart';
-import 'package:chitti/data/important_questions.dart';
 import 'package:chitti/data/semester.dart';
 import 'package:chitti/domain/fetch_resources.dart';
 import 'package:chitti/injector.dart';
