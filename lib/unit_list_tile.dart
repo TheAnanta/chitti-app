@@ -353,6 +353,28 @@ class UnitListTile extends StatelessWidget {
                                   FilledButton(
                                     onPressed: () async {
                                       isLoading.value = true;
+                                      SharedPreferences sharedPreferences =
+                                          await SharedPreferences.getInstance();
+                                      // Check if user agreed to the terms
+                                      if (!(sharedPreferences.getBool(
+                                            "isFirstTime",
+                                          ) ??
+                                          false)) {
+                                        isLoading.value = false;
+                                        ScaffoldMessenger.of(
+                                          sheetContext,
+                                        ).showSnackBar(
+                                          SnackBar(
+                                            content: Text(
+                                              "Please agree to the terms and conditions before proceeding.",
+                                            ),
+                                          ),
+                                        );
+                                        return showTermsModalSheet(
+                                          context,
+                                          sharedPreferences,
+                                        );
+                                      }
                                       if (Platform.isMacOS ||
                                           Platform.isWindows) {
                                         Navigator.of(context).push(

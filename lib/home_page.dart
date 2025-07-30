@@ -10,6 +10,7 @@ import 'package:chitti/unit_resources_page_large.dart';
 import 'package:collection/collection.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 class MyHomePage extends StatefulWidget {
@@ -33,6 +34,16 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin {
       length: widget.semester.courses.length,
       vsync: this,
     );
+
+    SharedPreferences.getInstance().then((prefs) {
+      //Check if the user is first time using the app
+      bool isFirstTime = prefs.getBool('isFirstTime') ?? true;
+
+      if (isFirstTime) {
+        // Show onboarding
+        showTermsModalSheet(context, prefs);
+      }
+    });
   }
 
   @override
@@ -409,6 +420,123 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin {
       }
     }
   }
+}
+
+Future showTermsModalSheet(BuildContext context, SharedPreferences prefs) {
+  return showModalBottomSheet(
+    showDragHandle: true,
+    enableDrag: true,
+    context: context,
+    isDismissible: false,
+    builder: (context) {
+      bool isTermsAccepted = false;
+      return BottomSheet(
+        onClosing: () {
+          Navigator.of(context).pop();
+        },
+        builder: (context) {
+          return SingleChildScrollView(
+            child: StatefulBuilder(
+              builder: (context, setSheetState) {
+                return Padding(
+                  padding: const EdgeInsets.all(
+                    16.0,
+                  ).copyWith(top: 24, bottom: 24),
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        "Welcome to CHITTI!",
+                        style: Theme.of(context).textTheme.headlineSmall
+                            ?.copyWith(fontWeight: FontWeight.w600),
+                      ),
+                      SizedBox(height: 8),
+                      Text(
+                        "This app will help you prepare for your exams effectively. You can track your progress, access resources, and stay motivated.",
+                      ),
+                      SizedBox(height: 16),
+                      Text(
+                        "Here’s how to get started:",
+                        style: Theme.of(context).textTheme.bodyMedium,
+                      ),
+                      SizedBox(height: 8),
+                      ListView.builder(
+                        itemBuilder: (context, index) {
+                          final steps = [
+                            "Choose the course you aim to ace.",
+                            "Make the payment.",
+                            "Track your progress and stay motivated.",
+                            "Oops, no sharing of credentials, please.",
+                            "Device restrictions apply.",
+                            "If you face any issues, report them to us.",
+                          ];
+                          final descriptions = [
+                            "Select the course you want to focus on from the list.",
+                            "Complete the payment, either medium plan (MID) or pro plan (SEM), to unlock all resources for the course.",
+                            "Monitor your learning progress and stay motivated with our tools.",
+                            "Your credentials are for your use only. Please do not share them. Any misuse will lead to account suspension.",
+                            "Please use the app on a single device only. Any attempt to use the app on multiple devices will result in account suspension.",
+                            "For any issues, please contact us at support@chitti.com",
+                          ];
+                          final icons = [
+                            Icons.book,
+                            Icons.payment,
+                            Icons.bar_chart,
+                            Icons.lock,
+                            Icons.devices,
+                            Icons.report_problem,
+                          ];
+                          return ListTile(
+                            leading: Icon(icons[index]),
+                            title: Text(steps[index]),
+                            subtitle: Text(descriptions[index]),
+                          );
+                        },
+                        itemCount: 6,
+                        shrinkWrap: true,
+                        physics: NeverScrollableScrollPhysics(),
+                      ),
+                      Row(
+                        children: [
+                          Checkbox(
+                            value: isTermsAccepted,
+                            onChanged: (value) {
+                              setSheetState(() {
+                                isTermsAccepted = value ?? false;
+                              });
+                            },
+                          ),
+                          Text(
+                            "I accept the terms and conditions.",
+                            style: Theme.of(context).textTheme.bodyMedium,
+                          ),
+                        ],
+                      ),
+                      SizedBox(height: 16),
+                      SizedBox(
+                        width: double.infinity,
+                        child: FilledButton(
+                          onPressed:
+                              isTermsAccepted
+                                  ? () {
+                                    prefs.setBool('isFirstTime', false);
+                                    Navigator.of(context).pop();
+                                  }
+                                  : null,
+                          child: Text("Get Started"),
+                        ),
+                      ),
+                    ],
+                  ),
+                );
+              },
+            ),
+          );
+        },
+      );
+    },
+  );
 }
 
 class SubjectCardExpanded extends StatelessWidget {
