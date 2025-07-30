@@ -19,7 +19,7 @@ void disableScreenshot(context) async {
               body: BottomSheet(
                 onClosing: () {},
                 builder: (context) {
-                  return Container(
+                  return SizedBox(
                     height: 200,
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,

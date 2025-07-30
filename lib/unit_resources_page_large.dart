@@ -291,7 +291,6 @@ class _UnitResourcePageExtendedState extends State<UnitResourcePageExtended>
                       valueListenable: _unit,
                       builder: (context, _unitWithIndex, _) {
                         final unit = _unitWithIndex?.unit;
-                        final unitIndex = _unitWithIndex?.index;
                         if (unit == null) {
                           return Expanded(
                             flex: 2,
@@ -473,6 +472,8 @@ class _UnitResourcePageExtendedState extends State<UnitResourcePageExtended>
                     courseId: courseId,
                     resourceId: notesItem.id,
                     resourceName: notesItem.name,
+                    unitId: _unit.value?.unit.unitId ?? "",
+                    resourceType: "notes",
                   ),
                 );
                 Navigator.of(context).push(
@@ -586,6 +587,10 @@ class _UnitResourcePageExtendedState extends State<UnitResourcePageExtended>
                                               courseId: courseId,
                                               resourceId: videos[index].id,
                                               resourceName: videos[index].name,
+                                              unitId:
+                                                  _unit.value?.unit.unitId ??
+                                                  "",
+                                              resourceType: "video",
                                             ),
                                           );
                                         },
@@ -601,6 +606,10 @@ class _UnitResourcePageExtendedState extends State<UnitResourcePageExtended>
                                                 resourceId: videos[index].id,
                                                 resourceName:
                                                     videos[index].name,
+                                                unitId:
+                                                    _unit.value?.unit.unitId ??
+                                                    "",
+                                                resourceType: "video",
                                               ),
                                             ) ??
                                         false)
@@ -654,31 +663,6 @@ class _UnitResourcePageExtendedState extends State<UnitResourcePageExtended>
         );
   }
 
-  Widget _buildRoadmapView(Roadmap? roadmap) {
-    return roadmap == null
-        ? Center(child: Text("You haven't purchased a valid subscription."))
-        : roadmap.roadmapItems.isEmpty
-        ? Center(child: Text("No roadmap available."))
-        : ListView.separated(
-          padding: EdgeInsets.symmetric(horizontal: 0, vertical: 12),
-          itemBuilder: (context, index) {
-            final roadmapItem = roadmap.roadmapItems[index];
-            return ListTile(
-              title: Text(
-                roadmapItem.name,
-                style: Theme.of(
-                  context,
-                ).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w600),
-              ),
-              trailing: Text(roadmapItem.difficulty),
-            );
-          },
-          separatorBuilder: (_, __) => Divider(),
-          itemCount: roadmap.roadmapItems.length,
-          shrinkWrap: true,
-        );
-  }
-
   Widget _buildCheatsheetView(List<Cheatsheet>? cheatsheets, String courseId) {
     return cheatsheets == null
         ? Center(child: Text("You haven't purchased a valid subscription."))
@@ -701,6 +685,8 @@ class _UnitResourcePageExtendedState extends State<UnitResourcePageExtended>
                           courseId: courseId,
                           resourceId: cheatsheet.id,
                           resourceName: cheatsheet.name,
+                          unitId: _unit.value?.unit.unitId ?? "",
+                          resourceType: "cheatsheet",
                         ),
                       );
                     }

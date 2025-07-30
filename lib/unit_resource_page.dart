@@ -67,7 +67,6 @@ class _UnitResourcePageState extends State<UnitResourcePage>
 
   @override
   void dispose() {
-    // TODO: implement dispose
     _scrollOffsetNotifier.dispose(); // Dispose the ValueNotifier
     _tabController.dispose();
     _scrollController.dispose();
@@ -303,14 +302,14 @@ class _UnitResourcePageState extends State<UnitResourcePage>
             final notesItem = notes[index];
             return ListTile(
               onTap: () {
-                //TODO: Show PDF
-
                 addCompletedResource(
                   context,
                   CompletedResources(
                     courseId: courseId,
                     resourceId: notesItem.id,
                     resourceName: notesItem.name,
+                    unitId: widget.unit.unitId,
+                    resourceType: "notes",
                   ),
                 );
                 Navigator.of(context).push(
@@ -403,6 +402,8 @@ class _UnitResourcePageState extends State<UnitResourcePage>
                                               courseId: courseId,
                                               resourceId: videos[index].id,
                                               resourceName: videos[index].name,
+                                              unitId: widget.unit.unitId,
+                                              resourceType: "video",
                                             ),
                                           );
                                         },
@@ -418,6 +419,8 @@ class _UnitResourcePageState extends State<UnitResourcePage>
                                                 resourceId: videos[index].id,
                                                 resourceName:
                                                     videos[index].name,
+                                                unitId: widget.unit.unitId,
+                                                resourceType: "video",
                                               ),
                                             ) ??
                                         false)
@@ -472,31 +475,6 @@ class _UnitResourcePageState extends State<UnitResourcePage>
         );
   }
 
-  Widget _buildRoadmapView(Roadmap? roadmap) {
-    return roadmap == null
-        ? Center(child: Text("You haven't purchased a valid subscription."))
-        : roadmap.roadmapItems.isEmpty
-        ? Center(child: Text("No roadmap available."))
-        : ListView.separated(
-          padding: EdgeInsets.symmetric(horizontal: 0, vertical: 12),
-          itemBuilder: (context, index) {
-            final roadmapItem = roadmap.roadmapItems[index];
-            return ListTile(
-              title: Text(
-                roadmapItem.name,
-                style: Theme.of(
-                  context,
-                ).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w600),
-              ),
-              trailing: Text(roadmapItem.difficulty),
-            );
-          },
-          separatorBuilder: (_, __) => Divider(),
-          itemCount: roadmap.roadmapItems.length,
-          shrinkWrap: true,
-        );
-  }
-
   Widget _buildCheatsheetView(List<Cheatsheet>? cheatsheets, String courseId) {
     return cheatsheets == null
         ? Center(child: Text("You haven't purchased a valid subscription."))
@@ -519,6 +497,8 @@ class _UnitResourcePageState extends State<UnitResourcePage>
                           courseId: courseId,
                           resourceId: cheatsheet.id,
                           resourceName: cheatsheet.name,
+                          unitId: widget.unit.unitId,
+                          resourceType: "cheatsheet",
                         ),
                       );
                     }
@@ -777,7 +757,6 @@ class _VideoPlayerWidgetState extends State<VideoPlayerWidget> {
 
   @override
   void initState() {
-    // TODO: implement initState
     super.initState();
     SystemChrome.setPreferredOrientations([
       DeviceOrientation.landscapeRight,

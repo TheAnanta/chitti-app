@@ -7,6 +7,7 @@ import 'package:chitti/size_config.dart';
 import 'package:device_info_plus/device_info_plus.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 import 'package:http/http.dart';
@@ -116,63 +117,7 @@ class _LoginScreenState extends State<LoginScreen> {
                             children: [
                               getSizeClass() == WidthSizeClass.large
                                   ? Spacer()
-                                  : Expanded(
-                                    child: Container(
-                                      color: Color(0xFFF26E0C),
-                                      width: double.infinity,
-                                      padding: EdgeInsets.only(
-                                        top: 48,
-                                        left: 24,
-                                        right: 24,
-                                      ),
-                                      child: Stack(
-                                        children: [
-                                          Column(
-                                            crossAxisAlignment:
-                                                CrossAxisAlignment.start,
-                                            children: [
-                                              Text(
-                                                "Hack through your exam prep",
-
-                                                style: Theme.of(context)
-                                                    .textTheme
-                                                    .headlineSmall
-                                                    ?.copyWith(
-                                                      fontWeight:
-                                                          FontWeight.bold,
-                                                      color: Colors.white,
-                                                    ),
-                                              ),
-                                              SizedBox(height: 12),
-                                              Opacity(
-                                                opacity: 0.7,
-                                                child: Text(
-                                                  "Chitti is your go-to exam prep platform, offering curated resources like notes, cheat sheets, and videos crafted by top students for stress-free studying. We provide clear roadmaps for each subject, guiding you to focus on what matters most as exams approach.",
-                                                  style: Theme.of(context)
-                                                      .textTheme
-                                                      .bodySmall
-                                                      ?.copyWith(
-                                                        color: Colors.white,
-                                                      ),
-                                                ),
-                                              ),
-                                            ],
-                                          ),
-                                          SizedBox(width: 16),
-                                          Transform.translate(
-                                            offset: Offset(24, 0),
-                                            child: Align(
-                                              alignment: Alignment.bottomRight,
-                                              child: Image.asset(
-                                                "assets/images/ghost-launch.png",
-                                                height: 150,
-                                              ),
-                                            ),
-                                          ),
-                                        ],
-                                      ),
-                                    ),
-                                  ),
+                                  : Expanded(child: OnboardingSlideOne()),
                               Padding(
                                 padding: EdgeInsets.all(
                                   getSizeClass() == WidthSizeClass.large
@@ -461,7 +406,6 @@ class _LoginScreenState extends State<LoginScreen> {
                             data: htmlString,
                           ),
                           onLoadStop: (controller, url) {
-                            print(url.toString());
                             if (Platform.isWindows
                                 ? url.toString() == ""
                                 : url.toString() == "about:blank") {
@@ -471,7 +415,9 @@ class _LoginScreenState extends State<LoginScreen> {
                                       "document.getElementById('Submit').click();",
                                 );
                               } on Exception catch (e) {
-                                print(e);
+                                if (kDebugMode) {
+                                  print(e);
+                                }
                               }
                             } else if (url.toString().contains(
                               "https://login.gitam.edu",
@@ -480,7 +426,6 @@ class _LoginScreenState extends State<LoginScreen> {
                                 source:
                                     'document.body.innerHTML.search("Invalid User ID / Password. Please try again. !")',
                               )).then((isError) {
-                                print(isError);
                                 if (double.parse(isError.toString()) > 0) {
                                   _passwordController.clear();
                                   password = "";
@@ -507,7 +452,7 @@ class _LoginScreenState extends State<LoginScreen> {
                                     name: "ASP.NET_SessionId",
                                   )
                                   .then((cookie) {
-                                    print(cookie?.value);
+                                    print("COOKIEDATA: ${cookie?.value}");
                                     get(
                                       Uri.parse(
                                         "https://gstudent.gitam.edu/Home/GetStudentData",
@@ -517,7 +462,7 @@ class _LoginScreenState extends State<LoginScreen> {
                                             "ASP.NET_SessionId=${cookie?.value}",
                                       },
                                     ).then((response) {
-                                      print(response.body);
+                                      print(response);
                                       final tag =
                                           RegExp(
                                                 r'<input\s+class="form-control"\s+id="curr_sem"\s+name="curr_sem"\s+onkeydown="return ValidateSpecialText\(event\);"\s+readonly="readonly"\s+type="text"\s+value="[0-9]*"\s*/>',
@@ -612,6 +557,7 @@ class _LoginScreenState extends State<LoginScreen> {
                                           "name": name,
                                           "courses": res.toSet().toList(),
                                         };
+                                        print("PAYLOAD: $payload");
                                         final signupRequest = await post(
                                           Uri.parse(
                                             "https://asia-south1-chitti-ananta.cloudfunctions.net/webApi/signup",
@@ -749,7 +695,24 @@ class _LoginScreenState extends State<LoginScreen> {
                       color: Colors.white,
                       height: double.infinity,
                       width: double.infinity,
-                      child: Center(child: CircularProgressIndicator()),
+                      child: Center(
+                        child: Column(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            CircularProgressIndicator(),
+                            SizedBox(height: 16),
+                            Text(
+                              "Hang on there for a moment...",
+                              style: Theme.of(context).textTheme.titleMedium
+                                  ?.copyWith(fontWeight: FontWeight.w700),
+                            ),
+                            Text(
+                              ".. as we break some walls for you.",
+                              style: Theme.of(context).textTheme.bodyMedium,
+                            ),
+                          ],
+                        ),
+                      ),
                     ),
                   ],
                 ),
@@ -758,10 +721,14 @@ class _LoginScreenState extends State<LoginScreen> {
   }
 
   Future<String> fetchDeviceId() async {
-    if (Platform.isMacOS || Platform.isIOS) {
+    if (Platform.isMacOS) {
       final deviceData = DeviceInfoPlugin();
       final macOSData = await deviceData.macOsInfo;
       return macOSData.systemGUID ?? "revoked";
+    } else if (Platform.isIOS) {
+      final deviceData = DeviceInfoPlugin();
+      final iosData = await deviceData.iosInfo;
+      return iosData.identifierForVendor ?? "revoked";
     } else if (Platform.isWindows) {
       final deviceData = DeviceInfoPlugin();
       final windowsData = await deviceData.windowsInfo;
@@ -769,5 +736,139 @@ class _LoginScreenState extends State<LoginScreen> {
     } else {
       return await FirebaseMessaging.instance.getToken() ?? "revoked";
     }
+  }
+}
+
+class OnboardingSlideOne extends StatelessWidget {
+  const OnboardingSlideOne({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    final headlines = [
+      "Hack through your exam prep",
+      "Chitti turns one!!",
+      "99% users passed with Chitti",
+      "Hear it from our students",
+    ];
+    final descriptions = [
+      "Chitti is your go-to exam prep platform, offering curated resources like notes, cheat sheets, and videos crafted by top students for stress-free studying. We provide clear roadmaps for each subject, guiding you to focus on what matters most as exams approach.",
+      "Chitti is celebrating its first anniversary! Join us in this journey of academic excellence and discover how we can help you ace your exams with ease.",
+      "With a 99% success rate, Chitti has helped over 300 students achieve their academic goals. Our platform is designed to simplify your exam preparation, ensuring you have the best resources at your fingertips.",
+      //Testimonial from student
+      "Chitti made studying so much easier for me! I couldn't have done it without their help.\n~ John Doe",
+    ];
+    return PageView.builder(
+      itemCount: 4,
+      itemBuilder: (context, index) {
+        return Container(
+          color:
+              [
+                Color(0xFFF26E0C),
+                Color(0xFFA08DFF),
+                Color(0xFF8FD14F),
+                Color(0xFFF7AD19),
+              ][index],
+          width: double.infinity,
+          padding: EdgeInsets.only(top: 48, left: 24, right: 24),
+          child: Stack(
+            children: [
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    headlines[index],
+
+                    style: Theme.of(context).textTheme.headlineSmall?.copyWith(
+                      fontWeight: FontWeight.bold,
+                      color: Colors.white,
+                    ),
+                  ),
+                  SizedBox(height: 12),
+                  Opacity(
+                    opacity: 0.7,
+                    child: Text(
+                      descriptions[index],
+                      style: Theme.of(
+                        context,
+                      ).textTheme.bodySmall?.copyWith(color: Colors.white),
+                    ),
+                  ),
+                ],
+              ),
+              SizedBox(width: 16),
+              Transform.translate(
+                offset: Offset(24, 0),
+                child: Align(
+                  alignment: Alignment.bottomRight,
+                  child: Image.asset(
+                    "assets/images/ghost-launch.png",
+                    height: 150,
+                  ),
+                ),
+              ),
+              Align(
+                alignment: Alignment.bottomCenter,
+                child: Padding(
+                  padding: const EdgeInsets.only(bottom: 16),
+                  child: Row(
+                    children: [
+                      Spacer(),
+                      Container(
+                        width: 8,
+                        height: 8,
+                        decoration: BoxDecoration(
+                          color:
+                              index == 0
+                                  ? Colors.white
+                                  : Colors.black.withValues(alpha: 0.2),
+                          shape: BoxShape.circle,
+                        ),
+                      ),
+                      SizedBox(width: 12),
+                      Container(
+                        width: 8,
+                        height: 8,
+                        decoration: BoxDecoration(
+                          color:
+                              index == 1
+                                  ? Colors.white
+                                  : Colors.black.withValues(alpha: 0.2),
+                          shape: BoxShape.circle,
+                        ),
+                      ),
+                      SizedBox(width: 12),
+                      Container(
+                        width: 8,
+                        height: 8,
+                        decoration: BoxDecoration(
+                          color:
+                              index == 2
+                                  ? Colors.white
+                                  : Colors.black.withValues(alpha: 0.2),
+                          shape: BoxShape.circle,
+                        ),
+                      ),
+                      SizedBox(width: 12),
+                      Container(
+                        width: 8,
+                        height: 8,
+                        decoration: BoxDecoration(
+                          color:
+                              index == 3
+                                  ? Colors.white
+                                  : Colors.black.withValues(alpha: 0.2),
+                          shape: BoxShape.circle,
+                        ),
+                      ),
+                      Spacer(),
+                    ],
+                  ),
+                ),
+              ),
+            ],
+          ),
+        );
+      },
+    );
   }
 }

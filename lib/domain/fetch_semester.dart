@@ -8,10 +8,14 @@ import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:http/http.dart';
 
 Future<String> fetchDeviceId() async {
-  if (Platform.isMacOS || Platform.isIOS) {
+  if (Platform.isMacOS) {
     final deviceData = DeviceInfoPlugin();
     final macOSData = await deviceData.macOsInfo;
     return macOSData.systemGUID ?? "revoked";
+  } else if (Platform.isIOS) {
+    final deviceData = DeviceInfoPlugin();
+    final iosData = await deviceData.iosInfo;
+    return iosData.identifierForVendor ?? "revoked";
   } else if (Platform.isWindows) {
     final deviceData = DeviceInfoPlugin();
     final windowsData = await deviceData.windowsInfo;

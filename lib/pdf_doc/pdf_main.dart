@@ -1,4 +1,3 @@
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:pdfrx/pdfrx.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -9,9 +8,6 @@ import 'search_view.dart';
 import 'thumbnails_view.dart';
 
 class PDFViewPage extends StatefulWidget {
-  /**
-   * 
-   */
   final PdfDocumentRef documentRef;
   final String pdfName;
   const PDFViewPage({
@@ -141,8 +137,9 @@ class _PDFViewPageState extends State<PDFViewPage> with WidgetsBindingObserver {
                     visualDensity: visualDensity,
                     icon: const Icon(Icons.first_page),
                     onPressed: () {
-                      if (controller.isReady)
+                      if (controller.isReady) {
                         controller.goToPage(pageNumber: 1);
+                      }
                     },
                   ),
                   IconButton(
@@ -211,8 +208,9 @@ class _PDFViewPageState extends State<PDFViewPage> with WidgetsBindingObserver {
                                   ValueListenableBuilder(
                                     valueListenable: textSearcher,
                                     builder: (context, textSearcher, child) {
-                                      if (textSearcher == null)
+                                      if (textSearcher == null) {
                                         return SizedBox();
+                                      }
                                       return TextSearchView(
                                         textSearcher: textSearcher,
                                       );
@@ -270,14 +268,6 @@ class _PDFViewPageState extends State<PDFViewPage> with WidgetsBindingObserver {
                 children: [
                   Builder(
                     builder: (context) {
-                      if (widget.documentRef == null) {
-                        return const Center(
-                          child: Text(
-                            'No document loaded',
-                            style: TextStyle(fontSize: 20),
-                          ),
-                        );
-                      }
                       return PdfViewer(
                         widget.documentRef,
                         // PdfViewer.asset(
@@ -404,9 +394,7 @@ class _PDFViewPageState extends State<PDFViewPage> with WidgetsBindingObserver {
                                         color: Colors.black,
                                         child: Center(
                                           child: Text(
-                                            pageNumber.toString() +
-                                                ' / ' +
-                                                controller.pageCount.toString(),
+                                            '$pageNumber / ${controller.pageCount}',
                                             style: const TextStyle(
                                               color: Colors.white,
                                             ),
@@ -569,11 +557,5 @@ class _PDFViewPageState extends State<PDFViewPage> with WidgetsBindingObserver {
       },
     );
     return result ?? false;
-  }
-
-  static String? _fileName(String? path) {
-    if (path == null) return null;
-    final parts = path.split(RegExp(r'[\\/]'));
-    return parts.isEmpty ? path : parts.last;
   }
 }

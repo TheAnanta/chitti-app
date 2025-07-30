@@ -38,7 +38,7 @@ class UnitListTile extends StatelessWidget {
   final List<Unit> units;
   final String subjectCoverImage;
   final Function(Unit, String roadmapId, String roadmapName)? onUnitTap;
-  ValueNotifier<bool> isLoading = ValueNotifier(false);
+  final ValueNotifier<bool> isLoading = ValueNotifier(false);
 
   @override
   Widget build(BuildContext context) {
@@ -191,13 +191,14 @@ class UnitListTile extends StatelessWidget {
                   ),
                 );
               } else if (roadmapId == "IMPQUES") {
-                //TODO: Fetch the PDF url
                 addCompletedResource(
                   context,
                   CompletedResources(
                     courseId: courseId,
                     resourceId: units[index].importantQuestions!.id,
                     resourceName: units[index].name,
+                    unitId: units[index].unitId,
+                    resourceType: "important_questions",
                   ),
                 );
                 Navigator.of(context).push(
@@ -366,7 +367,6 @@ class UnitListTile extends StatelessWidget {
                                         return;
                                       }
 
-                                      //TODO: Change the payment later
                                       final razorpayAPIRequest = await post(
                                         Uri.parse(
                                           "https://asia-south1-chitti-ananta.cloudfunctions.net/createOrder",
@@ -414,8 +414,6 @@ class UnitListTile extends StatelessWidget {
                                       _razorpay.on(Razorpay.EVENT_PAYMENT_SUCCESS, (
                                         PaymentSuccessResponse response,
                                       ) {
-                                        print("Payment Success");
-                                        print(response);
                                         Future.delayed(Duration(seconds: 1), () async {
                                           final oldAuthToken =
                                               await FirebaseAuth
@@ -502,21 +500,26 @@ class UnitListTile extends StatelessWidget {
                                                 return;
                                               }
                                               try {
-                                                fetchSemester(token, (){
-                                                   ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(
-                          content: Text("Session expired, please login again."),
-                        ),
-                      );
-                      Navigator.of(context).pushReplacement(
-                                                      MaterialPageRoute(
-                                                        builder: (context) =>
-                                                            SplashScreen(),
+                                                fetchSemester(token, () {
+                                                  ScaffoldMessenger.of(
+                                                    context,
+                                                  ).showSnackBar(
+                                                    SnackBar(
+                                                      content: Text(
+                                                        "Session expired, please login again.",
                                                       ),
-                                                    );
-                                                }).then((
-                                                  semester,
-                                                ) {
+                                                    ),
+                                                  );
+                                                  Navigator.of(
+                                                    context,
+                                                  ).pushReplacement(
+                                                    MaterialPageRoute(
+                                                      builder:
+                                                          (context) =>
+                                                              SplashScreen(),
+                                                    ),
+                                                  );
+                                                }).then((semester) {
                                                   SharedPreferences.getInstance().then((
                                                     sharedPreferences,
                                                   ) {
@@ -569,8 +572,6 @@ class UnitListTile extends StatelessWidget {
                                       _razorpay.on(
                                         Razorpay.EVENT_PAYMENT_ERROR,
                                         (PaymentFailureResponse response) {
-                                          print("Payment Error");
-                                          print(response);
                                           isLoading.value = false;
                                           Navigator.of(sheetContext).pop();
                                           ScaffoldMessenger.of(

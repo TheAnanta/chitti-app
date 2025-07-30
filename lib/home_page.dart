@@ -28,7 +28,7 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin {
   void initState() {
     super.initState();
 
-    disableScreenshot(context);
+    // disableScreenshot(context);
     _controller = TabController(
       length: widget.semester.courses.length,
       vsync: this,
@@ -42,6 +42,7 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin {
         WindowSizeClass().init(constraints);
         return Scaffold(
           appBar: AppBar(
+            toolbarHeight: kToolbarHeight + 8,
             automaticallyImplyLeading: false,
             backgroundColor: Theme.of(context).colorScheme.surface,
             title: Text(
@@ -76,14 +77,23 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin {
                     MaterialPageRoute(builder: (context) => ProfilePage()),
                   );
                 },
-                icon: ClipOval(
-                  child: CircleAvatar(
-                    child: Image.network(
-                      "https://doeresults.gitam.edu/photo/img.aspx?id=${FirebaseAuth.instance.currentUser!.uid}",
-                      fit: BoxFit.cover,
-                      width: double.infinity,
-                      height: double.infinity,
-                      alignment: Alignment.topCenter,
+                icon: DecoratedBox(
+                  decoration: BoxDecoration(
+                    border: Border.all(width: 2, color: Color(0xFFF27F0C)),
+                    shape: BoxShape.circle,
+                  ),
+                  child: Padding(
+                    padding: const EdgeInsets.all(2.0),
+                    child: ClipOval(
+                      child: CircleAvatar(
+                        child: Image.network(
+                          "https://doeresults.gitam.edu/photo/img.aspx?id=${FirebaseAuth.instance.currentUser!.uid}",
+                          fit: BoxFit.cover,
+                          width: double.infinity,
+                          height: double.infinity,
+                          alignment: Alignment.topCenter,
+                        ),
+                      ),
                     ),
                   ),
                 ),

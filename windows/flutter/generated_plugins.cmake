@@ -7,7 +7,6 @@ list(APPEND FLUTTER_PLUGIN_LIST
   firebase_core
   flutter_inappwebview_windows
   fvp
-  no_screenshot
   url_launcher_windows
 )
 

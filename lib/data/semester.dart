@@ -205,12 +205,12 @@ class Semester {
     final completed = List<CompletedResources>.from(
       (data["completed"] as List<dynamic>)
           .map((e) {
+            print(e.runtimeType);
             return CompletedResources.fromSnapshot(e);
           })
           .toSet()
           .toList(),
     );
-    print(completed);
     Map<String, double> progress = Map.fromEntries(
       courses.map((e) {
         final tr = e.units.fold(0, (a, b) => a + b.totalResources);
@@ -232,9 +232,12 @@ class Semester {
 
 class CompletedResources {
   final String courseId;
+  final String unitId;
   final String resourceId;
   final String resourceName;
+  final String resourceType;
 
+  @override
   bool operator ==(Object other) =>
       identical(this, other) ||
       (other as CompletedResources).courseId + other.resourceId ==
@@ -247,14 +250,19 @@ class CompletedResources {
     required this.courseId,
     required this.resourceId,
     required this.resourceName,
+    required this.unitId,
+    required this.resourceType,
   });
 
-  static fromSnapshot(String d) {
-    final Map<String, dynamic> data = json.decode(d);
+  static fromSnapshot(Map<String, dynamic> data) {
+    print(data);
     return CompletedResources(
       courseId: data["courseId"],
       resourceId: data["resourceId"],
       resourceName: data["resourceName"],
+      unitId: data["unitId"],
+      resourceType:
+          data["resourceType"] ?? "video", // Default to video if not specified
     );
   }
 
@@ -263,6 +271,8 @@ class CompletedResources {
       "courseId": courseId,
       "resourceId": resourceId,
       "resourceName": resourceName,
+      "unitId": unitId,
+      "resourceType": resourceType,
     };
   }
 

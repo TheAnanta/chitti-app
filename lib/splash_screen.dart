@@ -1,10 +1,8 @@
-import 'package:chitti/ds.dart';
 import 'package:chitti/home_page.dart';
 import 'package:chitti/injector.dart';
 import 'package:chitti/login_screen.dart';
 import 'package:chitti/size_config.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -34,37 +32,36 @@ class SplashScreen extends StatelessWidget {
             return;
           }
           try {
-            Injector.semesterRepository.fetchSemester(token, (){
-               ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(
-                          content: Text("Session expired, please login again."),
-                        ),
-                      );
-                      Navigator.of(context).pushReplacement(
-                                                      MaterialPageRoute(
-                                                        builder: (context) =>
-                                                            SplashScreen(),
-                                                      ),
-                                                    );
-            }).then((semester) {
-              SharedPreferences.getInstance().then((sharedPreferences) {
-                final name =
-                    FirebaseAuth.instance.currentUser?.displayName?.split(
-                      " ",
-                    )[0];
-                if (context.mounted) {
-                  Navigator.of(context).pushReplacement(
-                    MaterialPageRoute(
-                      builder:
-                          (context) => MyHomePage(
-                            name: name ?? "User",
-                            semester: semester,
-                          ),
+            Injector.semesterRepository
+                .fetchSemester(token, () {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text("Session expired, please login again."),
                     ),
                   );
-                }
-              });
-            });
+                  Navigator.of(context).pushReplacement(
+                    MaterialPageRoute(builder: (context) => SplashScreen()),
+                  );
+                })
+                .then((semester) {
+                  SharedPreferences.getInstance().then((sharedPreferences) {
+                    final name =
+                        FirebaseAuth.instance.currentUser?.displayName?.split(
+                          " ",
+                        )[0];
+                    if (context.mounted) {
+                      Navigator.of(context).pushReplacement(
+                        MaterialPageRoute(
+                          builder:
+                              (context) => MyHomePage(
+                                name: name ?? "User",
+                                semester: semester,
+                              ),
+                        ),
+                      );
+                    }
+                  });
+                });
           } catch (e) {
             if (context.mounted) {
               ScaffoldMessenger.of(
@@ -152,7 +149,10 @@ class SplashScreen extends StatelessWidget {
                           offset: Offset(6, 0),
                           child: SvgPicture.asset(
                             "assets/images/theananta.svg",
-                            color: Colors.grey.shade700,
+                            colorFilter: ColorFilter.mode(
+                              Colors.grey.shade700,
+                              BlendMode.srcIn,
+                            ),
                           ),
                         ),
                       ],

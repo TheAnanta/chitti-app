@@ -1,19 +1,11 @@
 import 'dart:convert';
 
-import 'package:chitti/data/important_questions.dart';
 import 'package:chitti/data/semester.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart';
 
-Future<
-  (
-    Roadmap?,
-    List<Video>?,
-    List<Notes>?,
-    List<Cheatsheet>?,
-  )
->
+Future<(Roadmap?, List<Video>?, List<Notes>?, List<Cheatsheet>?)>
 fetchResourcesForUnit(
   BuildContext context,
   String subjectId,
@@ -49,96 +41,6 @@ fetchResourcesForUnit(
     }
   });
 
-  // Map<String, dynamic>? notes = await get(
-  //   Uri.parse(
-  //     "https://asia-south1-chitti-ananta.cloudfunctions.net/webApi/unit/${subjectId}/${unitId}/notes",
-  //   ),
-  //   headers: {"Authorization": "Bearer $token"},
-  // ).then((response) {
-  //   if (response.statusCode == 200) {
-  //     return json.decode(response.body);
-  //   } else {
-  //     try {
-  //       final result = json.decode(response.body);
-  //       ScaffoldMessenger.of(
-  //         context,
-  //       ).showSnackBar(SnackBar(content: Text(result["message"])));
-  //     } catch (e) {
-  //       ScaffoldMessenger.of(
-  //         context,
-  //       ).showSnackBar(SnackBar(content: Text(e.toString())));
-  //     }
-  //     return null;
-  //   }
-  // });
-  // Map<String, dynamic>? cheatsheet = await get(
-  //   Uri.parse(
-  //     "https://asia-south1-chitti-ananta.cloudfunctions.net/webApi/unit/${subjectId}/${unitId}/cheatsheet",
-  //   ),
-  //   headers: {"Authorization": "Bearer $token"},
-  // ).then((response) {
-  //   if (response.statusCode == 200) {
-  //     return json.decode(response.body);
-  //   } else {
-  //     try {
-  //       final result = json.decode(response.body);
-  //       ScaffoldMessenger.of(
-  //         context,
-  //       ).showSnackBar(SnackBar(content: Text(result["message"])));
-  //     } catch (e) {
-  //       ScaffoldMessenger.of(
-  //         context,
-  //       ).showSnackBar(SnackBar(content: Text(e.toString())));
-  //     }
-  //     return null;
-  //   }
-  // });
-  // Map<String, dynamic>? roadmap = await get(
-  //   Uri.parse(
-  //     "https://asia-south1-chitti-ananta.cloudfunctions.net/webApi/unit/${subjectId}/${unitId}/roadmap",
-  //   ),
-  //   headers: {"Authorization": "Bearer $token"},
-  // ).then((response) {
-  //   if (response.statusCode == 200) {
-  //     return json.decode(response.body);
-  //   } else {
-  //     try {
-  //       final result = json.decode(response.body);
-  //       ScaffoldMessenger.of(
-  //         context,
-  //       ).showSnackBar(SnackBar(content: Text(result["message"])));
-  //     } catch (e) {
-  //       ScaffoldMessenger.of(
-  //         context,
-  //       ).showSnackBar(SnackBar(content: Text(e.toString())));
-  //     }
-  //     return null;
-  //   }
-  // });
-  // Map<String, dynamic>? video = await get(
-  //   Uri.parse(
-  //     "https://asia-south1-chitti-ananta.cloudfunctions.net/webApi/unit/${subjectId}/${unitId}/video",
-  //   ),
-  //   headers: {"Authorization": "Bearer $token"},
-  // ).then((response) {
-  //   if (response.statusCode == 200) {
-  //     return json.decode(response.body);
-  //   } else {
-  //     try {
-  //       final result = json.decode(response.body);
-  //       ScaffoldMessenger.of(
-  //         context,
-  //       ).showSnackBar(SnackBar(content: Text(result["message"])));
-  //     } catch (e) {
-  //       ScaffoldMessenger.of(
-  //         context,
-  //       ).showSnackBar(SnackBar(content: Text(e.toString())));
-  //     }
-  //     return null;
-  //   }
-  // });
-  // print(roadmap);
-  // return (roadmap, video, notes, cheatsheet);
   var (roadmap, videos, notes, cheatsheet) = (
     Roadmap(
       roadmapItems:
@@ -169,7 +71,6 @@ fetchResourcesForUnit(
         )
         .toList(),
   );
-  //TODO: HANDLE ERRORS FROM API LIKE FORBIDDEN
   return (roadmap, videos, notes, cheatsheet);
 }
 
@@ -183,7 +84,13 @@ Future<String> addCompletedResource(
     Uri.parse(
       "https://asia-south1-chitti-ananta.cloudfunctions.net/webApi/add-completed",
     ),
-    body: json.encode({"resourceId": res.toJson()}),
+    body: json.encode({
+      "resourceId": res.resourceId,
+      "resourceName": res.resourceName,
+      "resourceType": res.resourceType,
+      "courseId": res.courseId,
+      "unitId": res.unitId,
+    }),
     headers: {
       "Authorization": "Bearer $token",
       "Content-Type": "application/json",
@@ -199,14 +106,15 @@ Future<String> addCompletedResource(
             context,
           ).showSnackBar(SnackBar(content: Text(result["message"])));
         }
+        return result;
       } catch (e) {
         if (context.mounted) {
           ScaffoldMessenger.of(
             context,
           ).showSnackBar(SnackBar(content: Text(e.toString())));
         }
+        return {"message": "An error occurred while adding the resource."};
       }
-      return null;
     }
   });
   return result?["message"];
