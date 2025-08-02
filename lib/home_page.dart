@@ -1,4 +1,5 @@
 import 'package:chitti/animated_image.dart';
+import 'package:chitti/cart_page.dart';
 import 'package:chitti/color_filters.dart';
 import 'package:chitti/data/semester.dart';
 import 'package:chitti/ds.dart';
@@ -53,7 +54,6 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin {
         WindowSizeClass().init(constraints);
         return Scaffold(
           appBar: AppBar(
-            toolbarHeight: kToolbarHeight + 8,
             automaticallyImplyLeading: false,
             backgroundColor: Theme.of(context).colorScheme.surface,
             title: Text(
@@ -66,6 +66,15 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin {
             actions: [
               IconButton(
                 onPressed: () {
+                  // Navigate to the cart page
+                  Navigator.of(
+                    context,
+                  ).push(MaterialPageRoute(builder: (context) => CartPage()));
+                },
+                icon: Icon(Icons.shopping_cart),
+              ),
+              IconButton(
+                onPressed: () {
                   ScaffoldMessenger.of(context).showSnackBar(
                     SnackBar(
                       content: Text(
@@ -76,38 +85,29 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin {
                   );
                   launchUrl(Uri.parse("mailto:scorewithchitti@gmail.com"));
                 },
-                icon: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [Icon(Icons.bug_report_outlined), Text("Help")],
-                ),
+                icon: Icon(Icons.support_agent_outlined),
               ),
-              SizedBox(width: 8),
               IconButton(
                 onPressed: () {
                   Navigator.of(context).push(
                     MaterialPageRoute(builder: (context) => ProfilePage()),
                   );
                 },
-                icon: DecoratedBox(
-                  decoration: BoxDecoration(
-                    border: Border.all(width: 2, color: Color(0xFFF27F0C)),
-                    shape: BoxShape.circle,
-                  ),
-                  child: Padding(
-                    padding: const EdgeInsets.all(2.0),
-                    child: ClipOval(
-                      child: CircleAvatar(
-                        child: Image.network(
-                          "https://doeresults.gitam.edu/photo/img.aspx?id=${FirebaseAuth.instance.currentUser!.uid}",
-                          fit: BoxFit.cover,
-                          width: double.infinity,
-                          height: double.infinity,
-                          alignment: Alignment.topCenter,
-                        ),
-                      ),
-                    ),
-                  ),
-                ),
+                icon: Icon(Icons.account_circle_outlined),
+                // icon: AspectRatio(
+                //   aspectRatio: 1,
+                //   child: ClipOval(
+                //     child: CircleAvatar(
+                //       child: Image.network(
+                //         "https://doeresults.gitam.edu/photo/img.aspx?id=${FirebaseAuth.instance.currentUser!.uid}",
+                //         fit: BoxFit.cover,
+                //         width: double.infinity,
+                //         height: double.infinity,
+                //         alignment: Alignment.topCenter,
+                //       ),
+                //     ),
+                //   ),
+                // ),
               ),
             ],
           ),

@@ -461,7 +461,7 @@ class _LoginScreenState extends State<LoginScreen> {
                                         "Cookie":
                                             "ASP.NET_SessionId=${cookie?.value}",
                                       },
-                                    ).then((response) {
+                                    ).then((response) async {
                                       print(response);
                                       final tag =
                                           RegExp(
@@ -494,10 +494,18 @@ class _LoginScreenState extends State<LoginScreen> {
                                           .join(" ");
                                       developer.log(semester.toString());
                                       developer.log(name ?? "No Name");
-                                      controller.evaluateJavascript(
-                                        source:
-                                            'document.getElementsByClassName("course")[0].click();',
-                                      );
+                                      if (username.startsWith("202") &&
+                                          !username.startsWith("2023")) {
+                                        await controller.evaluateJavascript(
+                                          source:
+                                              'document.getElementsByClassName("course")[1].click();',
+                                        );
+                                      } else {
+                                        await controller.evaluateJavascript(
+                                          source:
+                                              'document.getElementsByClassName("course")[0].click();',
+                                        );
+                                      }
                                     });
                                   });
                             } else if (url.toString().contains(

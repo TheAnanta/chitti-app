@@ -49,6 +49,7 @@ fetchResourcesForUnit(
               name: e["name"],
               difficulty: e["difficulty"],
               id: e["roadId"],
+              isUnlocked: e["isUnlocked"] ?? false,
             );
           }).toList(),
     ),

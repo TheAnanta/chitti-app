@@ -36,6 +36,7 @@ Future<Semester> fetchSemester(String token, Function onSignOut) async {
     },
   );
   if (request.statusCode == 200) {
+    print(request.body);
     final response = json.decode(request.body);
     return Semester.fromMap(response);
   } else if (request.statusCode == 401) {

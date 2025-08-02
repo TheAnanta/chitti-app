@@ -1,3 +1,4 @@
+import 'package:chitti/domain/fetch_cart.dart';
 import 'package:chitti/home_page.dart';
 import 'package:chitti/injector.dart';
 import 'package:chitti/login_screen.dart';
@@ -22,54 +23,68 @@ class SplashScreen extends StatelessWidget {
       });
     } else {
       WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
-        FirebaseAuth.instance.currentUser!.getIdToken(true).then((token) {
-          if (token == null) {
-            if (context.mounted) {
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(content: Text("Unable to create token.")),
-              );
+        try {
+          FirebaseAuth.instance.currentUser!.getIdToken(true).then((token) {
+            if (token == null) {
+              if (context.mounted) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(content: Text("Unable to create token.")),
+                );
+              }
+              return;
             }
+            try {
+              fetchCart(context);
+              Injector.semesterRepository
+                  .fetchSemester(token, () {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                        content: Text("Session expired, please login again."),
+                      ),
+                    );
+                    Navigator.of(context).pushReplacement(
+                      MaterialPageRoute(builder: (context) => SplashScreen()),
+                    );
+                  })
+                  .then((semester) {
+                    SharedPreferences.getInstance().then((sharedPreferences) {
+                      final name =
+                          FirebaseAuth.instance.currentUser?.displayName?.split(
+                            " ",
+                          )[0];
+                      if (context.mounted) {
+                        Navigator.of(context).pushReplacement(
+                          MaterialPageRoute(
+                            builder:
+                                (context) => MyHomePage(
+                                  name: name ?? "User",
+                                  semester: semester,
+                                ),
+                          ),
+                        );
+                      }
+                    });
+                  });
+            } catch (e) {
+              if (context.mounted) {
+                ScaffoldMessenger.of(
+                  context,
+                ).showSnackBar(SnackBar(content: Text(e.toString())));
+              }
+            }
+          });
+        } catch (e) {
+          if (FirebaseAuth.instance.currentUser == null) {
+            Future.delayed(Duration(seconds: 2), () async {
+              if (context.mounted) {
+                Navigator.of(context).pushReplacement(
+                  MaterialPageRoute(builder: (context) => LoginScreen()),
+                );
+              }
+            });
             return;
           }
-          try {
-            Injector.semesterRepository
-                .fetchSemester(token, () {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(
-                      content: Text("Session expired, please login again."),
-                    ),
-                  );
-                  Navigator.of(context).pushReplacement(
-                    MaterialPageRoute(builder: (context) => SplashScreen()),
-                  );
-                })
-                .then((semester) {
-                  SharedPreferences.getInstance().then((sharedPreferences) {
-                    final name =
-                        FirebaseAuth.instance.currentUser?.displayName?.split(
-                          " ",
-                        )[0];
-                    if (context.mounted) {
-                      Navigator.of(context).pushReplacement(
-                        MaterialPageRoute(
-                          builder:
-                              (context) => MyHomePage(
-                                name: name ?? "User",
-                                semester: semester,
-                              ),
-                        ),
-                      );
-                    }
-                  });
-                });
-          } catch (e) {
-            if (context.mounted) {
-              ScaffoldMessenger.of(
-                context,
-              ).showSnackBar(SnackBar(content: Text(e.toString())));
-            }
-          }
-        });
+        }
       });
     }
     return Scaffold(

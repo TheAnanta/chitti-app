@@ -4,6 +4,19 @@ import 'package:chitti/data/important_questions.dart';
 import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
 
+class Instructor {
+  final String name;
+  final String image;
+  final String bio;
+  final String id;
+  const Instructor({
+    required this.name,
+    required this.image,
+    required this.bio,
+    required this.id,
+  });
+}
+
 class Unit {
   final String unitId;
   final String name;
@@ -49,6 +62,7 @@ class Unit {
                       id: e["roadId"],
                       name: e["name"],
                       difficulty: e["difficulty"],
+                      isUnlocked: e["isUnlocked"] ?? false,
                     );
                   }),
                 ),
@@ -67,10 +81,12 @@ class RoadmapItem {
   final String id;
   final String name;
   final String difficulty;
+  final bool isUnlocked;
   const RoadmapItem({
     required this.name,
     required this.difficulty,
     required this.id,
+    required this.isUnlocked,
   });
 }
 
@@ -134,6 +150,7 @@ class Subject {
   final double progress;
   final String image;
   final List<Unit> units;
+  final Instructor instructor;
 
   const Subject({
     required this.courseId,
@@ -145,6 +162,7 @@ class Subject {
     this.image =
         "https://images.squarespace-cdn.com/content/v1/570b9bd42fe131a6e20717c2/1730901328712-ARXW9LQ4S2MVG2PULIKV/Gitam_Banner.jpg?format=2500w",
     this.units = const [],
+    required this.instructor,
   });
 
   static fromMap(Map<String, dynamic> data) {
@@ -165,6 +183,12 @@ class Subject {
           return Unit.fromMap(unit);
         }),
       ),
+      instructor: Instructor(
+        id: data["instructor"]["instructorId"],
+        name: data["instructor"]["name"],
+        image: data["instructor"]["image"],
+        bio: data["instructor"]["bio"],
+      ),
     );
   }
 
@@ -178,6 +202,7 @@ class Subject {
       image: image,
       progress: progress,
       units: units,
+      instructor: instructor,
     );
   }
 }

@@ -127,6 +127,30 @@ class SubjectPage extends StatelessWidget {
                           ),
                         ),
                         SizedBox(height: 24),
+                        Text(
+                          "Instructor",
+                          style: Theme.of(context).textTheme.titleMedium
+                              ?.copyWith(fontWeight: FontWeight.bold),
+                        ),
+                        ListTile(
+                          leading: CircleAvatar(
+                            backgroundImage: NetworkImage(
+                              subject.instructor.image,
+                            ),
+                          ),
+                          title: Text(
+                            subject.instructor.name,
+                            style: Theme.of(context).textTheme.titleMedium
+                                ?.copyWith(fontWeight: FontWeight.bold),
+                          ),
+                          subtitle: Text(
+                            subject.instructor.bio,
+                            style: Theme.of(context).textTheme.bodyMedium,
+                            maxLines: 5,
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                        ),
+                        SizedBox(height: 24),
                         UnitListTile(
                           units: subject.units,
                           subjectName: subject.title,
