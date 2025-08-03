@@ -302,16 +302,6 @@ class _UnitResourcePageState extends State<UnitResourcePage>
             final notesItem = notes[index];
             return ListTile(
               onTap: () {
-                addCompletedResource(
-                  context,
-                  CompletedResources(
-                    courseId: courseId,
-                    resourceId: notesItem.id,
-                    resourceName: notesItem.name,
-                    unitId: widget.unit.unitId,
-                    resourceType: "notes",
-                  ),
-                );
                 Navigator.of(context).push(
                   MaterialPageRoute(
                     builder:
@@ -334,6 +324,18 @@ class _UnitResourcePageState extends State<UnitResourcePage>
                                   return PDFViewPage(
                                     documentRef: pdfDocumentRef,
                                     pdfName: notesItem.name,
+                                    onAddResource: () {
+                                      addCompletedResource(
+                                        context,
+                                        CompletedResources(
+                                          courseId: courseId,
+                                          resourceId: notesItem.id,
+                                          resourceName: notesItem.name,
+                                          unitId: widget.unit.unitId,
+                                          resourceType: "notes",
+                                        ),
+                                      );
+                                    },
                                   );
                                 },
                               ),
@@ -490,18 +492,6 @@ class _UnitResourcePageState extends State<UnitResourcePage>
               builder: (context, setTileState) {
                 return InkWell(
                   onTap: () {
-                    if (!showCheatsheet) {
-                      addCompletedResource(
-                        context,
-                        CompletedResources(
-                          courseId: courseId,
-                          resourceId: cheatsheet.id,
-                          resourceName: cheatsheet.name,
-                          unitId: widget.unit.unitId,
-                          resourceType: "cheatsheet",
-                        ),
-                      );
-                    }
                     if (cheatsheet.url.contains(".pdf")) {
                       Navigator.of(context).push(
                         MaterialPageRoute(
@@ -529,6 +519,18 @@ class _UnitResourcePageState extends State<UnitResourcePage>
                                         return PDFViewPage(
                                           documentRef: pdfDocumentRef,
                                           pdfName: cheatsheet.name,
+                                          onAddResource: () {
+                                            addCompletedResource(
+                                              context,
+                                              CompletedResources(
+                                                courseId: courseId,
+                                                resourceId: cheatsheet.id,
+                                                resourceName: cheatsheet.name,
+                                                unitId: widget.unit.unitId,
+                                                resourceType: "cheatsheet",
+                                              ),
+                                            );
+                                          },
                                         );
                                       },
                                     ),
@@ -766,6 +768,10 @@ class _VideoPlayerWidgetState extends State<VideoPlayerWidget> {
 
     _initializeVideoPlayerFuture = _controller.initialize();
     _controller.addListener(() {
+      if (_controller.value.position + Duration(seconds: 10) ==
+          _controller.value.duration) {
+        widget.onPlayedVideo();
+      }
       if (_controller.value.isCompleted) {
         _isCompletedPlaying.value = true;
       }
@@ -785,6 +791,8 @@ class _VideoPlayerWidgetState extends State<VideoPlayerWidget> {
 
     super.dispose();
   }
+
+  var jumpGestureOverlays = [];
 
   @override
   Widget build(BuildContext context) {
@@ -806,46 +814,235 @@ class _VideoPlayerWidgetState extends State<VideoPlayerWidget> {
                     return Stack(
                       alignment: Alignment.bottomCenter,
                       children: [
-                        SizedBox(
-                          width: double.infinity,
-                          height: double.infinity,
-                          child: FittedBox(
-                            fit: BoxFit.cover,
-                            child: SizedBox(
-                              width: _controller.value.size.width,
-                              height: _controller.value.size.height,
-                              child: GestureDetector(
-                                onScaleUpdate: (details) {
-                                  if (details.scale < 1) {
-                                    zoomScale.value = 1;
-                                  } else {
-                                    zoomScale.value = details.scale;
-                                  }
-                                },
-                                // onPanUpdate: (details) {
-                                //   panOffset.value = Offset(
-                                //     panOffset.value.dx + details.delta.dx,
-                                //     panOffset.value.dy + details.delta.dy,
-                                //   );
-                                // },
-                                child: InkWell(
-                                  onTap: () {
-                                    showAppBar.value = !showAppBar.value;
-                                    showControls.value = !showControls.value;
-                                  },
-                                  child: ValueListenableBuilder<double>(
-                                    valueListenable: zoomScale,
-                                    builder: (context, _zoomScale, child) {
-                                      return Transform.scale(
-                                        scale: _zoomScale,
-                                        child: VideoPlayer(_controller),
-                                      );
+                        LayoutBuilder(
+                          builder: (context, constraints) {
+                            return SizedBox(
+                              width: double.infinity,
+                              height: double.infinity,
+                              child: FittedBox(
+                                fit: BoxFit.cover,
+                                child: SizedBox(
+                                  width: _controller.value.size.width,
+                                  height: _controller.value.size.height,
+                                  child: GestureDetector(
+                                    onDoubleTapDown: (details) {
+                                      if (details.localPosition.dx >
+                                          _controller.value.size.width *
+                                              2 /
+                                              3) {
+                                        _controller.seekTo(
+                                          _controller.value.position +
+                                              Duration(seconds: 10),
+                                        );
+                                        if (jumpGestureOverlays.isNotEmpty) {
+                                          jumpGestureOverlays.clear();
+                                        }
+                                        jumpGestureOverlays.add(
+                                          IgnorePointer(
+                                            child: Transform.translate(
+                                              offset: Offset(
+                                                _controller.value.size.width /
+                                                    4,
+                                                0,
+                                              ),
+                                              child: AspectRatio(
+                                                aspectRatio: 1,
+                                                child: Container(
+                                                  width: 1080,
+                                                  height: 1080,
+                                                  decoration: BoxDecoration(
+                                                    color: Theme.of(context)
+                                                        .colorScheme
+                                                        .surface
+                                                        .withValues(alpha: 0.3),
+                                                    shape: BoxShape.circle,
+                                                  ),
+                                                  padding: EdgeInsets.only(
+                                                    left: 36,
+                                                    right: 36,
+                                                  ),
+                                                  child: Align(
+                                                    alignment:
+                                                        Alignment.centerLeft,
+                                                    child: Row(
+                                                      children: [
+                                                        Column(
+                                                          mainAxisSize:
+                                                              MainAxisSize.min,
+                                                          children: [
+                                                            Icon(
+                                                              Icons
+                                                                  .fast_forward,
+                                                              color:
+                                                                  Theme.of(
+                                                                        context,
+                                                                      )
+                                                                      .colorScheme
+                                                                      .surface,
+                                                              size: 32,
+                                                            ),
+                                                            Text(
+                                                              "10 seconds",
+                                                              style: Theme.of(
+                                                                    context,
+                                                                  )
+                                                                  .textTheme
+                                                                  .bodyMedium
+                                                                  ?.copyWith(
+                                                                    fontWeight:
+                                                                        FontWeight
+                                                                            .bold,
+                                                                    color:
+                                                                        Theme.of(
+                                                                          context,
+                                                                        ).colorScheme.surface,
+                                                                  ),
+                                                            ),
+                                                          ],
+                                                        ),
+                                                        Spacer(),
+                                                      ],
+                                                    ),
+                                                  ),
+                                                ),
+                                              ),
+                                            ),
+                                          ),
+                                        );
+                                        setState(() {
+                                          Future.delayed(
+                                            Duration(milliseconds: 400),
+                                            () {
+                                              jumpGestureOverlays.clear();
+                                              setState(() {});
+                                            },
+                                          );
+                                        });
+                                      } else if (details.localPosition.dx <
+                                          _controller.value.size.width / 3) {
+                                        _controller.seekTo(
+                                          _controller.value.position -
+                                              Duration(seconds: 10),
+                                        );
+                                        if (jumpGestureOverlays.isNotEmpty) {
+                                          jumpGestureOverlays.clear();
+                                        }
+                                        jumpGestureOverlays.add(
+                                          IgnorePointer(
+                                            child: Transform.translate(
+                                              offset: Offset(
+                                                -_controller.value.size.width /
+                                                    4,
+                                                0,
+                                              ),
+                                              child: AspectRatio(
+                                                aspectRatio: 1,
+                                                child: Container(
+                                                  width: 1080,
+                                                  height: 1080,
+                                                  decoration: BoxDecoration(
+                                                    color: Theme.of(context)
+                                                        .colorScheme
+                                                        .surface
+                                                        .withValues(alpha: 0.3),
+                                                    shape: BoxShape.circle,
+                                                  ),
+                                                  padding: EdgeInsets.only(
+                                                    left: 36,
+                                                    right: 36,
+                                                  ),
+                                                  child: Align(
+                                                    alignment:
+                                                        Alignment.centerRight,
+                                                    child: Row(
+                                                      children: [
+                                                        Spacer(),
+                                                        Column(
+                                                          mainAxisSize:
+                                                              MainAxisSize.min,
+                                                          children: [
+                                                            Icon(
+                                                              Icons.fast_rewind,
+                                                              color:
+                                                                  Theme.of(
+                                                                        context,
+                                                                      )
+                                                                      .colorScheme
+                                                                      .surface,
+                                                              size: 32,
+                                                            ),
+                                                            Text(
+                                                              "10 seconds",
+                                                              style: Theme.of(
+                                                                    context,
+                                                                  )
+                                                                  .textTheme
+                                                                  .bodyMedium
+                                                                  ?.copyWith(
+                                                                    fontWeight:
+                                                                        FontWeight
+                                                                            .bold,
+                                                                    color:
+                                                                        Theme.of(
+                                                                          context,
+                                                                        ).colorScheme.surface,
+                                                                  ),
+                                                            ),
+                                                          ],
+                                                        ),
+                                                      ],
+                                                    ),
+                                                  ),
+                                                ),
+                                              ),
+                                            ),
+                                          ),
+                                        );
+                                        setState(() {
+                                          Future.delayed(
+                                            Duration(milliseconds: 400),
+                                            () {
+                                              jumpGestureOverlays.clear();
+                                              setState(() {});
+                                            },
+                                          );
+                                        });
+                                      }
                                     },
+                                    onScaleUpdate: (details) {
+                                      if (details.scale < 1) {
+                                        zoomScale.value = 1;
+                                      } else {
+                                        zoomScale.value = details.scale;
+                                      }
+                                    },
+                                    // onPanUpdate: (details) {
+                                    //   panOffset.value = Offset(
+                                    //     panOffset.value.dx + details.delta.dx,
+                                    //     panOffset.value.dy + details.delta.dy,
+                                    //   );
+                                    // },
+                                    child: InkWell(
+                                      onTap: () {
+                                        showAppBar.value = !showAppBar.value;
+                                        showControls.value =
+                                            !showControls.value;
+                                      },
+                                      child: ValueListenableBuilder<double>(
+                                        valueListenable: zoomScale,
+                                        builder: (context, _zoomScale, child) {
+                                          return Transform.scale(
+                                            scale: _zoomScale,
+                                            child: VideoPlayer(_controller),
+                                          );
+                                        },
+                                      ),
+                                    ),
                                   ),
                                 ),
                               ),
-                            ),
-                          ),
+                            );
+                          },
                         ),
                         ValueListenableBuilder<bool>(
                           valueListenable: showAppBar,
@@ -1042,6 +1239,13 @@ class _VideoPlayerWidgetState extends State<VideoPlayerWidget> {
                             );
                           },
                         ),
+                        AnimatedContainer(
+                          duration: Duration(milliseconds: 500),
+                          child:
+                              jumpGestureOverlays.isNotEmpty
+                                  ? jumpGestureOverlays[0]
+                                  : SizedBox(),
+                        ),
                       ],
                     );
                   } else {
@@ -1078,7 +1282,6 @@ class _VideoPlayerWidgetState extends State<VideoPlayerWidget> {
                           automaticallyImplyLeading: false,
                           leading: IconButton(
                             onPressed: () {
-                              widget.onPlayedVideo();
                               Navigator.of(context).pop();
                             },
                             icon: Icon(Icons.chevron_left),

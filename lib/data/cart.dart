@@ -326,6 +326,7 @@ class CartRepository {
     ) {
       onLoading(false);
       Navigator.of(context).pop();
+      Navigator.of(context).pop();
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           behavior: SnackBarBehavior.floating,

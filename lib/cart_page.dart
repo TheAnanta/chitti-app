@@ -342,7 +342,7 @@ class _CartPageState extends State<CartPage> {
 
                       label:
                           value
-                              ? CircularProgressIndicator()
+                              ? CircularProgressIndicator(color: Theme.of(context).colorScheme.onPrimary,)
                               : Text('Checkout'),
                       icon: Icon(Icons.payment),
                     );

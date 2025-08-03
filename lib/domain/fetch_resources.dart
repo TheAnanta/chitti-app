@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:chitti/data/semester.dart';
+import 'package:chitti/injector.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart';
@@ -102,6 +103,17 @@ Future<String> addCompletedResource(
     } else {
       try {
         final result = json.decode(response.body);
+        final newProgress = result["progress"];
+        if (newProgress != null) {
+          Injector
+              .semesterRepository
+              .semester
+              ?.courses
+              .values
+              .fold([], (a, b) => [...a, ...b])
+              .firstWhere((course) => course.courseId == res.courseId)
+              ?.progress = newProgress;
+        }
         if (context.mounted) {
           ScaffoldMessenger.of(
             context,

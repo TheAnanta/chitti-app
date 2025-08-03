@@ -125,277 +125,375 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin {
                 Text("Here’s a quick overview of your exam preparation"),
                 Padding(
                   padding: const EdgeInsets.symmetric(vertical: 12),
-                  child: Card(
-                    color: Color(0xFF429EBD),
-                    child: Padding(
-                      padding: const EdgeInsets.all(24.0),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            "All the best!",
-                            style: Theme.of(
-                              context,
-                            ).textTheme.titleLarge?.copyWith(
-                              fontWeight: FontWeight.w800,
-                              color: Colors.white,
+                  child: ConstrainedBox(
+                    constraints: BoxConstraints(minHeight: 100, maxHeight: 200),
+                    child: PageView.builder(
+                      itemCount: 1,
+                      itemBuilder: (context, pageIndex) {
+                        return Center(
+                          child: Card(
+                            color: Color(0xFF429EBD),
+                            child: Padding(
+                              padding: const EdgeInsets.all(
+                                24.0,
+                              ).copyWith(right: 0),
+                              child: Row(
+                                children: [
+                                  Expanded(
+                                    child: Column(
+                                      mainAxisSize: MainAxisSize.min,
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        Text(
+                                          "All the best!",
+                                          style: Theme.of(
+                                            context,
+                                          ).textTheme.titleLarge?.copyWith(
+                                            fontWeight: FontWeight.w800,
+                                            color: Colors.white,
+                                          ),
+                                        ),
+                                        SizedBox(height: 12),
+                                        Text(
+                                          "We are here to help you ace your exams. So, the first two topics are on us!\nYes, free, so you can try them out.",
+                                          style: Theme.of(
+                                            context,
+                                          ).textTheme.bodyMedium?.copyWith(
+                                            color: Colors.white.withValues(
+                                              alpha: 0.8,
+                                            ),
+                                          ),
+                                        ),
+                                        // TextButton(
+                                        //   onPressed: () {},
+                                        //   style: TextButton.styleFrom(
+                                        //     overlayColor: Color(0xFF053F5C),
+                                        //     padding: EdgeInsets.only(top: 16),
+                                        //   ),
+                                        //   child: Text(
+                                        //     "Explore More".toUpperCase(),
+                                        //     style: Theme.of(
+                                        //       context,
+                                        //     ).textTheme.bodyLarge?.copyWith(
+                                        //       fontWeight: FontWeight.w800,
+                                        //       color: Color(0xFFFFFFFF),
+                                        //     ),
+                                        //   ),
+                                        // ),
+                                      ],
+                                    ),
+                                  ),
+                                  SizedBox(width: 16),
+                                  Image.asset(
+                                    "assets/images/ghost_blue.png",
+                                    height: 120,
+                                    color: Colors.white.withValues(alpha: 0.6),
+                                  ),
+                                ],
+                              ),
                             ),
                           ),
-                          SizedBox(height: 12),
-                          Text(
-                            "Hope you’re motivated enough to prepare for you exam?",
-                            style: Theme.of(
-                              context,
-                            ).textTheme.bodyMedium?.copyWith(
-                              color: Colors.white.withValues(alpha: 0.6),
-                            ),
-                          ),
-                          // TextButton(
-                          //   onPressed: () {},
-                          //   style: TextButton.styleFrom(
-                          //     overlayColor: Color(0xFF053F5C),
-                          //   ),
-                          //   child: Text(
-                          //     "Explore More".toUpperCase(),
-                          //     style: Theme.of(
-                          //       context,
-                          //     ).textTheme.bodyLarge?.copyWith(
-                          //       fontWeight: FontWeight.w800,
-                          //       color: Color(0xFF053F5C),
-                          //     ),
-                          //   ),
-                          // ),
-                        ],
-                      ),
+                        );
+                      },
                     ),
                   ),
                 ),
-                TabBar(
-                  isScrollable: true,
-                  labelStyle: Theme.of(
-                    context,
-                  ).textTheme.bodyMedium?.copyWith(fontWeight: FontWeight.bold),
-                  tabs:
-                      widget.semester.courses.keys
-                          .map(
-                            (e) => Tab(
-                              text: e
-                                  .split("-")
-                                  .map(
-                                    (f) =>
-                                        "${f[0].toUpperCase()}${f.substring(1)}",
-                                  )
-                                  .join(" "),
-                            ),
-                          )
-                          .toList(),
-                  controller: _controller,
-                ),
-                Expanded(
-                  child: TabBarView(
-                    controller: _controller,
-                    children:
-                        widget.semester.courses.values.toList().map((subjects) {
-                          return LayoutBuilder(
-                            builder: (context, constraints) {
-                              WindowSizeClass().init(constraints);
-                              onTap(Subject subject, index) {
-                                if (getSizeClass() == WidthSizeClass.large) {
-                                  Navigator.of(context).push(
-                                    MaterialPageRoute(
-                                      builder: (context) {
-                                        return FutureBuilder(
-                                          future: fetchSubjectForExtended(
-                                            context,
-                                            subject,
-                                          ),
-                                          builder: (context, futureValue) {
-                                            if (futureValue.connectionState ==
-                                                ConnectionState.done) {
-                                              return UnitResourcePageExtended(
-                                                subjectName: subject.title,
-                                                subjectCoverImage:
-                                                    subject.image,
-                                                courseId: subject.courseId,
-                                                subject: subject,
-                                              );
-                                            }
-                                            return Scaffold(
-                                              body: Center(
-                                                child: Column(
-                                                  mainAxisAlignment:
-                                                      MainAxisAlignment.center,
-                                                  children: [
-                                                    SizedBox(height: 128),
-                                                    CircularProgressIndicator(
-                                                      color:
-                                                          Colors.grey.shade800,
-                                                    ),
-                                                    SizedBox(height: 24),
-                                                    Align(
-                                                      alignment:
-                                                          Alignment.centerLeft,
-                                                      child: AnimatedImageEntry(
-                                                        child: Row(
-                                                          mainAxisSize:
-                                                              MainAxisSize.min,
-                                                          mainAxisAlignment:
-                                                              MainAxisAlignment
-                                                                  .start,
-                                                          children: [
-                                                            Transform.flip(
-                                                              flipX: true,
-                                                              child: Transform.translate(
-                                                                offset: Offset(
-                                                                  0,
-                                                                  48,
-                                                                ),
-                                                                child: ColorFiltered(
-                                                                  colorFilter:
-                                                                      ColorFilters.matrix(
-                                                                        saturation:
-                                                                            -1,
-                                                                        brightness:
-                                                                            0.5,
+                ...(widget.semester.courses.entries.isNotEmpty
+                    ? [
+                      TabBar(
+                        isScrollable: true,
+                        labelStyle: Theme.of(context).textTheme.bodyMedium
+                            ?.copyWith(fontWeight: FontWeight.bold),
+                        tabs:
+                            widget.semester.courses.keys
+                                .map(
+                                  (e) => Tab(
+                                    text: e
+                                        .split("-")
+                                        .map(
+                                          (f) =>
+                                              "${f[0].toUpperCase()}${f.substring(1)}",
+                                        )
+                                        .join(" "),
+                                  ),
+                                )
+                                .toList(),
+                        controller: _controller,
+                      ),
+                      Expanded(
+                        child: TabBarView(
+                          controller: _controller,
+                          children:
+                              widget.semester.courses.values.toList().map((
+                                subjects,
+                              ) {
+                                return LayoutBuilder(
+                                  builder: (context, constraints) {
+                                    WindowSizeClass().init(constraints);
+                                    onTap(Subject subject, index) {
+                                      if (getSizeClass() ==
+                                          WidthSizeClass.large) {
+                                        Navigator.of(context).push(
+                                          MaterialPageRoute(
+                                            builder: (context) {
+                                              return FutureBuilder(
+                                                future: fetchSubjectForExtended(
+                                                  context,
+                                                  subject,
+                                                ),
+                                                builder: (
+                                                  context,
+                                                  futureValue,
+                                                ) {
+                                                  if (futureValue
+                                                          .connectionState ==
+                                                      ConnectionState.done) {
+                                                    return UnitResourcePageExtended(
+                                                      subjectName:
+                                                          subject.title,
+                                                      subjectCoverImage:
+                                                          subject.image,
+                                                      courseId:
+                                                          subject.courseId,
+                                                      subject: subject,
+                                                    );
+                                                  }
+                                                  return Scaffold(
+                                                    body: Center(
+                                                      child: Column(
+                                                        mainAxisAlignment:
+                                                            MainAxisAlignment
+                                                                .center,
+                                                        children: [
+                                                          SizedBox(height: 128),
+                                                          CircularProgressIndicator(
+                                                            color:
+                                                                Colors
+                                                                    .grey
+                                                                    .shade800,
+                                                          ),
+                                                          SizedBox(height: 24),
+                                                          Align(
+                                                            alignment:
+                                                                Alignment
+                                                                    .centerLeft,
+                                                            child: AnimatedImageEntry(
+                                                              child: Row(
+                                                                mainAxisSize:
+                                                                    MainAxisSize
+                                                                        .min,
+                                                                mainAxisAlignment:
+                                                                    MainAxisAlignment
+                                                                        .start,
+                                                                children: [
+                                                                  Transform.flip(
+                                                                    flipX: true,
+                                                                    child: Transform.translate(
+                                                                      offset:
+                                                                          Offset(
+                                                                            0,
+                                                                            48,
+                                                                          ),
+                                                                      child: ColorFiltered(
+                                                                        colorFilter: ColorFilters.matrix(
+                                                                          saturation:
+                                                                              -1,
+                                                                          brightness:
+                                                                              0.5,
+                                                                        ),
+                                                                        child: Image.asset(
+                                                                          "assets/images/ghost_blue.png",
+                                                                          height:
+                                                                              180,
+                                                                        ),
                                                                       ),
-                                                                  child: Image.asset(
-                                                                    "assets/images/ghost_blue.png",
-                                                                    height: 180,
-                                                                  ),
-                                                                ),
-                                                              ),
-                                                            ),
-                                                            Container(
-                                                              padding:
-                                                                  EdgeInsets.all(
-                                                                    12,
-                                                                  ),
-                                                              width: 264,
-                                                              decoration: BoxDecoration(
-                                                                borderRadius:
-                                                                    BorderRadius.circular(
-                                                                      8,
                                                                     ),
-                                                                color:
-                                                                    Colors
-                                                                        .grey
-                                                                        .shade400,
-                                                              ),
-                                                              child: Opacity(
-                                                                opacity: 0.6,
-                                                                child: Text(
-                                                                  "Go grab a break while we sneak into the server.",
-                                                                  textAlign:
-                                                                      TextAlign
-                                                                          .center,
-                                                                  style:
-                                                                      Theme.of(
-                                                                        context,
-                                                                      ).textTheme.titleMedium,
-                                                                ),
+                                                                  ),
+                                                                  Container(
+                                                                    padding:
+                                                                        EdgeInsets.all(
+                                                                          12,
+                                                                        ),
+                                                                    width: 264,
+                                                                    decoration: BoxDecoration(
+                                                                      borderRadius:
+                                                                          BorderRadius.circular(
+                                                                            8,
+                                                                          ),
+                                                                      color:
+                                                                          Colors
+                                                                              .grey
+                                                                              .shade400,
+                                                                    ),
+                                                                    child: Opacity(
+                                                                      opacity:
+                                                                          0.6,
+                                                                      child: Text(
+                                                                        "Go grab a break while we sneak into the server.",
+                                                                        textAlign:
+                                                                            TextAlign.center,
+                                                                        style:
+                                                                            Theme.of(
+                                                                              context,
+                                                                            ).textTheme.titleMedium,
+                                                                      ),
+                                                                    ),
+                                                                  ),
+                                                                ],
                                                               ),
                                                             ),
-                                                          ],
-                                                        ),
+                                                          ),
+                                                        ],
                                                       ),
                                                     ),
-                                                  ],
-                                                ),
-                                              ),
-                                            );
-                                          },
-                                        );
-                                      },
-                                    ),
-                                  );
-                                } else {
-                                  Navigator.of(context).push(
-                                    MaterialPageRoute(
-                                      builder:
-                                          (context) =>
-                                              SubjectPage(subject: subject),
-                                    ),
-                                  );
-                                }
-                              }
-
-                              itemBuilder(_, index) {
-                                final subject = subjects[index];
-                                return ListTile(
-                                  title: Text(
-                                    subject.title,
-                                    style: Theme.of(context)
-                                        .textTheme
-                                        .titleMedium
-                                        ?.copyWith(fontWeight: FontWeight.w600),
-                                  ),
-                                  subtitle: Column(
-                                    children: [
-                                      Text(
-                                        subject.description,
-                                        maxLines: 1,
-                                        overflow: TextOverflow.ellipsis,
-                                      ),
-                                      SizedBox(height: 16),
-                                      LinearProgressIndicator(
-                                        value: subject.progress,
-                                      ),
-                                    ],
-                                  ),
-                                  trailing: Icon(Icons.chevron_right_outlined),
-                                  leading: Icon(subject.icon),
-                                  isThreeLine: true,
-                                  onTap: () {
-                                    onTap(subject, index);
-                                  },
-                                  contentPadding: EdgeInsets.symmetric(
-                                    vertical: 12,
-                                    horizontal: 6,
-                                  ).copyWith(bottom: 6),
-                                );
-                              }
-
-                              return getSizeClass() == WidthSizeClass.large
-                                  ? Padding(
-                                    padding: const EdgeInsets.all(16.0),
-                                    child: SingleChildScrollView(
-                                      child: Wrap(
-                                        children:
-                                            subjects.mapIndexed((
-                                              index,
-                                              subject,
-                                            ) {
-                                              return ConstrainedBox(
-                                                constraints: BoxConstraints(
-                                                  maxWidth: 300,
-                                                  minWidth: 200,
-                                                ),
-                                                child: AspectRatio(
-                                                  aspectRatio: 0.98,
-                                                  child: SubjectCardExpanded(
-                                                    subject: subject,
-                                                    onTap: (subject) {
-                                                      onTap(subject, index);
-                                                    },
-                                                  ),
-                                                ),
+                                                  );
+                                                },
                                               );
-                                            }).toList(),
-                                      ),
+                                            },
+                                          ),
+                                        );
+                                      } else {
+                                        Navigator.of(context).push(
+                                          MaterialPageRoute(
+                                            builder:
+                                                (context) => SubjectPage(
+                                                  subject: subject,
+                                                ),
+                                          ),
+                                        );
+                                      }
+                                    }
+
+                                    itemBuilder(_, index) {
+                                      final subject = subjects[index];
+                                      return ListTile(
+                                        title: Text(
+                                          subject.title,
+                                          style: Theme.of(
+                                            context,
+                                          ).textTheme.titleMedium?.copyWith(
+                                            fontWeight: FontWeight.w600,
+                                          ),
+                                        ),
+                                        subtitle: Column(
+                                          children: [
+                                            Text(
+                                              subject.description,
+                                              maxLines: 1,
+                                              overflow: TextOverflow.ellipsis,
+                                            ),
+                                            SizedBox(height: 16),
+                                            LinearProgressIndicator(
+                                              value: subject.progress,
+                                            ),
+                                          ],
+                                        ),
+                                        trailing: Icon(
+                                          Icons.chevron_right_outlined,
+                                        ),
+                                        leading: Icon(subject.icon),
+                                        isThreeLine: true,
+                                        onTap: () {
+                                          onTap(subject, index);
+                                        },
+                                        contentPadding: EdgeInsets.symmetric(
+                                          vertical: 12,
+                                          horizontal: 6,
+                                        ).copyWith(bottom: 6),
+                                      );
+                                    }
+
+                                    return getSizeClass() ==
+                                            WidthSizeClass.large
+                                        ? Padding(
+                                          padding: const EdgeInsets.all(16.0),
+                                          child: SingleChildScrollView(
+                                            child: Wrap(
+                                              children:
+                                                  subjects.mapIndexed((
+                                                    index,
+                                                    subject,
+                                                  ) {
+                                                    return ConstrainedBox(
+                                                      constraints:
+                                                          BoxConstraints(
+                                                            maxWidth: 300,
+                                                            minWidth: 200,
+                                                          ),
+                                                      child: AspectRatio(
+                                                        aspectRatio: 0.98,
+                                                        child:
+                                                            SubjectCardExpanded(
+                                                              subject: subject,
+                                                              onTap: (subject) {
+                                                                onTap(
+                                                                  subject,
+                                                                  index,
+                                                                );
+                                                              },
+                                                            ),
+                                                      ),
+                                                    );
+                                                  }).toList(),
+                                            ),
+                                          ),
+                                        )
+                                        : ListView.separated(
+                                          itemCount: subjects.length,
+                                          separatorBuilder: (_, __) {
+                                            return Divider();
+                                          },
+                                          itemBuilder: itemBuilder,
+                                        );
+                                  },
+                                );
+                              }).toList(),
+                        ),
+                      ),
+                    ]
+                    : [
+                      Expanded(
+                        child: Transform.translate(
+                          offset: Offset(0, -24),
+                          child: Padding(
+                            padding: const EdgeInsets.all(12.0),
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              crossAxisAlignment: CrossAxisAlignment.center,
+                              children: [
+                                Padding(
+                                  padding: const EdgeInsets.all(32.0),
+                                  child: Opacity(
+                                    opacity: 0.9,
+                                    child: Image.asset(
+                                      "assets/images/construction.png",
                                     ),
-                                  )
-                                  : ListView.separated(
-                                    itemCount: subjects.length,
-                                    separatorBuilder: (_, __) {
-                                      return Divider();
-                                    },
-                                    itemBuilder: itemBuilder,
-                                  );
-                            },
-                          );
-                        }).toList(),
-                  ),
-                ),
+                                  ),
+                                ),
+                                Text(
+                                  "Oops! CHITTI isn't there for you yet.",
+                                  style: Theme.of(
+                                    context,
+                                  ).textTheme.titleLarge?.copyWith(
+                                    fontSize: 20,
+                                    fontWeight: FontWeight.w600,
+                                    color: Colors.grey.shade800,
+                                  ),
+                                  textAlign: TextAlign.center,
+                                ),
+                                SizedBox(height: 12),
+                                Text(
+                                  "No courses available for this semester. We'll be adding more soon. But, thanks for using CHITTI.",
+                                  textAlign: TextAlign.center,
+                                  style: Theme.of(context).textTheme.bodyMedium,
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                      ),
+                    ]),
               ],
             ),
           ),
@@ -422,12 +520,16 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin {
   }
 }
 
-Future showTermsModalSheet(BuildContext context, SharedPreferences prefs) {
+Future showTermsModalSheet(
+  BuildContext context,
+  SharedPreferences prefs, {
+  bool showCheckbox = true,
+}) {
   return showModalBottomSheet(
     showDragHandle: true,
     enableDrag: true,
     context: context,
-    isDismissible: false,
+    isDismissible: !showCheckbox,
     builder: (context) {
       bool isTermsAccepted = false;
       return BottomSheet(
@@ -477,7 +579,7 @@ Future showTermsModalSheet(BuildContext context, SharedPreferences prefs) {
                             "Monitor your learning progress and stay motivated with our tools.",
                             "Your credentials are for your use only. Please do not share them. Any misuse will lead to account suspension.",
                             "Please use the app on a single device only. Any attempt to use the app on multiple devices will result in account suspension.",
-                            "For any issues, please contact us at support@chitti.com",
+                            "For any issues, please contact us at scorewithchitti@gmail.com",
                           ];
                           final icons = [
                             Icons.book,
@@ -497,36 +599,43 @@ Future showTermsModalSheet(BuildContext context, SharedPreferences prefs) {
                         shrinkWrap: true,
                         physics: NeverScrollableScrollPhysics(),
                       ),
-                      Row(
-                        children: [
-                          Checkbox(
-                            value: isTermsAccepted,
-                            onChanged: (value) {
-                              setSheetState(() {
-                                isTermsAccepted = value ?? false;
-                              });
-                            },
-                          ),
-                          Text(
-                            "I accept the terms and conditions.",
-                            style: Theme.of(context).textTheme.bodyMedium,
-                          ),
-                        ],
-                      ),
-                      SizedBox(height: 16),
-                      SizedBox(
-                        width: double.infinity,
-                        child: FilledButton(
-                          onPressed:
-                              isTermsAccepted
-                                  ? () {
-                                    prefs.setBool('isFirstTime', true);
-                                    Navigator.of(context).pop();
-                                  }
-                                  : null,
-                          child: Text("Get Started"),
-                        ),
-                      ),
+                      ...(showCheckbox
+                          ? [
+                            Row(
+                              children: [
+                                Checkbox(
+                                  value: isTermsAccepted,
+                                  onChanged: (value) {
+                                    setSheetState(() {
+                                      isTermsAccepted = value ?? false;
+                                    });
+                                  },
+                                ),
+                                Text(
+                                  "I accept the terms and conditions.",
+                                  style: Theme.of(context).textTheme.bodyMedium,
+                                ),
+                              ],
+                            ),
+                            SizedBox(height: 16),
+                            SizedBox(
+                              width: double.infinity,
+                              child: FilledButton(
+                                onPressed:
+                                    isTermsAccepted
+                                        ? () async {
+                                          await prefs.setBool(
+                                            'isFirstTime',
+                                            false,
+                                          );
+                                          Navigator.of(context).pop();
+                                        }
+                                        : null,
+                                child: Text("Get Started"),
+                              ),
+                            ),
+                          ]
+                          : []),
                     ],
                   ),
                 );

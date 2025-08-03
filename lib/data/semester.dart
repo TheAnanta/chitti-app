@@ -177,7 +177,7 @@ class Subject {
       description: data["description"],
       icon: IconData(data["icon"], fontFamily: "MaterialIcons"),
       image: data["image"],
-      progress: 0,
+      progress: double.tryParse(data["progress"].toString()) ?? 0,
       units: List<Unit>.from(
         data["units"].map((unit) {
           return Unit.fromMap(unit);
@@ -228,28 +228,18 @@ class Semester {
           .toList(),
     );
     final completed = List<CompletedResources>.from(
-      (data["completed"] as List<dynamic>)
+      ((data["completed"] as List<dynamic>)..sorted((a, b) {
+            return a["updatedAt"].compareTo(b["updatedAt"]);
+          }))
           .map((e) {
-            print(e.runtimeType);
             return CompletedResources.fromSnapshot(e);
           })
           .toSet()
           .toList(),
     );
-    Map<String, double> progress = Map.fromEntries(
-      courses.map((e) {
-        final tr = e.units.fold(0, (a, b) => a + b.totalResources);
-        if (tr == 0) return MapEntry(e.courseId, 0.0);
-        final cr = completed.where((c) => c.courseId == e.courseId).length;
-        return MapEntry(e.courseId, (cr.toDouble() / tr.toDouble()));
-      }),
-    );
     return Semester(
       semester: data["semester"],
-      courses: groupBy(
-        courses.map((e) => e.copyWithProgress(progress[e.courseId] ?? 0.0)),
-        (s) => s.courseCategory,
-      ),
+      courses: groupBy(courses, (s) => s.courseCategory),
       completed: completed,
     );
   }

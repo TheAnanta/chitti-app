@@ -307,6 +307,11 @@ class _LoginScreenState extends State<LoginScreen> {
                                                       sharedPreferences,
                                                     ) {
                                                       if (context.mounted) {
+                                                        sharedPreferences
+                                                            .setBool(
+                                                              "isFirstTime",
+                                                              true,
+                                                            );
                                                         Navigator.of(
                                                           context,
                                                         ).pushReplacement(
@@ -633,6 +638,11 @@ class _LoginScreenState extends State<LoginScreen> {
                                                               ?.displayName
                                                               ?.split(" ")[0];
                                                       if (context.mounted) {
+                                                        sharedPreferences
+                                                            .setBool(
+                                                              "isFirstTime",
+                                                              true,
+                                                            );
                                                         Navigator.of(
                                                           context,
                                                         ).pushReplacement(

@@ -8,12 +8,14 @@ import 'search_view.dart';
 import 'thumbnails_view.dart';
 
 class PDFViewPage extends StatefulWidget {
+  final Function onAddResource;
   final PdfDocumentRef documentRef;
   final String pdfName;
   const PDFViewPage({
     super.key,
     required this.documentRef,
     required this.pdfName,
+    required this.onAddResource,
   });
 
   @override
@@ -459,6 +461,15 @@ class _PDFViewPageState extends State<PDFViewPage> with WidgetsBindingObserver {
                             outline.value = await document.loadOutline();
                             textSearcher.value = PdfTextSearcher(controller)
                               ..addListener(_update);
+                            // Check if the user has scrolled to the bottom of the document
+                            controller.addListener(() {
+                              if (controller.isReady &&
+                                  controller.pageCount > 0 &&
+                                  controller.pageNumber ==
+                                      controller.pageCount) {
+                                widget.onAddResource();
+                              }
+                            });
                           },
                           onTextSelectionChange: (selections) {
                             textSelections = selections;

@@ -199,16 +199,6 @@ class UnitListTile extends StatelessWidget {
                   ),
                 );
               } else if (roadmapId == "IMPQUES") {
-                addCompletedResource(
-                  context,
-                  CompletedResources(
-                    courseId: courseId,
-                    resourceId: units[index].importantQuestions!.id,
-                    resourceName: units[index].name,
-                    unitId: units[index].unitId,
-                    resourceType: "important_questions",
-                  ),
-                );
                 Navigator.of(context).push(
                   MaterialPageRoute(
                     builder:
@@ -234,6 +224,21 @@ class UnitListTile extends StatelessWidget {
                                     documentRef: pdfDocumentRef,
                                     pdfName:
                                         '${units[index].name} - Important Questions',
+                                    onAddResource: () {
+                                      addCompletedResource(
+                                        context,
+                                        CompletedResources(
+                                          courseId: courseId,
+                                          resourceId:
+                                              units[index]
+                                                  .importantQuestions!
+                                                  .id,
+                                          resourceName: units[index].name,
+                                          unitId: units[index].unitId,
+                                          resourceType: "important_questions",
+                                        ),
+                                      );
+                                    },
                                   );
                                 },
                               ),
@@ -454,10 +459,10 @@ class UnitListTile extends StatelessWidget {
                                               sharedPreferences =
                                                   await SharedPreferences.getInstance();
                                               // Check if user agreed to the terms
-                                              if (!(sharedPreferences.getBool(
+                                              if ((sharedPreferences.getBool(
                                                     "isFirstTime",
                                                   ) ??
-                                                  false)) {
+                                                  true)) {
                                                 isLoading.value = false;
                                                 ScaffoldMessenger.of(
                                                   sheetContext,
@@ -497,7 +502,12 @@ class UnitListTile extends StatelessWidget {
                                                 child,
                                               ) {
                                                 return value
-                                                    ? CircularProgressIndicator()
+                                                    ? CircularProgressIndicator(
+                                                      color:
+                                                          Theme.of(context)
+                                                              .colorScheme
+                                                              .onPrimary,
+                                                    )
                                                     : Text("Pay Now");
                                               },
                                             ),

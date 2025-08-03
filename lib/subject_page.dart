@@ -97,10 +97,26 @@ class SubjectPage extends StatelessWidget {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text(
-                          subject.title,
-                          style: Theme.of(context).textTheme.titleLarge
-                              ?.copyWith(fontWeight: FontWeight.bold),
+                        Row(
+                          children: [
+                            Text(
+                              subject.title,
+                              style: Theme.of(context).textTheme.titleLarge
+                                  ?.copyWith(fontWeight: FontWeight.bold),
+                            ),
+                            Spacer(),
+                            Column(
+                              crossAxisAlignment: CrossAxisAlignment.end,
+                              children: [
+                                Text(
+                                  "(3.5K enrolled)",
+                                  style: Theme.of(context).textTheme.labelSmall
+                                      ?.copyWith(fontWeight: FontWeight.bold),
+                                ),
+                                RatingView(rating: 4.5),
+                              ],
+                            ),
+                          ],
                         ),
                         SizedBox(height: 4),
                         Text(
@@ -126,30 +142,7 @@ class SubjectPage extends StatelessWidget {
                             ),
                           ),
                         ),
-                        SizedBox(height: 24),
-                        Text(
-                          "Instructor",
-                          style: Theme.of(context).textTheme.titleMedium
-                              ?.copyWith(fontWeight: FontWeight.bold),
-                        ),
-                        ListTile(
-                          leading: CircleAvatar(
-                            backgroundImage: NetworkImage(
-                              subject.instructor.image,
-                            ),
-                          ),
-                          title: Text(
-                            subject.instructor.name,
-                            style: Theme.of(context).textTheme.titleMedium
-                                ?.copyWith(fontWeight: FontWeight.bold),
-                          ),
-                          subtitle: Text(
-                            subject.instructor.bio,
-                            style: Theme.of(context).textTheme.bodyMedium,
-                            maxLines: 5,
-                            overflow: TextOverflow.ellipsis,
-                          ),
-                        ),
+
                         SizedBox(height: 24),
                         UnitListTile(
                           units: subject.units,
@@ -158,6 +151,133 @@ class SubjectPage extends StatelessWidget {
                           subjectCoverImage: subject.image,
                           courseId: subject.courseId,
                         ),
+                        SizedBox(height: 12),
+                        Divider(),
+                        SizedBox(height: 12),
+                        Text(
+                          "Instructor",
+                          style: Theme.of(
+                            context,
+                          ).textTheme.titleMedium?.copyWith(
+                            fontWeight: FontWeight.bold,
+                            color:
+                                Theme.of(
+                                  context,
+                                ).colorScheme.onSecondaryContainer,
+                          ),
+                        ),
+                        SizedBox(height: 16),
+                        Text(
+                          subject.instructor.name,
+                          style: Theme.of(
+                            context,
+                          ).textTheme.titleMedium?.copyWith(
+                            fontWeight: FontWeight.bold,
+                            color: Theme.of(context).colorScheme.primary,
+                          ),
+                        ),
+                        Padding(
+                          padding: const EdgeInsets.symmetric(vertical: 8.0),
+                          child: Row(
+                            children: [
+                              CircleAvatar(
+                                backgroundImage: NetworkImage(
+                                  subject.instructor.image,
+                                ),
+                                radius: 30,
+                              ),
+                              SizedBox(width: 12),
+                              Column(
+                                children: [
+                                  Row(
+                                    children: [
+                                      Icon(Icons.star, size: 16),
+                                      SizedBox(width: 4),
+                                      Text(
+                                        "4.5 rating",
+                                        style:
+                                            Theme.of(
+                                              context,
+                                            ).textTheme.bodySmall,
+                                      ),
+                                    ],
+                                  ),
+                                  SizedBox(height: 4),
+                                  Row(
+                                    children: [
+                                      Icon(Icons.timer_outlined, size: 16),
+                                      SizedBox(width: 4),
+                                      Text(
+                                        "120 hours",
+                                        style:
+                                            Theme.of(
+                                              context,
+                                            ).textTheme.bodySmall,
+                                      ),
+                                    ],
+                                  ),
+                                  SizedBox(height: 4),
+                                  Row(
+                                    children: [
+                                      Icon(Icons.school_outlined, size: 16),
+                                      SizedBox(width: 4),
+                                      Text(
+                                        "9.6 CGPA",
+                                        style:
+                                            Theme.of(
+                                              context,
+                                            ).textTheme.bodySmall,
+                                      ),
+                                    ],
+                                  ),
+                                ],
+                              ),
+                            ],
+                          ),
+                        ),
+                        Text(
+                          subject.instructor.bio,
+                          style: Theme.of(context).textTheme.bodySmall,
+                          maxLines: 4,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                        SizedBox(height: 12),
+                        Divider(),
+                        SizedBox(height: 12),
+                        Text(
+                          "Reviews",
+                          style: Theme.of(
+                            context,
+                          ).textTheme.titleMedium?.copyWith(
+                            fontWeight: FontWeight.bold,
+                            color:
+                                Theme.of(
+                                  context,
+                                ).colorScheme.onSecondaryContainer,
+                          ),
+                        ),
+                        SizedBox(height: 16),
+                        TextField(
+                          decoration: InputDecoration(
+                            hintText: "Write a review...",
+                            border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(8),
+                            ),
+                          ),
+                          maxLines: null,
+                          minLines: 4,
+                        ),
+                        SizedBox(height: 12),
+                        FilledButton(
+                          onPressed: () {},
+                          child: Text("Submit Review"),
+                        ),
+                        SizedBox(height: 12),
+                        Text(
+                          "No reviews yet.",
+                          style: Theme.of(context).textTheme.bodySmall,
+                        ),
+                        SizedBox(height: 24),
                       ],
                     ),
                   ),
@@ -167,6 +287,27 @@ class SubjectPage extends StatelessWidget {
           ),
         ],
       ),
+    );
+  }
+}
+
+class RatingView extends StatelessWidget {
+  const RatingView({super.key, required this.rating});
+
+  final double rating;
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      children: List.generate(5, (index) {
+        return Icon(
+          index + 1 <= rating
+              ? Icons.star
+              : (index + 0.5 <= rating ? Icons.star_half : Icons.star_border),
+          color: Colors.amber,
+          size: 16,
+        );
+      }),
     );
   }
 }

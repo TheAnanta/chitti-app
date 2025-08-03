@@ -1,11 +1,14 @@
 import 'dart:math';
 
 import 'package:chitti/data/semester.dart';
+import 'package:chitti/home_page.dart';
 import 'package:chitti/injector.dart';
 import 'package:chitti/splash_screen.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class MyClipper extends CustomClipper<Path> {
   @override
@@ -230,6 +233,31 @@ class ProfilePage extends StatelessWidget {
                 ),
               ),
             ),
+            SizedBox(height: 12),
+            ListTile(
+              leading: Icon(Icons.policy_outlined),
+              title: Text("Terms & Conditions"),
+              onTap: () async {
+                SharedPreferences prefs = await SharedPreferences.getInstance();
+                showTermsModalSheet(context, prefs, showCheckbox: true);
+              },
+            ),
+            ListTile(
+              leading: Icon(Icons.contact_support_outlined),
+              title: Text("Help & Support"),
+              onTap: () async {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    content: Text(
+                      "Report a bug or issue to us at scorewithchitti@gmail.com",
+                    ),
+                    duration: Duration(seconds: 2),
+                  ),
+                );
+                launchUrl(Uri.parse("mailto:scorewithchitti@gmail.com"));
+              },
+            ),
+            SizedBox(height: 12),
             FilledButton(
               onPressed: () {
                 FirebaseAuth.instance.signOut();
