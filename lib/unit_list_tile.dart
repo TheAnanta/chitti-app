@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:chitti/animated_image.dart';
+import 'package:chitti/cart_page.dart';
 import 'package:chitti/color_filters.dart';
 import 'package:chitti/data/cart.dart';
 import 'package:chitti/data/semester.dart';
@@ -303,7 +304,7 @@ class UnitListTile extends StatelessWidget {
                                       Opacity(
                                         opacity: 0.4,
                                         child: Text(
-                                          "₹180",
+                                          "₹90",
                                           style: Theme.of(
                                             sheetContext,
                                           ).textTheme.headlineMedium?.copyWith(
@@ -330,7 +331,7 @@ class UnitListTile extends StatelessWidget {
                                       ),
                                       SizedBox(width: 2),
                                       Text(
-                                        "99",
+                                        "49",
                                         style: Theme.of(
                                           sheetContext,
                                         ).textTheme.headlineLarge?.copyWith(
@@ -379,6 +380,9 @@ class UnitListTile extends StatelessWidget {
                                                     if (isInCart) {
                                                       Injector.cartRepository
                                                           .removeItem(courseId);
+
+                                                      Injector.cartRepository
+                                                          .persist(context);
                                                       ScaffoldMessenger.of(
                                                         context,
                                                       ).showSnackBar(
@@ -395,6 +399,8 @@ class UnitListTile extends StatelessWidget {
                                                             SubscriptionType
                                                                 .mid,
                                                           );
+                                                      Injector.cartRepository
+                                                          .persist(context);
                                                       ScaffoldMessenger.of(
                                                         context,
                                                       ).showSnackBar(
@@ -467,259 +473,21 @@ class UnitListTile extends StatelessWidget {
                                                   sharedPreferences,
                                                 );
                                               }
-                                              if (Platform.isMacOS ||
-                                                  Platform.isWindows) {
-                                                Navigator.of(context).push(
-                                                  MaterialPageRoute(
-                                                    builder: (context) {
-                                                      return PaymentWebView(
-                                                        courseId: courseId,
-                                                      );
-                                                    },
-                                                  ),
-                                                );
-                                                return;
-                                              }
-
-                                              final razorpayAPIRequest = await post(
-                                                Uri.parse(
-                                                  "https://asia-south1-chitti-ananta.cloudfunctions.net/createOrder",
+                                              Injector.cartRepository.items.add(
+                                                CartItem(
+                                                  item: courseId,
+                                                  type: SubscriptionType.mid,
                                                 ),
-                                                body: jsonEncode({
-                                                  "userId":
-                                                      FirebaseAuth
-                                                          .instance
-                                                          .currentUser
-                                                          ?.uid,
-                                                  "courseId": courseId,
-                                                  "amount": 10956,
-                                                }),
-                                                headers: {
-                                                  'Content-Type':
-                                                      'application/json',
-                                                },
                                               );
-                                              if (razorpayAPIRequest
-                                                      .statusCode !=
-                                                  200) {
-                                                ScaffoldMessenger.of(
-                                                  context,
-                                                ).showSnackBar(
-                                                  SnackBar(
-                                                    behavior:
-                                                        SnackBarBehavior
-                                                            .floating,
-                                                    content: Text(
-                                                      "Error: ${razorpayAPIRequest.body}",
-                                                    ),
-                                                  ),
-                                                );
-                                                return;
-                                              }
-                                              final razorpayAPIResponse =
-                                                  (json.decode(
-                                                    razorpayAPIRequest.body,
-                                                  ))["id"];
-                                              var _razorpay = Razorpay();
-                                              var options = {
-                                                'order_id': razorpayAPIResponse,
-                                                'key':
-                                                    'rzp_live_dXsSgWNlpWQ07d',
-                                                'amount': 10956,
-                                                'name': 'Score With CHITTI.',
-                                                'description':
-                                                    "Purchasing subscription to study $subjectName",
-                                              };
-                                              _razorpay.on(Razorpay.EVENT_PAYMENT_SUCCESS, (
-                                                PaymentSuccessResponse response,
-                                              ) {
-                                                Future.delayed(Duration(seconds: 1), () async {
-                                                  final oldAuthToken =
-                                                      await FirebaseAuth
-                                                          .instance
-                                                          .currentUser
-                                                          ?.getIdToken();
-                                                  final loginRequest = await post(
-                                                    Uri.parse(
-                                                      "https://asia-south1-chitti-ananta.cloudfunctions.net/webApi/reauthenticate",
-                                                    ),
-                                                    headers: {
-                                                      "Content-Type":
-                                                          "application/json",
-                                                      "Authorization":
-                                                          "Bearer $oldAuthToken",
-                                                    },
-                                                    body: json.encode({
-                                                      "rollNo":
-                                                          FirebaseAuth
-                                                              .instance
-                                                              .currentUser
-                                                              ?.uid,
-                                                    }),
-                                                  );
-                                                  if (loginRequest.statusCode ==
-                                                      404) {
-                                                    // MARK: Alert the user on wrong authentication details
-                                                    isLoading.value = false;
-                                                    if (sheetContext.mounted) {
-                                                      ScaffoldMessenger.of(
-                                                        sheetContext,
-                                                      ).showSnackBar(
-                                                        SnackBar(
-                                                          content: Text(
-                                                            json.decode(
-                                                              loginRequest.body,
-                                                            )["message"],
-                                                          ),
-                                                        ),
-                                                      );
-                                                    }
-                                                  } else if (loginRequest
-                                                          .statusCode ==
-                                                      403) {
-                                                    // MARK: Alert the user on wrong authentication details
-                                                    isLoading.value = false;
-                                                    if (sheetContext.mounted) {
-                                                      ScaffoldMessenger.of(
-                                                        sheetContext,
-                                                      ).showSnackBar(
-                                                        SnackBar(
-                                                          content: Text(
-                                                            json.decode(
-                                                              loginRequest.body,
-                                                            )["message"],
-                                                          ),
-                                                        ),
-                                                      );
-                                                    }
-                                                  } else {
-                                                    // MARK: Authenticate the user
-                                                    final result = json.decode(
-                                                      loginRequest.body,
-                                                    );
-                                                    final userCredential =
-                                                        await FirebaseAuth
-                                                            .instance
-                                                            .signInWithCustomToken(
-                                                              result["token"],
-                                                            );
-                                                    FirebaseAuth.instance.currentUser!.getIdToken(true).then((
-                                                      token,
-                                                    ) {
-                                                      if (token == null) {
-                                                        isLoading.value = false;
-                                                        if (sheetContext
-                                                            .mounted) {
-                                                          ScaffoldMessenger.of(
-                                                            sheetContext,
-                                                          ).showSnackBar(
-                                                            SnackBar(
-                                                              content: Text(
-                                                                "Unable to create token.",
-                                                              ),
-                                                            ),
-                                                          );
-                                                        }
-                                                        return;
-                                                      }
-                                                      try {
-                                                        fetchSemester(token, () {
-                                                          ScaffoldMessenger.of(
-                                                            context,
-                                                          ).showSnackBar(
-                                                            SnackBar(
-                                                              content: Text(
-                                                                "Session expired, please login again.",
-                                                              ),
-                                                            ),
-                                                          );
-                                                          Navigator.of(
-                                                            context,
-                                                          ).pushReplacement(
-                                                            MaterialPageRoute(
-                                                              builder:
-                                                                  (context) =>
-                                                                      SplashScreen(),
-                                                            ),
-                                                          );
-                                                        }).then((semester) {
-                                                          SharedPreferences.getInstance().then((
-                                                            sharedPreferences,
-                                                          ) {
-                                                            Navigator.of(
-                                                              context,
-                                                            ).pop();
-                                                            if (context
-                                                                .mounted) {
-                                                              Navigator.of(
-                                                                context,
-                                                              ).pushReplacement(
-                                                                MaterialPageRoute(
-                                                                  builder:
-                                                                      (
-                                                                        context,
-                                                                      ) => MyHomePage(
-                                                                        name:
-                                                                            userCredential.user?.displayName?.split(
-                                                                              " ",
-                                                                            )[0] ??
-                                                                            "User",
-                                                                        semester:
-                                                                            semester,
-                                                                      ),
-                                                                ),
-                                                              );
-                                                            }
-                                                          });
-                                                        });
-                                                      } on Exception catch (e) {
-                                                        isLoading.value = false;
-                                                        if (sheetContext
-                                                            .mounted) {
-                                                          ScaffoldMessenger.of(
-                                                            sheetContext,
-                                                          ).showSnackBar(
-                                                            SnackBar(
-                                                              content: Text(
-                                                                e.toString(),
-                                                              ),
-                                                            ),
-                                                          );
-                                                        }
-                                                      }
-                                                    });
-                                                  }
-                                                  isLoading.value = false;
-                                                  Navigator.of(
-                                                    sheetContext,
-                                                  ).pop();
-                                                });
-                                              });
-                                              _razorpay.on(
-                                                Razorpay.EVENT_PAYMENT_ERROR,
-                                                (
-                                                  PaymentFailureResponse
-                                                  response,
-                                                ) {
-                                                  isLoading.value = false;
-                                                  Navigator.of(
-                                                    sheetContext,
-                                                  ).pop();
-                                                  ScaffoldMessenger.of(
-                                                    sheetContext,
-                                                  ).showSnackBar(
-                                                    SnackBar(
-                                                      behavior:
-                                                          SnackBarBehavior
-                                                              .floating,
-                                                      content: Text(
-                                                        "Error: ${response.message}",
-                                                      ),
-                                                    ),
-                                                  );
-                                                },
+                                              await Injector.cartRepository
+                                                  .persist(context);
+                                              Navigator.of(context).push(
+                                                MaterialPageRoute(
+                                                  builder: (context) {
+                                                    return CartPage();
+                                                  },
+                                                ),
                                               );
-                                              _razorpay.open(options);
                                             },
                                             child: ValueListenableBuilder<bool>(
                                               valueListenable: isLoading,

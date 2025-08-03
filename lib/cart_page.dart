@@ -1,5 +1,6 @@
 import 'package:chitti/data/semester.dart';
 import 'package:chitti/injector.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
 class CartPage extends StatefulWidget {
@@ -10,8 +11,12 @@ class CartPage extends StatefulWidget {
 }
 
 class _CartPageState extends State<CartPage> {
+  String? couponCode = Injector.cartRepository.coupon?.code;
+  Coupon? coupon = Injector.cartRepository.coupon;
+  final ValueNotifier<bool> isLoading = ValueNotifier<bool>(false);
   @override
   Widget build(BuildContext context) {
+    print("Cart items: ${Injector.cartRepository.items}");
     final cartItems =
         List<Subject>.from(
               Injector.semesterRepository.semester?.courses.values.fold(
@@ -36,7 +41,15 @@ class _CartPageState extends State<CartPage> {
             )
             .toList();
     return Scaffold(
-      appBar: AppBar(title: Text('Cart')),
+      appBar: AppBar(
+        title: Text('Cart'),
+        leading: IconButton(
+          onPressed: () {
+            Navigator.pop(context);
+          },
+          icon: Icon(Icons.arrow_back),
+        ),
+      ),
       body: Center(
         child:
             cartItems.isEmpty
@@ -82,6 +95,8 @@ class _CartPageState extends State<CartPage> {
                                         ),
                                       ),
                                     );
+
+                                    Injector.cartRepository.persist(context);
                                     setState(() {});
                                   },
                                   child: Text('Remove'),
@@ -129,7 +144,7 @@ class _CartPageState extends State<CartPage> {
                               ),
                               SizedBox(height: 8),
                               Text(
-                                '₹52',
+                                '₹${Injector.cartRepository.getPrice(cartItem.courseId, subscriptionType)}',
                                 style: Theme.of(
                                   context,
                                 ).textTheme.titleMedium?.copyWith(
@@ -166,19 +181,110 @@ class _CartPageState extends State<CartPage> {
               ),
               child: Row(
                 children: [
-                  Text("Have a coupon?"),
+                  Text(
+                    couponCode == null
+                        ? "Have a coupon?"
+                        : "Coupon code: $couponCode (-₹${coupon?.discount ?? 0})",
+                    style:
+                        couponCode == null
+                            ? null
+                            : TextStyle(
+                              color: Theme.of(context).colorScheme.primary,
+                              fontWeight: FontWeight.bold,
+                            ),
+                  ),
                   Spacer(),
                   TextButton(
-                    onPressed: () {
-                      // Handle coupon code logic
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(
-                          content: Text('Coupon code feature not implemented'),
-                        ),
-                      );
-                    },
+                    onPressed:
+                        cartItems.isEmpty
+                            ? null
+                            : () {
+                              if (couponCode != null) {
+                                couponCode = null;
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  SnackBar(
+                                    content: Text('Coupon code removed'),
+                                  ),
+                                );
+                                setState(() {});
+                                return;
+                              } else {
+                                // Show dialog to enter coupon code
+                                showDialog(
+                                  context: context,
+                                  builder: (context) {
+                                    return AlertDialog(
+                                      title: Text('Enter Coupon Code'),
+                                      content: TextField(
+                                        onChanged: (value) {
+                                          couponCode = value;
+                                        },
+                                        decoration: InputDecoration(
+                                          hintText: 'Enter your coupon code',
+                                        ),
+                                      ),
+                                      actions: [
+                                        TextButton(
+                                          onPressed: () {
+                                            Navigator.pop(context);
+                                          },
+                                          child: Text('Cancel'),
+                                        ),
+                                        ElevatedButton(
+                                          onPressed: () async {
+                                            if (couponCode != null &&
+                                                couponCode!.isNotEmpty) {
+                                              coupon = await Injector
+                                                  .cartRepository
+                                                  .applyCoupon(
+                                                    couponCode!,
+                                                    context,
+                                                  );
+                                              print(coupon);
+                                              if (coupon == null ||
+                                                  (coupon?.minAmount ?? 0) >
+                                                      Injector
+                                                          .cartRepository
+                                                          .totalPrice) {
+                                                couponCode = null;
+                                                coupon = null;
+                                                Injector.cartRepository.coupon =
+                                                    null;
+                                                ScaffoldMessenger.of(
+                                                  context,
+                                                ).showSnackBar(
+                                                  SnackBar(
+                                                    content: Text(
+                                                      'Invalid coupon code or minimum amount not met.',
+                                                    ),
+                                                  ),
+                                                );
+                                              } else {
+                                                ScaffoldMessenger.of(
+                                                  context,
+                                                ).showSnackBar(
+                                                  SnackBar(
+                                                    content: Text(
+                                                      'Coupon applied: ${coupon?.code}',
+                                                    ),
+                                                  ),
+                                                );
+                                                couponCode = coupon?.code;
+                                              }
+                                              setState(() {});
+                                            }
+                                            Navigator.pop(context);
+                                          },
+                                          child: Text('Apply'),
+                                        ),
+                                      ],
+                                    );
+                                  },
+                                );
+                              }
+                            },
                     child: Text(
-                      "Apply",
+                      couponCode == null ? "Apply" : "Remove",
                       style: TextStyle(
                         color: Theme.of(context).colorScheme.primary,
                         fontWeight: FontWeight.bold,
@@ -208,17 +314,39 @@ class _CartPageState extends State<CartPage> {
                     ),
                   ],
                 ),
-                FloatingActionButton.extended(
-                  backgroundColor: Theme.of(context).colorScheme.primary,
-                  foregroundColor: Theme.of(context).colorScheme.onPrimary,
-                  onPressed: () {
-                    // Handle checkout action
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(content: Text('Checkout not implemented')),
+                ValueListenableBuilder<bool>(
+                  valueListenable: isLoading,
+                  builder: (BuildContext context, value, Widget? child) {
+                    return FloatingActionButton.extended(
+                      backgroundColor:
+                          cartItems.isEmpty
+                              ? Theme.of(context).disabledColor
+                              : Theme.of(context).colorScheme.primary,
+                      foregroundColor: Theme.of(context).colorScheme.onPrimary,
+                      onPressed:
+                          cartItems.isEmpty
+                              ? null
+                              : value
+                              ? null
+                              : () {
+                                Injector.cartRepository.persist(context);
+                                // Handle checkout action
+                                Injector.cartRepository.checkout(
+                                  context,
+                                  coupon: coupon,
+                                  onLoading: (p0) {
+                                    isLoading.value = p0;
+                                  },
+                                );
+                              },
+
+                      label:
+                          value
+                              ? CircularProgressIndicator()
+                              : Text('Checkout'),
+                      icon: Icon(Icons.payment),
                     );
                   },
-                  label: Text('Checkout'),
-                  icon: Icon(Icons.payment),
                 ),
               ],
             ),
@@ -227,4 +355,21 @@ class _CartPageState extends State<CartPage> {
       ),
     );
   }
+}
+
+class Coupon {
+  final String couponId;
+  final String code;
+  final double discount;
+  final DateTime expiryDate;
+  final DateTime validFrom;
+  final double minAmount;
+  Coupon({
+    required this.couponId,
+    required this.code,
+    required this.discount,
+    required this.expiryDate,
+    required this.validFrom,
+    required this.minAmount,
+  });
 }

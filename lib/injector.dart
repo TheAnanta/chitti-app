@@ -5,5 +5,5 @@ import 'package:chitti/data/unit_repository.dart';
 class Injector {
   static UnitRepository unitRepository = UnitRepository();
   static SemesterRepository semesterRepository = SemesterRepository();
-  static CartRepository cartRepository = CartRepository();
+  static CartRepository cartRepository = CartRepository(null);
 }

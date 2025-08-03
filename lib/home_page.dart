@@ -473,7 +473,7 @@ Future showTermsModalSheet(BuildContext context, SharedPreferences prefs) {
                           ];
                           final descriptions = [
                             "Select the course you want to focus on from the list.",
-                            "Complete the payment, either medium plan (MID) or pro plan (SEM), to unlock all resources for the course.",
+                            "Complete the payment, to unlock all resources for the course.",
                             "Monitor your learning progress and stay motivated with our tools.",
                             "Your credentials are for your use only. Please do not share them. Any misuse will lead to account suspension.",
                             "Please use the app on a single device only. Any attempt to use the app on multiple devices will result in account suspension.",
@@ -520,7 +520,7 @@ Future showTermsModalSheet(BuildContext context, SharedPreferences prefs) {
                           onPressed:
                               isTermsAccepted
                                   ? () {
-                                    prefs.setBool('isFirstTime', false);
+                                    prefs.setBool('isFirstTime', true);
                                     Navigator.of(context).pop();
                                   }
                                   : null,

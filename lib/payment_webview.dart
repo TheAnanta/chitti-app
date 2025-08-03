@@ -10,8 +10,8 @@ import 'package:http/http.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class PaymentWebView extends StatelessWidget {
-  final String courseId;
-  const PaymentWebView({super.key, required this.courseId});
+  final String paymentId;
+  const PaymentWebView({super.key, required this.paymentId});
 
   @override
   Widget build(BuildContext context) {
@@ -24,7 +24,7 @@ class PaymentWebView extends StatelessWidget {
         initialUrlRequest: URLRequest(
           url: WebUri.uri(
             Uri.parse(
-              "https://app.scorewithchitti.in/payments?userid=${FirebaseAuth.instance.currentUser!.uid}&courseid=$courseId",
+              "https://app.scorewithchitti.in/payments?paymentId=$paymentId",
             ),
           ),
         ),
@@ -94,18 +94,15 @@ class PaymentWebView extends StatelessWidget {
                     return;
                   }
                   try {
-                    fetchSemester(token, (){
+                    fetchSemester(token, () {
                       ScaffoldMessenger.of(context).showSnackBar(
                         SnackBar(
                           content: Text("Session expired, please login again."),
                         ),
                       );
                       Navigator.of(context).pushReplacement(
-                                                      MaterialPageRoute(
-                                                        builder: (context) =>
-                                                            SplashScreen(),
-                                                      ),
-                                                    );
+                        MaterialPageRoute(builder: (context) => SplashScreen()),
+                      );
                     }).then((semester) {
                       SharedPreferences.getInstance().then((sharedPreferences) {
                         // Navigator.of(context).pop();

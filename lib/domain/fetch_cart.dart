@@ -9,7 +9,7 @@ import 'package:http/http.dart';
 Future<void> fetchCart(BuildContext context) async {
   final token = await FirebaseAuth.instance.currentUser?.getIdToken(true);
 
-  List<String>? data = await get(
+  List<CartItem>? data = await get(
     Uri.parse(
       "https://asia-south1-chitti-ananta.cloudfunctions.net/webApi/cart",
     ),
@@ -17,8 +17,16 @@ Future<void> fetchCart(BuildContext context) async {
   ).then((response) {
     if (response.statusCode == 200) {
       print(json.decode(response.body)["cart"]?["courseId"]);
-      return List<String>.from(
-        (json.decode(response.body))["cart"]?["courseId"] ?? [],
+      final result = json.decode(response.body);
+      Injector.cartRepository.cartId = result["cart"]["cartId"];
+      return List<CartItem>.from(
+        result["cart"]?["cartItems"]?.map(
+              (cartItem) => CartItem(
+                item: cartItem["courseId"],
+                type: SubscriptionType.values[cartItem["subscriptionType"]],
+              ),
+            ) ??
+            [],
       );
     } else {
       try {
@@ -40,9 +48,5 @@ Future<void> fetchCart(BuildContext context) async {
   });
   Injector.cartRepository.items.clear();
 
-  Injector.cartRepository.items.addAll(
-    (data ?? List<String>.empty()).map((e) {
-      return CartItem(item: e, type: SubscriptionType.mid);
-    }),
-  );
+  Injector.cartRepository.items.addAll((data ?? List<CartItem>.empty()));
 }

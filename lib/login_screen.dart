@@ -43,12 +43,13 @@ class _LoginScreenState extends State<LoginScreen> {
   }
 
   var obscurePassword = true;
+  var isCredentialCorrect = true;
 
   @override
   Widget build(BuildContext context) {
     return Center(
       child:
-          password == ""
+          password == "" || !isCredentialCorrect
               ? LayoutBuilder(
                 builder: (context, constraints) {
                   WindowSizeClass().init(constraints);
@@ -170,6 +171,7 @@ class _LoginScreenState extends State<LoginScreen> {
                                         suffixIcon: IconButton(
                                           onPressed: () {
                                             obscurePassword = !obscurePassword;
+                                            isLoading.value = false;
                                             setState(() {});
                                           },
                                           icon: Icon(
@@ -233,6 +235,7 @@ class _LoginScreenState extends State<LoginScreen> {
                                             );
                                             if (loginRequest.statusCode ==
                                                 404) {
+                                              isCredentialCorrect = true;
                                               gitamPageDetails =
                                                   (json.decode(
                                                     loginRequest.body,
@@ -257,7 +260,10 @@ class _LoginScreenState extends State<LoginScreen> {
                                                   ),
                                                 );
                                               }
+                                              isCredentialCorrect = false;
+                                              setState(() {});
                                             } else {
+                                              isCredentialCorrect = true;
                                               // MARK: Authenticate the user
                                               final result = json.decode(
                                                 loginRequest.body,
