@@ -9,11 +9,17 @@ class Instructor {
   final String image;
   final String bio;
   final String id;
+  final int gpa;
+  final int rating;
+  final int hours;
   const Instructor({
     required this.name,
     required this.image,
     required this.bio,
     required this.id,
+    required this.gpa,
+    required this.rating,
+    required this.hours,
   });
 }
 
@@ -151,6 +157,8 @@ class Subject {
   final String image;
   final List<Unit> units;
   final Instructor instructor;
+  final double rating;
+  final List<Review> reviews;
 
   const Subject({
     required this.courseId,
@@ -163,6 +171,8 @@ class Subject {
         "https://images.squarespace-cdn.com/content/v1/570b9bd42fe131a6e20717c2/1730901328712-ARXW9LQ4S2MVG2PULIKV/Gitam_Banner.jpg?format=2500w",
     this.units = const [],
     required this.instructor,
+    required this.rating,
+    this.reviews = const [],
   });
 
   static fromMap(Map<String, dynamic> data) {
@@ -183,11 +193,26 @@ class Subject {
           return Unit.fromMap(unit);
         }),
       ),
+      rating: double.tryParse(data["rating"].toString()) ?? 0,
+      reviews: List<Review>.from(
+        data["feedback"].map((review) {
+          return Review(
+            rating: review["rating"],
+            comment: review["review"],
+            name: review["name"],
+            image: review["image"],
+            date: DateTime.parse(review["createdAt"]),
+          );
+        }),
+      ),
       instructor: Instructor(
         id: data["instructor"]["instructorId"],
         name: data["instructor"]["name"],
         image: data["instructor"]["image"],
         bio: data["instructor"]["bio"],
+        gpa: data["instructor"]["gpa"] ?? 0,
+        rating: data["instructor"]["rating"] ?? 0,
+        hours: data["instructor"]["hours"] ?? 0,
       ),
     );
   }
@@ -203,8 +228,25 @@ class Subject {
       progress: progress,
       units: units,
       instructor: instructor,
+      rating: rating,
+      reviews: reviews,
     );
   }
+}
+
+class Review {
+  final int rating;
+  final String comment;
+  final String name;
+  final String image;
+  final DateTime date;
+  const Review({
+    required this.rating,
+    required this.comment,
+    required this.name,
+    required this.image,
+    required this.date,
+  });
 }
 
 class Semester {
