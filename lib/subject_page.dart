@@ -1,11 +1,14 @@
 import 'dart:io';
 
 import 'package:chitti/data/semester.dart';
+import 'package:chitti/injector.dart';
 import 'package:chitti/profile_page.dart';
 import 'package:chitti/unit_list_tile.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:http/http.dart';
 
 class SubjectPage extends StatelessWidget {
   final Subject subject;
@@ -109,11 +112,11 @@ class SubjectPage extends StatelessWidget {
                               crossAxisAlignment: CrossAxisAlignment.end,
                               children: [
                                 Text(
-                                  "(3.5K enrolled)",
+                                  "(${subject.reviews.length} reviews)",
                                   style: Theme.of(context).textTheme.labelSmall
                                       ?.copyWith(fontWeight: FontWeight.bold),
                                 ),
-                                RatingView(rating: 4.5),
+                                RatingView(rating: subject.rating),
                               ],
                             ),
                           ],
@@ -194,7 +197,7 @@ class SubjectPage extends StatelessWidget {
                                       Icon(Icons.star, size: 16),
                                       SizedBox(width: 4),
                                       Text(
-                                        "4.5 rating",
+                                        "${subject.instructor.rating} rating",
                                         style:
                                             Theme.of(
                                               context,
@@ -208,7 +211,7 @@ class SubjectPage extends StatelessWidget {
                                       Icon(Icons.timer_outlined, size: 16),
                                       SizedBox(width: 4),
                                       Text(
-                                        "120 hours",
+                                        "${subject.instructor.hours} hours",
                                         style:
                                             Theme.of(
                                               context,
@@ -222,7 +225,7 @@ class SubjectPage extends StatelessWidget {
                                       Icon(Icons.school_outlined, size: 16),
                                       SizedBox(width: 4),
                                       Text(
-                                        "9.6 CGPA",
+                                        "${subject.instructor.gpa} CGPA",
                                         style:
                                             Theme.of(
                                               context,
@@ -241,6 +244,108 @@ class SubjectPage extends StatelessWidget {
                           maxLines: 4,
                           overflow: TextOverflow.ellipsis,
                         ),
+                        OutlinedButton(
+                          onPressed: () {
+                            showModalBottomSheet(
+                              context: context,
+                              builder: (context) {
+                                int rating = 0;
+                                final reviewController =
+                                    TextEditingController();
+                                return StatefulBuilder(
+                                  builder: (context, setSheetState) {
+                                    return Padding(
+                                      padding: const EdgeInsets.all(16.0),
+                                      child: Column(
+                                        mainAxisSize: MainAxisSize.min,
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
+                                        children: [
+                                          Text(
+                                            "Write a review for ${subject.instructor.name}",
+                                            style: Theme.of(
+                                              context,
+                                            ).textTheme.titleMedium?.copyWith(
+                                              fontWeight: FontWeight.bold,
+                                            ),
+                                          ),
+                                          SizedBox(height: 12),
+                                          RatingView(
+                                            rating: rating.toDouble(),
+                                            isEditable: true,
+                                            onTap: (ratingValue) {
+                                              setSheetState(() {
+                                                rating = ratingValue;
+                                              });
+                                            },
+                                          ),
+                                          TextField(
+                                            controller: reviewController,
+                                            decoration: InputDecoration(
+                                              hintText:
+                                                  "Share your thoughts...",
+                                              border: OutlineInputBorder(
+                                                borderRadius:
+                                                    BorderRadius.circular(8),
+                                              ),
+                                            ),
+                                            maxLines: null,
+                                            minLines: 4,
+                                          ),
+                                          SizedBox(height: 12),
+                                          FilledButton(
+                                            onPressed: () {
+                                              if (reviewController
+                                                  .text
+                                                  .isEmpty) {
+                                                ScaffoldMessenger.of(
+                                                  context,
+                                                ).showSnackBar(
+                                                  SnackBar(
+                                                    content: Text(
+                                                      "Review cannot be empty!",
+                                                    ),
+                                                  ),
+                                                );
+                                                return;
+                                              }
+                                              // Here you would typically send the review to your backend
+                                              submitReview(
+                                                rating,
+                                                reviewController.text,
+                                                () {
+                                                  // For now, we will just clear the text field
+                                                  reviewController.clear();
+                                                  ScaffoldMessenger.of(
+                                                    context,
+                                                  ).showSnackBar(
+                                                    SnackBar(
+                                                      content: Text(
+                                                        "Review submitted!",
+                                                      ),
+                                                    ),
+                                                  );
+
+                                                  Navigator.of(context).pop();
+                                                },
+                                                context,
+
+                                                instructorId:
+                                                    subject.instructor.id,
+                                              );
+                                            },
+                                            child: Text("Submit Review"),
+                                          ),
+                                        ],
+                                      ),
+                                    );
+                                  },
+                                );
+                              },
+                            );
+                          },
+                          child: Text("Rate instructor"),
+                        ),
                         SizedBox(height: 12),
                         Divider(),
                         SizedBox(height: 12),
@@ -257,26 +362,201 @@ class SubjectPage extends StatelessWidget {
                           ),
                         ),
                         SizedBox(height: 16),
-                        TextField(
-                          decoration: InputDecoration(
-                            hintText: "Write a review...",
-                            border: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(8),
+                        !subject.reviews.any(
+                              (e) =>
+                                  e.userId ==
+                                  FirebaseAuth.instance.currentUser?.uid,
+                            )
+                            ? OutlinedButton(
+                              onPressed: () {
+                                showModalBottomSheet(
+                                  context: context,
+                                  builder: (context) {
+                                    int rating = 0;
+                                    final reviewController =
+                                        TextEditingController();
+                                    return StatefulBuilder(
+                                      builder: (context, setSheetState) {
+                                        return Padding(
+                                          padding: const EdgeInsets.all(16.0),
+                                          child: Column(
+                                            mainAxisSize: MainAxisSize.min,
+                                            crossAxisAlignment:
+                                                CrossAxisAlignment.start,
+                                            children: [
+                                              Text(
+                                                "Write a review for ${subject.title}",
+                                                style: Theme.of(context)
+                                                    .textTheme
+                                                    .titleMedium
+                                                    ?.copyWith(
+                                                      fontWeight:
+                                                          FontWeight.bold,
+                                                    ),
+                                              ),
+                                              SizedBox(height: 12),
+                                              RatingView(
+                                                rating: rating.toDouble(),
+                                                isEditable: true,
+                                                onTap: (ratingValue) {
+                                                  setSheetState(() {
+                                                    rating = ratingValue;
+                                                  });
+                                                },
+                                              ),
+                                              TextField(
+                                                controller: reviewController,
+                                                decoration: InputDecoration(
+                                                  hintText:
+                                                      "Share your thoughts...",
+                                                  border: OutlineInputBorder(
+                                                    borderRadius:
+                                                        BorderRadius.circular(
+                                                          8,
+                                                        ),
+                                                  ),
+                                                ),
+                                                maxLines: null,
+                                                minLines: 4,
+                                              ),
+                                              SizedBox(height: 12),
+                                              FilledButton(
+                                                onPressed: () {
+                                                  if (reviewController
+                                                      .text
+                                                      .isEmpty) {
+                                                    ScaffoldMessenger.of(
+                                                      context,
+                                                    ).showSnackBar(
+                                                      SnackBar(
+                                                        content: Text(
+                                                          "Review cannot be empty!",
+                                                        ),
+                                                      ),
+                                                    );
+                                                    return;
+                                                  }
+                                                  // Here you would typically send the review to your backend
+                                                  submitReview(
+                                                    rating,
+                                                    reviewController.text,
+                                                    () {
+                                                      // For now, we will just clear the text field
+                                                      reviewController.clear();
+                                                      ScaffoldMessenger.of(
+                                                        context,
+                                                      ).showSnackBar(
+                                                        SnackBar(
+                                                          content: Text(
+                                                            "Review submitted!",
+                                                          ),
+                                                        ),
+                                                      );
+                                                      Navigator.of(
+                                                        context,
+                                                      ).pop();
+                                                    },
+                                                    context,
+                                                    courseId: subject.courseId,
+                                                  );
+                                                },
+                                                child: Text("Submit Review"),
+                                              ),
+                                            ],
+                                          ),
+                                        );
+                                      },
+                                    );
+                                  },
+                                );
+                              },
+                              child: Text("Write a review"),
+                            )
+                            : Builder(
+                              builder: (context) {
+                                final userRating = subject.reviews.firstWhere(
+                                  (e) =>
+                                      e.userId ==
+                                      FirebaseAuth.instance.currentUser?.uid,
+                                  orElse:
+                                      () => Review(
+                                        userId: "",
+                                        rating: 0,
+                                        comment: "",
+                                        name: "",
+                                        image: "",
+                                        date: DateTime.now(),
+                                      ),
+                                );
+                                return ListTile(
+                                  leading: CircleAvatar(
+                                    backgroundImage: NetworkImage(
+                                      userRating.image,
+                                    ),
+                                  ),
+                                  title: Text(userRating.name),
+                                  subtitle: Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      RatingView(
+                                        rating: userRating.rating.toDouble(),
+                                      ),
+                                      SizedBox(height: 4),
+                                      Text(userRating.comment),
+                                    ],
+                                  ),
+                                  trailing: Text(
+                                    "${userRating.date.day}/${userRating.date.month}/${userRating.date.year}",
+                                    style:
+                                        Theme.of(context).textTheme.labelSmall,
+                                  ),
+                                );
+                              },
                             ),
-                          ),
-                          maxLines: null,
-                          minLines: 4,
-                        ),
                         SizedBox(height: 12),
-                        FilledButton(
-                          onPressed: () {},
-                          child: Text("Submit Review"),
-                        ),
-                        SizedBox(height: 12),
-                        Text(
-                          "No reviews yet.",
-                          style: Theme.of(context).textTheme.bodySmall,
-                        ),
+
+                        subject.reviews.isEmpty
+                            ? Text(
+                              "No reviews yet.",
+                              style: Theme.of(context).textTheme.bodySmall,
+                            )
+                            : ListView.separated(
+                              itemBuilder: (context, ratingIndex) {
+                                return ListTile(
+                                  leading: CircleAvatar(
+                                    backgroundImage: NetworkImage(
+                                      subject.reviews[ratingIndex].image,
+                                    ),
+                                  ),
+                                  title: Text(
+                                    subject.reviews[ratingIndex].name,
+                                  ),
+                                  subtitle: Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      RatingView(
+                                        rating:
+                                            subject.reviews[ratingIndex].rating
+                                                .toDouble(),
+                                      ),
+                                      SizedBox(height: 4),
+                                      Text(
+                                        subject.reviews[ratingIndex].comment,
+                                      ),
+                                    ],
+                                  ),
+                                  trailing: Text(
+                                    "${subject.reviews[ratingIndex].date.day}/${subject.reviews[ratingIndex].date.month}/${subject.reviews[ratingIndex].date.year}",
+                                    style:
+                                        Theme.of(context).textTheme.labelSmall,
+                                  ),
+                                );
+                              },
+                              separatorBuilder: (_, _) => Divider(),
+                              itemCount: subject.reviews.length,
+                            ),
                         SizedBox(height: 24),
                       ],
                     ),
@@ -289,23 +569,89 @@ class SubjectPage extends StatelessWidget {
       ),
     );
   }
+
+  Future<void> submitReview(
+    int rating,
+    String comment,
+    Function() onSuccess,
+    BuildContext context, {
+    String? courseId,
+    String? instructorId,
+  }) async {
+    if (courseId == null && instructorId == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text("Course ID or Instructor ID must be provided.")),
+      );
+      return;
+    }
+    post(
+          Uri.parse(
+            "https://asia-south1-chitti-ananta.cloudfunctions.net/webApi/feedback",
+          ),
+          body:
+              courseId != null
+                  ? {
+                    "courseId": courseId,
+                    "rating": rating.toString(),
+                    "review": comment,
+                  }
+                  : {
+                    "rating": rating.toString(),
+                    "review": comment,
+                    "instructorId": instructorId,
+                  },
+          headers: {
+            "Authorization":
+                "Bearer ${await FirebaseAuth.instance.currentUser!.getIdToken()}",
+            "Content-Type": "application/json",
+          },
+        )
+        .then((response) {
+          if (response.statusCode == 200) {
+            onSuccess();
+          } else {
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: Text("Failed to submit review. Please try again."),
+              ),
+            );
+          }
+        })
+        .catchError((error) {
+          ScaffoldMessenger.of(
+            context,
+          ).showSnackBar(SnackBar(content: Text("An error occurred: $error")));
+        });
+  }
 }
 
 class RatingView extends StatelessWidget {
-  const RatingView({super.key, required this.rating});
+  const RatingView({
+    super.key,
+    required this.rating,
+    this.isEditable = false,
+    this.onTap,
+  }) : assert(
+         rating >= 0 && rating <= 5 && (isEditable ? onTap != null : true),
+       );
 
   final double rating;
+  final bool isEditable;
+  final Function(int)? onTap;
 
   @override
   Widget build(BuildContext context) {
     return Row(
       children: List.generate(5, (index) {
-        return Icon(
-          index + 1 <= rating
-              ? Icons.star
-              : (index + 0.5 <= rating ? Icons.star_half : Icons.star_border),
-          color: Colors.amber,
-          size: 16,
+        return InkWell(
+          onTap: isEditable ? () => onTap!(index + 1) : null,
+          child: Icon(
+            index + 1 <= rating
+                ? Icons.star
+                : (index + 0.5 <= rating ? Icons.star_half : Icons.star_border),
+            color: Colors.amber,
+            size: 16,
+          ),
         );
       }),
     );

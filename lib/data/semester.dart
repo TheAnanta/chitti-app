@@ -197,6 +197,7 @@ class Subject {
       reviews: List<Review>.from(
         data["feedback"].map((review) {
           return Review(
+            userId: review["userId"],
             rating: review["rating"],
             comment: review["review"],
             name: review["name"],
@@ -235,12 +236,14 @@ class Subject {
 }
 
 class Review {
+  final String userId;
   final int rating;
   final String comment;
   final String name;
   final String image;
   final DateTime date;
   const Review({
+    required this.userId,
     required this.rating,
     required this.comment,
     required this.name,
