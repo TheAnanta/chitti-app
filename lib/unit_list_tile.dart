@@ -198,7 +198,7 @@ class UnitListTile extends StatelessWidget {
                     },
                   ),
                 );
-              } else if (roadmapId == "IMPQUES") {
+              } else if (roadmapId == "IMPQUES" && units[1].isUnlocked) {
                 Navigator.of(context).push(
                   MaterialPageRoute(
                     builder:
