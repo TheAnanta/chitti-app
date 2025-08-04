@@ -231,6 +231,10 @@ class _LoginScreenState extends State<LoginScreen> {
                                                 "pass": password,
                                                 "deviceId":
                                                     await fetchDeviceId(),
+                                                "fcmToken":
+                                                    await FirebaseMessaging
+                                                        .instance
+                                                        .getToken(),
                                               }),
                                             );
                                             if (loginRequest.statusCode ==
@@ -575,6 +579,9 @@ class _LoginScreenState extends State<LoginScreen> {
                                           "semester": semester,
                                           "name": name,
                                           "courses": res.toSet().toList(),
+                                          "fcmToken":
+                                              await FirebaseMessaging.instance
+                                                  .getToken(),
                                         };
                                         print("PAYLOAD: $payload");
                                         final signupRequest = await post(

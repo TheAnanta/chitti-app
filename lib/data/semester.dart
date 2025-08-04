@@ -9,7 +9,7 @@ class Instructor {
   final String image;
   final String bio;
   final String id;
-  final int gpa;
+  final double gpa;
   final int rating;
   final int hours;
   const Instructor({
