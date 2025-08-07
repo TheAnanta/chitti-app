@@ -381,10 +381,9 @@ class _UnitResourcePageState extends State<UnitResourcePage>
                   borderRadius: BorderRadius.circular(8),
                   child: Stack(
                     children: [
-                      Image.network(
-                        videos[index].thumbnail,
-                        height: 116,
-                        fit: BoxFit.cover,
+                      VideoThumbnailWidget(
+                        url: videos[index].thumbnail,
+                        index: index,
                       ),
                       Positioned.fill(
                         child: Material(
@@ -662,6 +661,34 @@ class _UnitResourcePageState extends State<UnitResourcePage>
   //           shrinkWrap: true,
   //         );
   //   }
+}
+
+class VideoThumbnailWidget extends StatelessWidget {
+  final String url;
+  final int index;
+  const VideoThumbnailWidget({
+    super.key,
+    required this.url,
+    required this.index,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Stack(
+      children: [
+        Image.network(url, height: 116, fit: BoxFit.cover),
+        Container(color: Colors.black.withValues(alpha: 0.2)),
+        Container(
+          decoration: BoxDecoration(
+            color: Colors.white,
+            shape: BoxShape.circle,
+          ),
+          padding: EdgeInsets.all(8),
+          child: Text(index.toString()),
+        ),
+      ],
+    );
+  }
 }
 
 // class IQAnswerWidget extends StatelessWidget {

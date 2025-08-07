@@ -283,7 +283,7 @@ class _PDFViewPageState extends State<PDFViewPage> with WidgetsBindingObserver {
                         //passwordProvider: () => passwordDialog(context),
                         controller: controller,
                         params: PdfViewerParams(
-                          enableTextSelection: true,
+                          enableTextSelection: false,
                           maxScale: 8,
                           // facing pages algorithm
                           // layoutPages: (pages, params) {

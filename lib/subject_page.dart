@@ -295,20 +295,20 @@ class SubjectPage extends StatelessWidget {
                                           SizedBox(height: 12),
                                           FilledButton(
                                             onPressed: () {
-                                              if (reviewController
-                                                  .text
-                                                  .isEmpty) {
-                                                ScaffoldMessenger.of(
-                                                  context,
-                                                ).showSnackBar(
-                                                  SnackBar(
-                                                    content: Text(
-                                                      "Review cannot be empty!",
-                                                    ),
-                                                  ),
-                                                );
-                                                return;
-                                              }
+                                              // if (reviewController
+                                              //     .text
+                                              //     .isEmpty) {
+                                              //   ScaffoldMessenger.of(
+                                              //     context,
+                                              //   ).showSnackBar(
+                                              //     SnackBar(
+                                              //       content: Text(
+                                              //         "Review cannot be empty!",
+                                              //       ),
+                                              //     ),
+                                              //   );
+                                              //   return;
+                                              // }
                                               // Here you would typically send the review to your backend
                                               submitReview(
                                                 rating,
@@ -422,20 +422,20 @@ class SubjectPage extends StatelessWidget {
                                               SizedBox(height: 12),
                                               FilledButton(
                                                 onPressed: () {
-                                                  if (reviewController
-                                                      .text
-                                                      .isEmpty) {
-                                                    ScaffoldMessenger.of(
-                                                      context,
-                                                    ).showSnackBar(
-                                                      SnackBar(
-                                                        content: Text(
-                                                          "Review cannot be empty!",
-                                                        ),
-                                                      ),
-                                                    );
-                                                    return;
-                                                  }
+                                                  // if (reviewController
+                                                  //     .text
+                                                  //     .isEmpty) {
+                                                  //   ScaffoldMessenger.of(
+                                                  //     context,
+                                                  //   ).showSnackBar(
+                                                  //     SnackBar(
+                                                  //       content: Text(
+                                                  //         "Review cannot be empty!",
+                                                  //       ),
+                                                  //     ),
+                                                  //   );
+                                                  //   return;
+                                                  // }
                                                   // Here you would typically send the review to your backend
                                                   submitReview(
                                                     rating,

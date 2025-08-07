@@ -259,8 +259,8 @@ class ProfilePage extends StatelessWidget {
             ),
             SizedBox(height: 12),
             FilledButton(
-              onPressed: () {
-                FirebaseAuth.instance.signOut();
+              onPressed: () async {
+                await FirebaseAuth.instance.signOut();
                 Navigator.of(context).pushReplacement(
                   MaterialPageRoute(builder: (context) => SplashScreen()),
                 );

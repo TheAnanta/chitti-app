@@ -30,7 +30,7 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin {
   void initState() {
     super.initState();
 
-    // disableScreenshot(context);
+    disableScreenshot(context);
     _controller = TabController(
       length: widget.semester.courses.length,
       vsync: this,

@@ -564,10 +564,9 @@ class _UnitResourcePageExtendedState extends State<UnitResourcePageExtended>
                   borderRadius: BorderRadius.circular(8),
                   child: Stack(
                     children: [
-                      Image.network(
-                        videos[index].thumbnail,
-                        height: 116,
-                        fit: BoxFit.cover,
+                      VideoThumbnailWidget(
+                        url: videos[index].thumbnail,
+                        index: index,
                       ),
                       Positioned.fill(
                         child: Material(
