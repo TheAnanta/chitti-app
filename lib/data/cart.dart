@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:chitti/cart_page.dart';
+import 'package:chitti/domain/fetch_cart.dart';
 import 'package:chitti/domain/fetch_semester.dart';
 import 'package:chitti/home_page.dart';
 import 'package:chitti/payment_webview.dart';
@@ -335,5 +336,9 @@ class CartRepository {
       );
     });
     _razorpay.open(options);
+  }
+
+  Future<void> fetchCartId(BuildContext context) async {
+    await fetchCart(context);
   }
 }

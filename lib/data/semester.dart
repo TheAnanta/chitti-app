@@ -60,12 +60,12 @@ class Unit {
               ).firstOrNull
               : null,
       roadmap:
-          data["roadmap"] != null
+          data["topic"] != null
               ? Roadmap(
                 roadmapItems: List<RoadmapItem>.from(
-                  data["roadmap"].map((e) {
+                  data["topic"].map((e) {
                     return RoadmapItem(
-                      id: e["roadId"],
+                      id: e["topicId"],
                       name: e["name"],
                       difficulty: e["difficulty"],
                       isUnlocked: e["isUnlocked"] ?? false,

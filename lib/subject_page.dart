@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'dart:io';
 
 import 'package:chitti/data/semester.dart';
@@ -244,18 +245,26 @@ class SubjectPage extends StatelessWidget {
                           maxLines: 4,
                           overflow: TextOverflow.ellipsis,
                         ),
+                        SizedBox(height: 12),
                         OutlinedButton(
                           onPressed: () {
+                            final reviewController = TextEditingController();
                             showModalBottomSheet(
                               context: context,
+                              isScrollControlled: true,
                               builder: (context) {
                                 int rating = 0;
-                                final reviewController =
-                                    TextEditingController();
                                 return StatefulBuilder(
                                   builder: (context, setSheetState) {
                                     return Padding(
-                                      padding: const EdgeInsets.all(16.0),
+                                      padding: const EdgeInsets.all(
+                                        16.0,
+                                      ).copyWith(
+                                        bottom:
+                                            MediaQuery.of(
+                                              context,
+                                            ).viewInsets.bottom,
+                                      ),
                                       child: Column(
                                         mainAxisSize: MainAxisSize.min,
                                         crossAxisAlignment:
@@ -279,6 +288,7 @@ class SubjectPage extends StatelessWidget {
                                               });
                                             },
                                           ),
+                                          SizedBox(height: 12),
                                           TextField(
                                             controller: reviewController,
                                             decoration: InputDecoration(
@@ -369,16 +379,24 @@ class SubjectPage extends StatelessWidget {
                             )
                             ? OutlinedButton(
                               onPressed: () {
+                                final reviewController =
+                                    TextEditingController();
                                 showModalBottomSheet(
                                   context: context,
+                                  isScrollControlled: true,
                                   builder: (context) {
                                     int rating = 0;
-                                    final reviewController =
-                                        TextEditingController();
                                     return StatefulBuilder(
                                       builder: (context, setSheetState) {
                                         return Padding(
-                                          padding: const EdgeInsets.all(16.0),
+                                          padding: const EdgeInsets.all(
+                                            16.0,
+                                          ).copyWith(
+                                            bottom:
+                                                MediaQuery.of(
+                                                  context,
+                                                ).viewInsets.bottom,
+                                          ),
                                           child: Column(
                                             mainAxisSize: MainAxisSize.min,
                                             crossAxisAlignment:
@@ -404,6 +422,7 @@ class SubjectPage extends StatelessWidget {
                                                   });
                                                 },
                                               ),
+                                              SizedBox(height: 12),
                                               TextField(
                                                 controller: reviewController,
                                                 decoration: InputDecoration(
@@ -521,41 +540,55 @@ class SubjectPage extends StatelessWidget {
                               "No reviews yet.",
                               style: Theme.of(context).textTheme.bodySmall,
                             )
-                            : ListView.separated(
-                              itemBuilder: (context, ratingIndex) {
-                                return ListTile(
-                                  leading: CircleAvatar(
-                                    backgroundImage: NetworkImage(
-                                      subject.reviews[ratingIndex].image,
-                                    ),
-                                  ),
-                                  title: Text(
-                                    subject.reviews[ratingIndex].name,
-                                  ),
-                                  subtitle: Column(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    children: [
-                                      RatingView(
-                                        rating:
-                                            subject.reviews[ratingIndex].rating
-                                                .toDouble(),
+                            : Builder(
+                              builder: (context) {
+                                final reviews =
+                                    subject.reviews
+                                        .where(
+                                          (e) =>
+                                              e.userId !=
+                                              FirebaseAuth
+                                                  .instance
+                                                  .currentUser
+                                                  ?.uid,
+                                        )
+                                        .toList();
+                                return ListView.separated(
+                                  shrinkWrap: true,
+                                  itemBuilder: (context, ratingIndex) {
+                                    return ListTile(
+                                      leading: CircleAvatar(
+                                        backgroundImage: NetworkImage(
+                                          reviews[ratingIndex].image,
+                                        ),
                                       ),
-                                      SizedBox(height: 4),
-                                      Text(
-                                        subject.reviews[ratingIndex].comment,
+                                      title: Text(reviews[ratingIndex].name),
+                                      subtitle: Column(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
+                                        children: [
+                                          RatingView(
+                                            rating:
+                                                reviews[ratingIndex].rating
+                                                    .toDouble(),
+                                          ),
+                                          SizedBox(height: 4),
+                                          Text(reviews[ratingIndex].comment),
+                                        ],
                                       ),
-                                    ],
-                                  ),
-                                  trailing: Text(
-                                    "${subject.reviews[ratingIndex].date.day}/${subject.reviews[ratingIndex].date.month}/${subject.reviews[ratingIndex].date.year}",
-                                    style:
-                                        Theme.of(context).textTheme.labelSmall,
-                                  ),
+                                      trailing: Text(
+                                        "${reviews[ratingIndex].date.day}/${reviews[ratingIndex].date.month}/${reviews[ratingIndex].date.year}",
+                                        style:
+                                            Theme.of(
+                                              context,
+                                            ).textTheme.labelSmall,
+                                      ),
+                                    );
+                                  },
+                                  separatorBuilder: (_, _) => Divider(),
+                                  itemCount: reviews.length,
                                 );
                               },
-                              separatorBuilder: (_, _) => Divider(),
-                              itemCount: subject.reviews.length,
                             ),
                         SizedBox(height: 24),
                       ],
@@ -578,6 +611,7 @@ class SubjectPage extends StatelessWidget {
     String? courseId,
     String? instructorId,
   }) async {
+    print(rating);
     if (courseId == null && instructorId == null) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text("Course ID or Instructor ID must be provided.")),
@@ -588,18 +622,15 @@ class SubjectPage extends StatelessWidget {
           Uri.parse(
             "https://asia-south1-chitti-ananta.cloudfunctions.net/webApi/feedback",
           ),
-          body:
-              courseId != null
-                  ? {
-                    "courseId": courseId,
-                    "rating": rating.toString(),
-                    "review": comment,
-                  }
-                  : {
-                    "rating": rating.toString(),
-                    "review": comment,
-                    "instructorId": instructorId,
-                  },
+          body: json.encode(
+            courseId != null
+                ? {"courseId": courseId, "rating": rating, "review": comment}
+                : {
+                  "rating": rating,
+                  "review": comment,
+                  "instructorId": instructorId,
+                },
+          ),
           headers: {
             "Authorization":
                 "Bearer ${await FirebaseAuth.instance.currentUser!.getIdToken()}",
@@ -608,6 +639,52 @@ class SubjectPage extends StatelessWidget {
         )
         .then((response) {
           if (response.statusCode == 200) {
+            // Update the review for either instructor or course in semester data in the repository
+            if (courseId != null) {
+              var data = Injector.semesterRepository.semester?.courses.values
+                  .fold(
+                    List<Subject>.empty(),
+                    (previous, next) => [...previous, ...next],
+                  )
+                  .toList()
+                  .firstWhere(
+                    (subject) =>
+                        subject.courseId == courseId ||
+                        subject.instructor.id == instructorId,
+                  );
+              data?.reviews.add(
+                Review(
+                  userId: FirebaseAuth.instance.currentUser!.uid,
+                  rating: rating,
+                  comment: comment,
+                  name: FirebaseAuth.instance.currentUser!.displayName ?? "",
+                  image: FirebaseAuth.instance.currentUser!.photoURL ?? "",
+                  date: DateTime.now(),
+                ),
+              );
+            } else {
+              var datas =
+                  Injector.semesterRepository.semester?.courses.values
+                      .fold(
+                        List<Subject>.empty(),
+                        (previous, next) => [...previous, ...next],
+                      )
+                      .toList()
+                      .where((course) => course.instructor.id == instructorId)
+                      .toList();
+              datas?.forEach((data) {
+                data.reviews.add(
+                  Review(
+                    userId: FirebaseAuth.instance.currentUser!.uid,
+                    rating: rating,
+                    comment: comment,
+                    name: FirebaseAuth.instance.currentUser!.displayName ?? "",
+                    image: FirebaseAuth.instance.currentUser!.photoURL ?? "",
+                    date: DateTime.now(),
+                  ),
+                );
+              });
+            }
             onSuccess();
           } else {
             ScaffoldMessenger.of(context).showSnackBar(
@@ -650,7 +727,7 @@ class RatingView extends StatelessWidget {
                 ? Icons.star
                 : (index + 0.5 <= rating ? Icons.star_half : Icons.star_border),
             color: Colors.amber,
-            size: 16,
+            size: isEditable ? 32 : 16,
           ),
         );
       }),

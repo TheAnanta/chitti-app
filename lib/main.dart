@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:chitti/firebase_options.dart';
 import 'package:chitti/splash_screen.dart';
 import 'package:firebase_core/firebase_core.dart';
@@ -6,6 +8,15 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:fvp/fvp.dart' as fvp;
+
+class MyHttpOverrides extends HttpOverrides {
+  @override
+  HttpClient createHttpClient(SecurityContext? context) {
+    return super.createHttpClient(context)
+      ..badCertificateCallback =
+          (X509Certificate cert, String host, int port) => true;
+  }
+}
 
 @pragma('vm:entry-point')
 Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
@@ -22,6 +33,7 @@ Future<void> main() async {
 
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
 
+  HttpOverrides.global = new MyHttpOverrides();
   final notificationSettings = await FirebaseMessaging.instance
       .requestPermission(
         provisional: false,

@@ -677,14 +677,34 @@ class VideoThumbnailWidget extends StatelessWidget {
     return Stack(
       children: [
         Image.network(url, height: 116, fit: BoxFit.cover),
-        Container(color: Colors.black.withValues(alpha: 0.2)),
         Container(
-          decoration: BoxDecoration(
-            color: Colors.white,
-            shape: BoxShape.circle,
+          color: Colors.black.withValues(alpha: 0.4),
+          width: double.infinity,
+          height: 116,
+          // alignment: Alignment.center,
+          // child: Text(
+          //   "CHITTI.",
+          //   style: Theme.of(context).textTheme.titleLarge?.copyWith(
+          //     fontWeight: FontWeight.w800,
+          //     color: Color(0xFFFFBD59),
+          //     fontSize: 30,
+          //   ),
+          //   textAlign: TextAlign.center,
+          // ),
+        ),
+        Align(
+          alignment: Alignment.topRight,
+          child: Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: Container(
+              decoration: BoxDecoration(
+                color: Colors.white,
+                shape: BoxShape.circle,
+              ),
+              padding: EdgeInsets.all(8),
+              child: Text((index + 1).toString()),
+            ),
           ),
-          padding: EdgeInsets.all(8),
-          child: Text(index.toString()),
         ),
       ],
     );
@@ -1071,6 +1091,7 @@ class _VideoPlayerWidgetState extends State<VideoPlayerWidget> {
                             );
                           },
                         ),
+
                         ValueListenableBuilder<bool>(
                           valueListenable: showAppBar,
                           builder: (context, showControlsValue, child) {
@@ -1283,7 +1304,71 @@ class _VideoPlayerWidgetState extends State<VideoPlayerWidget> {
                 },
               ),
             ),
-
+            // AppBar with fade-in effect
+            ValueListenableBuilder(
+              valueListenable: showAppBar,
+              builder: (context, showAppBarValue, child) {
+                return AnimatedOpacity(
+                  opacity: showAppBarValue ? 1 : 0,
+                  duration: Duration(milliseconds: 500),
+                  child: Container(
+                    width: double.infinity,
+                    height: double.infinity,
+                    child: Center(
+                      child: Container(
+                        decoration: BoxDecoration(
+                          color: Colors.black.withValues(alpha: 0.6),
+                          shape: BoxShape.circle,
+                        ),
+                        child: ValueListenableBuilder<bool>(
+                          valueListenable: _isCompletedPlaying,
+                          builder: (context, isCompletedPlaying, child) {
+                            return IconButton(
+                              color: Colors.white,
+                              iconSize: 48,
+                              padding: EdgeInsets.all(16),
+                              onPressed: () {
+                                if (isCompletedPlaying) {
+                                  _controller.play();
+                                  setState(() {});
+                                  return;
+                                }
+                                // Wrap the play or pause in a call to `setState`. This ensures the
+                                // correct icon is shown.
+                                setState(() {
+                                  // If the video is playing, pause it.
+                                  if (_controller.value.isPlaying) {
+                                    _controller.pause();
+                                    showAppBar.value = true;
+                                    showControls.value = true;
+                                  } else {
+                                    // If the video is paused, play it.
+                                    _controller.play();
+                                    // Hide the app bar after 3 seconds
+                                    Future.delayed(Duration(seconds: 3), () {
+                                      showAppBar.value = false;
+                                      showControls.value = false;
+                                    });
+                                  }
+                                });
+                              },
+                              // Display the correct icon depending on the state of the player.
+                              icon: Icon(
+                                isCompletedPlaying
+                                    ? Icons.replay
+                                    : _controller.value.isPlaying
+                                    ? Icons.pause
+                                    : Icons.play_arrow,
+                              ),
+                            );
+                          },
+                        ),
+                      ),
+                    ),
+                  ),
+                );
+              },
+            ),
             ValueListenableBuilder<bool>(
               valueListenable: showAppBar,
               builder: (context, showAppBarValue, child) {

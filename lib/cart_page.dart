@@ -328,10 +328,15 @@ class _CartPageState extends State<CartPage> {
                               ? null
                               : value
                               ? null
-                              : () {
-                                Injector.cartRepository.persist(context);
+                              : () async {
+                                if (Injector.cartRepository.cartId == null) {
+                                  await Injector.cartRepository.fetchCartId(
+                                    context,
+                                  );
+                                }
+                                await Injector.cartRepository.persist(context);
                                 // Handle checkout action
-                                Injector.cartRepository.checkout(
+                                await Injector.cartRepository.checkout(
                                   context,
                                   coupon: coupon,
                                   onLoading: (p0) {
@@ -342,7 +347,9 @@ class _CartPageState extends State<CartPage> {
 
                       label:
                           value
-                              ? CircularProgressIndicator(color: Theme.of(context).colorScheme.onPrimary,)
+                              ? CircularProgressIndicator(
+                                color: Theme.of(context).colorScheme.onPrimary,
+                              )
                               : Text('Checkout'),
                       icon: Icon(Icons.payment),
                     );

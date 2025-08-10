@@ -239,7 +239,7 @@ class ProfilePage extends StatelessWidget {
               title: Text("Terms & Conditions"),
               onTap: () async {
                 SharedPreferences prefs = await SharedPreferences.getInstance();
-                showTermsModalSheet(context, prefs, showCheckbox: true);
+                showTermsModalSheet(context, prefs, showCheckbox: false);
               },
             ),
             ListTile(

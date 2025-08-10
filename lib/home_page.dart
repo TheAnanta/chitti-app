@@ -126,7 +126,7 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin {
                 Padding(
                   padding: const EdgeInsets.symmetric(vertical: 12),
                   child: ConstrainedBox(
-                    constraints: BoxConstraints(minHeight: 100, maxHeight: 200),
+                    constraints: BoxConstraints(minHeight: 100, maxHeight: 240),
                     child: PageView.builder(
                       itemCount: 1,
                       itemBuilder: (context, pageIndex) {

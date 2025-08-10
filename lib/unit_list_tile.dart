@@ -478,14 +478,22 @@ class UnitListTile extends StatelessWidget {
                                                   sharedPreferences,
                                                 );
                                               }
-                                              Injector.cartRepository.items.add(
-                                                CartItem(
-                                                  item: courseId,
-                                                  type: SubscriptionType.mid,
-                                                ),
-                                              );
-                                              await Injector.cartRepository
-                                                  .persist(context);
+                                              if (!Injector.cartRepository.items
+                                                  .isInCart(courseId)) {
+                                                Injector.cartRepository.items
+                                                    .add(
+                                                      CartItem(
+                                                        item: courseId,
+                                                        type:
+                                                            SubscriptionType
+                                                                .mid,
+                                                      ),
+                                                    );
+                                                await Injector.cartRepository
+                                                    .persist(context);
+                                              }
+
+                                              isLoading.value = false;
                                               Navigator.of(context).push(
                                                 MaterialPageRoute(
                                                   builder: (context) {
