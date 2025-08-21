@@ -171,190 +171,225 @@ class SubjectPage extends StatelessWidget {
                           ),
                         ),
                         SizedBox(height: 16),
-                        Text(
-                          subject.instructor.name,
-                          style: Theme.of(
-                            context,
-                          ).textTheme.titleMedium?.copyWith(
-                            fontWeight: FontWeight.bold,
-                            color: Theme.of(context).colorScheme.primary,
-                          ),
-                        ),
-                        Padding(
-                          padding: const EdgeInsets.symmetric(vertical: 8.0),
-                          child: Row(
-                            children: [
-                              CircleAvatar(
-                                backgroundImage: NetworkImage(
-                                  subject.instructor.image,
+                        ListView.separated(
+                          padding: const EdgeInsets.all(8.0),
+                          itemBuilder: (context, index) {
+                            final instructor = subject.instructor[index];
+                            return Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  instructor.name,
+                                  style: Theme.of(
+                                    context,
+                                  ).textTheme.titleMedium?.copyWith(
+                                    fontWeight: FontWeight.bold,
+                                    color:
+                                        Theme.of(context).colorScheme.primary,
+                                  ),
                                 ),
-                                radius: 30,
-                              ),
-                              SizedBox(width: 12),
-                              Column(
-                                children: [
-                                  Row(
-                                    children: [
-                                      Icon(Icons.star, size: 16),
-                                      SizedBox(width: 4),
-                                      Text(
-                                        "${subject.instructor.rating} rating",
-                                        style:
-                                            Theme.of(
-                                              context,
-                                            ).textTheme.bodySmall,
-                                      ),
-                                    ],
+                                Padding(
+                                  padding: const EdgeInsets.symmetric(
+                                    vertical: 8.0,
                                   ),
-                                  SizedBox(height: 4),
-                                  Row(
+                                  child: Row(
                                     children: [
-                                      Icon(Icons.timer_outlined, size: 16),
-                                      SizedBox(width: 4),
-                                      Text(
-                                        "${subject.instructor.hours} hours",
-                                        style:
-                                            Theme.of(
-                                              context,
-                                            ).textTheme.bodySmall,
+                                      CircleAvatar(
+                                        backgroundImage: NetworkImage(
+                                          instructor.image,
+                                        ),
+                                        radius: 30,
                                       ),
-                                    ],
-                                  ),
-                                  SizedBox(height: 4),
-                                  Row(
-                                    children: [
-                                      Icon(Icons.school_outlined, size: 16),
-                                      SizedBox(width: 4),
-                                      Text(
-                                        "${subject.instructor.gpa} CGPA",
-                                        style:
-                                            Theme.of(
-                                              context,
-                                            ).textTheme.bodySmall,
-                                      ),
-                                    ],
-                                  ),
-                                ],
-                              ),
-                            ],
-                          ),
-                        ),
-                        Text(
-                          subject.instructor.bio,
-                          style: Theme.of(context).textTheme.bodySmall,
-                          maxLines: 4,
-                          overflow: TextOverflow.ellipsis,
-                        ),
-                        SizedBox(height: 12),
-                        OutlinedButton(
-                          onPressed: () {
-                            final reviewController = TextEditingController();
-                            showModalBottomSheet(
-                              context: context,
-                              isScrollControlled: true,
-                              builder: (context) {
-                                int rating = 0;
-                                return StatefulBuilder(
-                                  builder: (context, setSheetState) {
-                                    return Padding(
-                                      padding: const EdgeInsets.all(
-                                        16.0,
-                                      ).copyWith(
-                                        bottom:
-                                            MediaQuery.of(
-                                              context,
-                                            ).viewInsets.bottom,
-                                      ),
-                                      child: Column(
-                                        mainAxisSize: MainAxisSize.min,
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.start,
+                                      SizedBox(width: 12),
+                                      Column(
                                         children: [
-                                          Text(
-                                            "Write a review for ${subject.instructor.name}",
-                                            style: Theme.of(
-                                              context,
-                                            ).textTheme.titleMedium?.copyWith(
-                                              fontWeight: FontWeight.bold,
-                                            ),
-                                          ),
-                                          SizedBox(height: 12),
-                                          RatingView(
-                                            rating: rating.toDouble(),
-                                            isEditable: true,
-                                            onTap: (ratingValue) {
-                                              setSheetState(() {
-                                                rating = ratingValue;
-                                              });
-                                            },
-                                          ),
-                                          SizedBox(height: 12),
-                                          TextField(
-                                            controller: reviewController,
-                                            decoration: InputDecoration(
-                                              hintText:
-                                                  "Share your thoughts...",
-                                              border: OutlineInputBorder(
-                                                borderRadius:
-                                                    BorderRadius.circular(8),
+                                          Row(
+                                            children: [
+                                              Icon(Icons.star, size: 16),
+                                              SizedBox(width: 4),
+                                              Text(
+                                                "${instructor.rating} rating",
+                                                style:
+                                                    Theme.of(
+                                                      context,
+                                                    ).textTheme.bodySmall,
                                               ),
-                                            ),
-                                            maxLines: null,
-                                            minLines: 4,
+                                            ],
                                           ),
-                                          SizedBox(height: 12),
-                                          FilledButton(
-                                            onPressed: () {
-                                              // if (reviewController
-                                              //     .text
-                                              //     .isEmpty) {
-                                              //   ScaffoldMessenger.of(
-                                              //     context,
-                                              //   ).showSnackBar(
-                                              //     SnackBar(
-                                              //       content: Text(
-                                              //         "Review cannot be empty!",
-                                              //       ),
-                                              //     ),
-                                              //   );
-                                              //   return;
-                                              // }
-                                              // Here you would typically send the review to your backend
-                                              submitReview(
-                                                rating,
-                                                reviewController.text,
-                                                () {
-                                                  // For now, we will just clear the text field
-                                                  reviewController.clear();
-                                                  ScaffoldMessenger.of(
-                                                    context,
-                                                  ).showSnackBar(
-                                                    SnackBar(
-                                                      content: Text(
-                                                        "Review submitted!",
-                                                      ),
-                                                    ),
-                                                  );
-
-                                                  Navigator.of(context).pop();
-                                                },
-                                                context,
-
-                                                instructorId:
-                                                    subject.instructor.id,
-                                              );
-                                            },
-                                            child: Text("Submit Review"),
+                                          SizedBox(height: 4),
+                                          Row(
+                                            children: [
+                                              Icon(
+                                                Icons.timer_outlined,
+                                                size: 16,
+                                              ),
+                                              SizedBox(width: 4),
+                                              Text(
+                                                "${instructor.hours} hours",
+                                                style:
+                                                    Theme.of(
+                                                      context,
+                                                    ).textTheme.bodySmall,
+                                              ),
+                                            ],
+                                          ),
+                                          SizedBox(height: 4),
+                                          Row(
+                                            children: [
+                                              Icon(
+                                                Icons.school_outlined,
+                                                size: 16,
+                                              ),
+                                              SizedBox(width: 4),
+                                              Text(
+                                                "${instructor.gpa} CGPA",
+                                                style:
+                                                    Theme.of(
+                                                      context,
+                                                    ).textTheme.bodySmall,
+                                              ),
+                                            ],
                                           ),
                                         ],
                                       ),
+                                    ],
+                                  ),
+                                ),
+                                Text(
+                                  instructor.bio,
+                                  style: Theme.of(context).textTheme.bodySmall,
+                                  maxLines: 4,
+                                  overflow: TextOverflow.ellipsis,
+                                ),
+                                SizedBox(height: 12),
+                                OutlinedButton(
+                                  onPressed: () {
+                                    final reviewController =
+                                        TextEditingController();
+                                    showModalBottomSheet(
+                                      context: context,
+                                      isScrollControlled: true,
+                                      builder: (context) {
+                                        int rating = 0;
+                                        return StatefulBuilder(
+                                          builder: (context, setSheetState) {
+                                            return Padding(
+                                              padding: const EdgeInsets.all(
+                                                16.0,
+                                              ).copyWith(
+                                                bottom:
+                                                    MediaQuery.of(
+                                                      context,
+                                                    ).viewInsets.bottom,
+                                              ),
+                                              child: Column(
+                                                mainAxisSize: MainAxisSize.min,
+                                                crossAxisAlignment:
+                                                    CrossAxisAlignment.start,
+                                                children: [
+                                                  Text(
+                                                    "Write a review for ${instructor.name}",
+                                                    style: Theme.of(context)
+                                                        .textTheme
+                                                        .titleMedium
+                                                        ?.copyWith(
+                                                          fontWeight:
+                                                              FontWeight.bold,
+                                                        ),
+                                                  ),
+                                                  SizedBox(height: 12),
+                                                  RatingView(
+                                                    rating: rating.toDouble(),
+                                                    isEditable: true,
+                                                    onTap: (ratingValue) {
+                                                      setSheetState(() {
+                                                        rating = ratingValue;
+                                                      });
+                                                    },
+                                                  ),
+                                                  SizedBox(height: 12),
+                                                  TextField(
+                                                    controller:
+                                                        reviewController,
+                                                    decoration: InputDecoration(
+                                                      hintText:
+                                                          "Share your thoughts...",
+                                                      border: OutlineInputBorder(
+                                                        borderRadius:
+                                                            BorderRadius.circular(
+                                                              8,
+                                                            ),
+                                                      ),
+                                                    ),
+                                                    maxLines: null,
+                                                    minLines: 4,
+                                                  ),
+                                                  SizedBox(height: 12),
+                                                  FilledButton(
+                                                    onPressed: () {
+                                                      // if (reviewController
+                                                      //     .text
+                                                      //     .isEmpty) {
+                                                      //   ScaffoldMessenger.of(
+                                                      //     context,
+                                                      //   ).showSnackBar(
+                                                      //     SnackBar(
+                                                      //       content: Text(
+                                                      //         "Review cannot be empty!",
+                                                      //       ),
+                                                      //     ),
+                                                      //   );
+                                                      //   return;
+                                                      // }
+                                                      // Here you would typically send the review to your backend
+                                                      submitReview(
+                                                        rating,
+                                                        reviewController.text,
+                                                        () {
+                                                          // For now, we will just clear the text field
+                                                          reviewController
+                                                              .clear();
+                                                          ScaffoldMessenger.of(
+                                                            context,
+                                                          ).showSnackBar(
+                                                            SnackBar(
+                                                              content: Text(
+                                                                "Review submitted!",
+                                                              ),
+                                                            ),
+                                                          );
+
+                                                          Navigator.of(
+                                                            context,
+                                                          ).pop();
+                                                        },
+                                                        context,
+
+                                                        instructorId:
+                                                            instructor.id,
+                                                      );
+                                                    },
+                                                    child: Text(
+                                                      "Submit Review",
+                                                    ),
+                                                  ),
+                                                ],
+                                              ),
+                                            );
+                                          },
+                                        );
+                                      },
                                     );
                                   },
-                                );
-                              },
+                                  child: Text("Rate instructor"),
+                                ),
+                              ],
                             );
                           },
-                          child: Text("Rate instructor"),
+                          separatorBuilder: (context, _) => Divider(),
+                          itemCount: subject.instructor.length,
+                          shrinkWrap: true,
+                          physics: NeverScrollableScrollPhysics(),
                         ),
                         SizedBox(height: 12),
                         Divider(),
@@ -620,7 +655,7 @@ class SubjectPage extends StatelessWidget {
     }
     post(
           Uri.parse(
-            "https://asia-south1-chitti-ananta.cloudfunctions.net/webApi/feedback",
+            "https://asia-south1-chitti-ananta.cloudfunctions.net/api/feedback",
           ),
           body: json.encode(
             courseId != null
@@ -650,7 +685,11 @@ class SubjectPage extends StatelessWidget {
                   .firstWhere(
                     (subject) =>
                         subject.courseId == courseId ||
-                        subject.instructor.id == instructorId,
+                        subject.instructor
+                            .where(
+                              (instructor) => instructor.id == instructorId,
+                            )
+                            .isNotEmpty,
                   );
               data?.reviews.add(
                 Review(
@@ -670,7 +709,14 @@ class SubjectPage extends StatelessWidget {
                         (previous, next) => [...previous, ...next],
                       )
                       .toList()
-                      .where((course) => course.instructor.id == instructorId)
+                      .where(
+                        (course) =>
+                            course.instructor
+                                .where(
+                                  (instructor) => instructor.id == instructorId,
+                                )
+                                .isNotEmpty,
+                      )
                       .toList();
               datas?.forEach((data) {
                 data.reviews.add(

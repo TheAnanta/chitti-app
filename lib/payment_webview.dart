@@ -47,7 +47,7 @@ class PaymentWebView extends StatelessWidget {
                   await FirebaseAuth.instance.currentUser?.getIdToken();
               final loginRequest = await post(
                 Uri.parse(
-                  "https://asia-south1-chitti-ananta.cloudfunctions.net/webApi/reauthenticate",
+                  "https://asia-south1-chitti-ananta.cloudfunctions.net/api/auth/reauthenticate",
                 ),
                 headers: {
                   "Content-Type": "application/json",

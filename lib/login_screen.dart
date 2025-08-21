@@ -220,7 +220,7 @@ class _LoginScreenState extends State<LoginScreen> {
                                                     .trimRight();
                                             final loginRequest = await post(
                                               Uri.parse(
-                                                "https://asia-south1-chitti-ananta.cloudfunctions.net/webApi/login",
+                                                "https://asia-south1-chitti-ananta.cloudfunctions.net/api/auth/login",
                                               ),
                                               headers: {
                                                 "Content-Type":
@@ -586,7 +586,7 @@ class _LoginScreenState extends State<LoginScreen> {
                                         print("PAYLOAD: $payload");
                                         final signupRequest = await post(
                                           Uri.parse(
-                                            "https://asia-south1-chitti-ananta.cloudfunctions.net/webApi/signup",
+                                            "https://asia-south1-chitti-ananta.cloudfunctions.net/api/auth/signup",
                                           ),
                                           headers: {
                                             "Content-Type": "application/json",

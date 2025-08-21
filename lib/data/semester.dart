@@ -156,7 +156,7 @@ class Subject {
   final double progress;
   final String image;
   final List<Unit> units;
-  final Instructor instructor;
+  final List<Instructor> instructor;
   final double rating;
   final List<Review> reviews;
 
@@ -206,15 +206,18 @@ class Subject {
           );
         }),
       ),
-      instructor: Instructor(
-        id: data["instructor"]["instructorId"],
-        name: data["instructor"]["name"],
-        image: data["instructor"]["image"],
-        bio: data["instructor"]["bio"],
-        gpa: data["instructor"]["gpa"] ?? 0,
-        rating: data["instructor"]["rating"] ?? 0,
-        hours: data["instructor"]["hours"] ?? 0,
-      ),
+      instructor:
+          (List.from(data["instructor"]).map((instructor) {
+            return Instructor(
+              id: instructor["instructorId"],
+              name: instructor["name"],
+              image: instructor["image"],
+              bio: instructor["bio"],
+              gpa: instructor["gpa"] ?? 0,
+              rating: instructor["rating"] ?? 0,
+              hours: instructor["hours"] ?? 0,
+            );
+          })).toList(),
     );
   }
 
