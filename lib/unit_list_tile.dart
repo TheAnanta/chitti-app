@@ -544,7 +544,7 @@ class UnitListTile extends StatelessWidget {
                   onTapUnitTile("PAYMENT", "PAYMENT");
                 }
               },
-              child: ListTile(
+              child: ExpansionTile(
                 title: Text(
                   "${index + 1}. ${units[index].name}",
                   style: Theme.of(
@@ -553,128 +553,122 @@ class UnitListTile extends StatelessWidget {
                 ),
                 shape: Border(),
                 enabled: units[index].isUnlocked,
-                onTap: () {
-                  onTapUnitTile(
-                    units[index].roadmap?.roadmapItems.firstOrNull?.id ?? "",
-                    units[index].roadmap?.roadmapItems.firstOrNull?.name ?? "",
-                  );
-                },
-                // children: List.generate(
-                //   (units[index].roadmap?.roadmapItems.length ?? 0) +
-                //       (units[index].importantQuestions != null ? 1 : 0),
-                //   (topicIndex) {
-                //     if (topicIndex ==
-                //         units[index].roadmap?.roadmapItems.length) {
-                //       return ListTile(
-                //         title: Text(
-                //           "Important Questions",
-                //           style: Theme.of(
-                //             context,
-                //           ).textTheme.bodyLarge?.copyWith(
-                //             fontWeight: FontWeight.w500,
-                //             color:
-                //                 units[index].isUnlocked
-                //                     ? Colors.grey.shade800
-                //                     : Colors.grey.shade400,
-                //           ),
-                //         ),
-                //         onTap: () {
-                //           onTapUnitTile("IMPQUES", "IMPQUES");
-                //         },
-                //         trailing: Icon(
-                //           units[index].isUnlocked
-                //               ? Icons.chevron_right_outlined
-                //               : Icons.lock_outline,
-                //         ),
-                //       );
-                //     }
-                //     final roadmapItem =
-                //         (units[index].roadmap?.roadmapItems ?? []).sorted((
-                //           a,
-                //           b,
-                //         ) {
-                //           // final strengthA =
-                //           //     a.difficulty == "beginner"
-                //           //         ? 1
-                //           //         : a.difficulty == "intermediate"
-                //           //         ? 2
-                //           //         : 3;
-                //           // final strengthB =
-                //           //     b.difficulty == "beginner"
-                //           //         ? 1
-                //           //         : b.difficulty == "intermediate"
-                //           //         ? 2
-                //           //         : 3;
-                //           return a.name.compareTo(b.name);
-                //         }).toList()[topicIndex];
-                //     return ListTile(
-                //       onTap: () {
-                //         onTapUnitTile(
-                //           units[index].roadmap?.roadmapItems[topicIndex].id ??
-                //               "",
-                //           units[index].roadmap?.roadmapItems[topicIndex].name ??
-                //               "",
-                //         );
-                //       },
+                children: List.generate(
+                  (units[index].roadmap?.roadmapItems.length ?? 0) +
+                      (units[index].importantQuestions != null ? 1 : 0),
+                  (topicIndex) {
+                    if (topicIndex ==
+                        units[index].roadmap?.roadmapItems.length) {
+                      return ListTile(
+                        title: Text(
+                          "Important Questions",
+                          style: Theme.of(
+                            context,
+                          ).textTheme.bodyLarge?.copyWith(
+                            fontWeight: FontWeight.w500,
+                            color:
+                                units[index].isUnlocked
+                                    ? Colors.grey.shade800
+                                    : Colors.grey.shade400,
+                          ),
+                        ),
+                        onTap: () {
+                          onTapUnitTile("IMPQUES", "IMPQUES");
+                        },
+                        trailing: Icon(
+                          units[index].isUnlocked
+                              ? Icons.chevron_right_outlined
+                              : Icons.lock_outline,
+                        ),
+                      );
+                    }
+                    final roadmapItem =
+                        (units[index].roadmap?.roadmapItems ?? []).sorted((
+                          a,
+                          b,
+                        ) {
+                          // final strengthA =
+                          //     a.difficulty == "beginner"
+                          //         ? 1
+                          //         : a.difficulty == "intermediate"
+                          //         ? 2
+                          //         : 3;
+                          // final strengthB =
+                          //     b.difficulty == "beginner"
+                          //         ? 1
+                          //         : b.difficulty == "intermediate"
+                          //         ? 2
+                          //         : 3;
+                          return a.name.compareTo(b.name);
+                        }).toList()[topicIndex];
+                    return ListTile(
+                      onTap: () {
+                        onTapUnitTile(
+                          units[index].roadmap?.roadmapItems[topicIndex].id ??
+                              "",
+                          units[index].roadmap?.roadmapItems[topicIndex].name ??
+                              "",
+                        );
+                      },
 
-                //       title: Text(
-                //         units[index].roadmap?.roadmapItems[topicIndex].name ??
-                //             "",
-                //         style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                //           fontWeight: FontWeight.w500,
-                //           color:
-                //               units[index].isUnlocked
-                //                   ? Colors.grey.shade800
-                //                   : Colors.grey.shade400,
-                //         ),
-                //       ),
-                //       trailing:
-                //           (units[index]
-                //                       .roadmap
-                //                       ?.roadmapItems[topicIndex]
-                //                       .isUnlocked ??
-                //                   false)
-                //               ? Row(
-                //                 mainAxisSize: MainAxisSize.min,
-                //                 children: [
-                //                   Builder(
-                //                     builder: (context) {
-                //                       final strength =
-                //                           roadmapItem.difficulty == "beginner"
-                //                               ? 1
-                //                               : roadmapItem.difficulty ==
-                //                                   "intermediate"
-                //                               ? 2
-                //                               : 3;
-                //                       return Row(
-                //                         children:
-                //                             List.generate(
-                //                               strength,
-                //                               (index) => Icon(
-                //                                 Icons.star,
-                //                                 color: Colors.amber,
-                //                                 size: 16,
-                //                               ),
-                //                             ).toList(),
-                //                       );
-                //                     },
-                //                   ),
-                //                   Icon(
-                //                     units[index].isUnlocked
-                //                         ? Icons.chevron_right_outlined
-                //                         : Icons.lock_outline,
-                //                   ),
-                //                 ],
-                //               )
-                //               : Icon(Icons.lock_outline),
-                //     );
-                //   },
-                // ),
-                trailing: Icon(
-                  units[index].isUnlocked
-                      ? Icons.chevron_right_outlined
-                      : Icons.lock_outline,
+                      title: Text(
+                        units[index].roadmap?.roadmapItems[topicIndex].name ??
+                            "",
+                        style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                          fontWeight: FontWeight.w500,
+                          color:
+                              units[index].isUnlocked
+                                  ? Colors.grey.shade800
+                                  : Colors.grey.shade400,
+                        ),
+                      ),
+                      trailing:
+                          (units[index]
+                                      .roadmap
+                                      ?.roadmapItems[topicIndex]
+                                      .isUnlocked ??
+                                  false)
+                              ? Row(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  Builder(
+                                    builder: (context) {
+                                      final strength =
+                                          roadmapItem.difficulty == "beginner"
+                                              ? 1
+                                              : roadmapItem.difficulty ==
+                                                  "intermediate"
+                                              ? 2
+                                              : 3;
+                                      return Row(
+                                        children:
+                                            List.generate(
+                                              strength,
+                                              (index) => Icon(
+                                                Icons.star,
+                                                color: Colors.amber,
+                                                size: 16,
+                                              ),
+                                            ).toList(),
+                                      );
+                                    },
+                                  ),
+                                  Icon(
+                                    units[index].isUnlocked
+                                        ? Icons.chevron_right_outlined
+                                        : Icons.lock_outline,
+                                  ),
+                                ],
+                              )
+                              : Icon(Icons.lock_outline),
+                    );
+                  },
                 ),
+                // trailing: Icon(
+                //   units[index].isUnlocked
+                //       ? Icons.chevron_right_outlined
+                //       : Icons.lock_outline,
+                // ),
               ),
             );
           },
