@@ -69,7 +69,7 @@ class CartRepository {
     );
     final response = await patch(
       Uri.parse(
-        "https://asia-south1-chitti-ananta.cloudfunctions.net/webApi/cart",
+        "https://asia-south1-chitti-ananta.cloudfunctions.net/api/cart",
       ),
       headers: {
         "Authorization": "Bearer $token",
@@ -114,7 +114,7 @@ class CartRepository {
   Future<Coupon?> applyCoupon(String couponCode, BuildContext context) async {
     final response = await get(
       Uri.parse(
-        "https://asia-south1-chitti-ananta.cloudfunctions.net/webApi/coupon/$couponCode",
+        "https://asia-south1-chitti-ananta.cloudfunctions.net/api/coupon/$couponCode",
       ),
     ).then((response) {
       if (response.statusCode == 200) {
@@ -166,7 +166,7 @@ class CartRepository {
     final token = await FirebaseAuth.instance.currentUser?.getIdToken(true);
     final paymentId = await post(
       Uri.parse(
-        "https://asia-south1-chitti-ananta.cloudfunctions.net/webApi/initiate-payment",
+        "https://asia-south1-chitti-ananta.cloudfunctions.net/api/initiate-payment",
       ),
       body: jsonEncode({"cartId": cartId, "couponCode": coupon?.code}),
       headers: {
@@ -235,7 +235,7 @@ class CartRepository {
             await FirebaseAuth.instance.currentUser?.getIdToken();
         final loginRequest = await post(
           Uri.parse(
-            "https://asia-south1-chitti-ananta.cloudfunctions.net/webApi/reauthenticate",
+            "https://asia-south1-chitti-ananta.cloudfunctions.net/api/auth/reauthenticate",
           ),
           headers: {
             "Content-Type": "application/json",

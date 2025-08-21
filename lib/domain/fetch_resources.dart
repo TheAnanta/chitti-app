@@ -17,7 +17,7 @@ fetchResourcesForUnit(
 
   Map<String, dynamic>? data = await get(
     Uri.parse(
-      "https://asia-south1-chitti-ananta.cloudfunctions.net/webApi/unit/$subjectId/$unitId/$roadmapId/all",
+      "https://asia-south1-chitti-ananta.cloudfunctions.net/api/course/$subjectId/$unitId/$roadmapId/all",
     ),
     headers: {"Authorization": "Bearer $token"},
   ).then((response) {
@@ -84,7 +84,7 @@ Future<String> addCompletedResource(
 
   Map<String, dynamic>? result = await post(
     Uri.parse(
-      "https://asia-south1-chitti-ananta.cloudfunctions.net/webApi/add-completed",
+      "https://asia-south1-chitti-ananta.cloudfunctions.net/api/course/complete-resource",
     ),
     body: json.encode({
       "resourceId": res.resourceId,

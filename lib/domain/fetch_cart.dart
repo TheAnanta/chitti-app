@@ -10,9 +10,7 @@ Future<void> fetchCart(BuildContext context) async {
   final token = await FirebaseAuth.instance.currentUser?.getIdToken(true);
 
   List<CartItem>? data = await get(
-    Uri.parse(
-      "https://asia-south1-chitti-ananta.cloudfunctions.net/webApi/cart",
-    ),
+    Uri.parse("https://asia-south1-chitti-ananta.cloudfunctions.net/api/cart"),
     headers: {"Authorization": "Bearer $token"},
   ).then((response) {
     if (response.statusCode == 200) {

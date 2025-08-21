@@ -28,7 +28,7 @@ Future<String> fetchDeviceId() async {
 Future<Semester> fetchSemester(String token, Function onSignOut) async {
   final request = await get(
     Uri.parse(
-      "https://asia-south1-chitti-ananta.cloudfunctions.net/webApi/dashboard/${await fetchDeviceId()}",
+      "https://asia-south1-chitti-ananta.cloudfunctions.net/api/dashboard/${await fetchDeviceId()}",
     ),
     headers: {
       "Content-Type": "application/json",
@@ -53,5 +53,5 @@ Future<Semester> fetchSemester(String token, Function onSignOut) async {
       await FirebaseAuth.instance.signOut();
       throw Exception("Unable to fetch semester, $e");
     }
-  }
+  } 
 }
