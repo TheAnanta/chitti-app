@@ -191,18 +191,31 @@ class _LoginScreenState extends State<LoginScreen> {
                                           BoxShadow(
                                             offset: Offset(10, 12),
                                             spreadRadius: 0,
+                                            color:
+                                                Theme.of(
+                                                  context,
+                                                ).colorScheme.onBackground,
                                           ),
                                         ],
                                       ),
                                       child: MaterialButton(
+                                        elevation: 0,
                                         padding: EdgeInsets.symmetric(
                                           vertical: 16,
                                           horizontal: 28,
                                         ),
                                         minWidth: double.infinity,
-                                        color: Colors.white,
+                                        color:
+                                            Theme.of(
+                                              context,
+                                            ).colorScheme.background,
                                         shape: RoundedRectangleBorder(
-                                          side: BorderSide(),
+                                          side: BorderSide(
+                                            color:
+                                                Theme.of(
+                                                  context,
+                                                ).colorScheme.onBackground,
+                                          ),
                                           borderRadius: BorderRadius.circular(
                                             4,
                                           ),
@@ -793,12 +806,19 @@ class OnboardingSlideOne extends StatelessWidget {
       itemBuilder: (context, index) {
         return Container(
           color:
-              [
-                Color(0xFFF26E0C),
-                Color(0xFFA08DFF),
-                Color(0xFF8FD14F),
-                Color(0xFFF7AD19),
-              ][index],
+              (Theme.of(context).brightness == Brightness.light
+                  ? [
+                    Color(0xFFF26E0C),
+                    Color(0xFFA08DFF),
+                    Color(0xFF8FD14F),
+                    Color(0xFFF7AD19),
+                  ]
+                  : [
+                    Color.fromARGB(255, 34, 34, 34),
+                    Color.fromARGB(255, 31, 31, 31),
+                    Color.fromARGB(255, 8, 8, 8),
+                    Color.fromARGB(255, 37, 37, 37),
+                  ])[index],
           width: double.infinity,
           padding: EdgeInsets.only(top: 48, left: 24, right: 24),
           child: Stack(

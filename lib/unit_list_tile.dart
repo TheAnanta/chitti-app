@@ -296,7 +296,9 @@ class UnitListTile extends StatelessWidget {
                                           ),
                                           SizedBox(height: 8),
                                           Text(
-                                            "• Units 1 & 2\n• All Roadmaps\n• All Resources\n• All Videos\n• All Notes\n• All Cheatsheets\n• All Important Questions",
+                                            courseId == "CSEN3041"
+                                                ? "• No Videos for this course\n• Units 1 & 2\n• All Roadmaps\n• All Resources\n• All Notes\n• All Cheatsheets\n• All Important Questions"
+                                                : "• Units 1 & 2\n• All Roadmaps\n• All Resources\n• All Videos\n• All Notes\n• All Cheatsheets\n• All Important Questions",
                                           ),
                                         ],
                                       ),
@@ -568,7 +570,13 @@ class UnitListTile extends StatelessWidget {
                             fontWeight: FontWeight.w500,
                             color:
                                 units[index].isUnlocked
-                                    ? Colors.grey.shade800
+                                    ? Theme.of(context).brightness ==
+                                            Brightness.dark
+                                        ? Colors.grey.shade500
+                                        : Colors.grey.shade800
+                                    : Theme.of(context).brightness ==
+                                        Brightness.dark
+                                    ? Colors.grey.shade700
                                     : Colors.grey.shade400,
                           ),
                         ),
@@ -617,8 +625,18 @@ class UnitListTile extends StatelessWidget {
                         style: Theme.of(context).textTheme.bodyLarge?.copyWith(
                           fontWeight: FontWeight.w500,
                           color:
-                              units[index].isUnlocked
-                                  ? Colors.grey.shade800
+                              (units[index]
+                                          .roadmap
+                                          ?.roadmapItems[topicIndex]
+                                          .isUnlocked ??
+                                      false)
+                                  ? Theme.of(context).brightness ==
+                                          Brightness.dark
+                                      ? Colors.grey.shade500
+                                      : Colors.grey.shade800
+                                  : Theme.of(context).brightness ==
+                                      Brightness.dark
+                                  ? Colors.grey.shade700
                                   : Colors.grey.shade400,
                         ),
                       ),

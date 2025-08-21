@@ -95,14 +95,14 @@ class ChittiMaterialApp extends StatelessWidget {
         useMaterial3: true,
         textTheme: GoogleFonts.poppinsTextTheme(),
       ),
-      // darkTheme: ThemeData(
-      //   colorScheme: ColorScheme.fromSeed(
-      //     seedColor: Color(0xFF0D47A1),
-      //     brightness: Brightness.dark,
-      //   ),
-      //   useMaterial3: true,
-      //   textTheme: GoogleFonts.poppinsTextTheme(),
-      // ),
+      darkTheme: ThemeData(
+        colorScheme: ColorScheme.fromSeed(
+          seedColor: Color(0xFF0D47A1),
+          brightness: Brightness.dark,
+        ),
+        fontFamily: GoogleFonts.poppins().fontFamily,
+        useMaterial3: true,
+      ),
       home: const SplashScreen(),
     );
   }

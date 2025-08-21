@@ -18,22 +18,44 @@ class SubjectPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor:
+          Theme.of(context).brightness == Brightness.light
+              ? Colors.white
+              : Colors.black,
 
       body: CustomScrollView(
         slivers: [
           SliverAppBar(
             automaticallyImplyLeading: false,
-            foregroundColor: Colors.white,
+            foregroundColor:
+                Theme.of(context).brightness == Brightness.light
+                    ? Colors.white
+                    : Colors.black,
             expandedHeight: 312,
             flexibleSpace: Stack(
               children: [
-                Image.network(
-                  subject.image,
-                  height: 372,
-                  width: double.infinity,
-                  alignment: Alignment.center,
-                  fit: BoxFit.cover,
+                ColorFiltered(
+                  colorFilter:
+                      Theme.of(context).brightness == Brightness.dark
+                          ? const ColorFilter.matrix(<double>[
+                            -1.0, 0.0, 0.0, 0.0, 255.0, //
+                            0.0, -1.0, 0.0, 0.0, 255.0, //
+                            0.0, 0.0, -1.0, 0.0, 255.0, //
+                            0.0, 0.0, 0.0, 1.0, 0.0, //
+                          ])
+                          : const ColorFilter.matrix(<double>[
+                            1.0, 0.0, 0.0, 0.0, 0.0, //
+                            0.0, 1.0, 0.0, 0.0, 0.0, //
+                            0.0, 0.0, 1.0, 0.0, 0.0, //
+                            0.0, 0.0, 0.0, 1.0, 0.0, //
+                          ]),
+                  child: Image.network(
+                    subject.image,
+                    height: 372,
+                    width: double.infinity,
+                    alignment: Alignment.center,
+                    fit: BoxFit.cover,
+                  ),
                 ),
                 Container(
                   decoration: BoxDecoration(
@@ -95,7 +117,10 @@ class SubjectPage extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Container(
-                  color: Colors.white,
+                  color:
+                      Theme.of(context).brightness == Brightness.light
+                          ? Colors.white
+                          : Colors.black,
                   child: Padding(
                     padding: const EdgeInsets.all(16.0).copyWith(top: 32),
                     child: Column(
@@ -548,7 +573,7 @@ class SubjectPage extends StatelessWidget {
                                       userRating.image,
                                     ),
                                   ),
-                                  title: Text(userRating.name),
+                                  title: Text("${userRating.name} (You)"),
                                   subtitle: Column(
                                     crossAxisAlignment:
                                         CrossAxisAlignment.start,
@@ -589,6 +614,7 @@ class SubjectPage extends StatelessWidget {
                                         )
                                         .toList();
                                 return ListView.separated(
+                                  padding: EdgeInsets.symmetric(vertical: 12),
                                   shrinkWrap: true,
                                   itemBuilder: (context, ratingIndex) {
                                     return ListTile(

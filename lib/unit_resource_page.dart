@@ -46,7 +46,7 @@ class _UnitResourcePageState extends State<UnitResourcePage>
   @override
   void initState() {
     super.initState();
-    _tabController = TabController(length: 3, vsync: this);
+    _tabController = TabController(length: 2, vsync: this);
     _scrollController = ScrollController(
       onAttach: (scrollPosition) {
         _scrollController.addListener(() {
@@ -78,13 +78,19 @@ class _UnitResourcePageState extends State<UnitResourcePage>
     return LayoutBuilder(
       builder: (context, constraints) {
         return Scaffold(
-          backgroundColor: Colors.white,
+          backgroundColor:
+              Theme.of(context).brightness == Brightness.light
+                  ? Colors.white
+                  : Colors.black,
           body: NestedScrollView(
             controller: _scrollController,
             headerSliverBuilder: (context, innerBoxIsScrolled) {
               return [
                 SliverAppBar(
-                  backgroundColor: Colors.white,
+                  backgroundColor:
+                      Theme.of(context).brightness == Brightness.light
+                          ? Colors.white
+                          : Colors.black,
                   foregroundColor: Colors.white,
                   expandedHeight:
                       500 -
@@ -112,12 +118,29 @@ class _UnitResourcePageState extends State<UnitResourcePage>
                         children: [
                           Stack(
                             children: [
-                              Image.network(
-                                widget.subjectCoverImage,
-                                height: 258,
-                                width: double.infinity,
-                                alignment: Alignment.center,
-                                fit: BoxFit.cover,
+                              ColorFiltered(
+                                colorFilter:
+                                    Theme.of(context).brightness ==
+                                            Brightness.dark
+                                        ? const ColorFilter.matrix(<double>[
+                                          -1.0, 0.0, 0.0, 0.0, 255.0, //
+                                          0.0, -1.0, 0.0, 0.0, 255.0, //
+                                          0.0, 0.0, -1.0, 0.0, 255.0, //
+                                          0.0, 0.0, 0.0, 1.0, 0.0, //
+                                        ])
+                                        : const ColorFilter.matrix(<double>[
+                                          1.0, 0.0, 0.0, 0.0, 0.0, //
+                                          0.0, 1.0, 0.0, 0.0, 0.0, //
+                                          0.0, 0.0, 1.0, 0.0, 0.0, //
+                                          0.0, 0.0, 0.0, 1.0, 0.0, //
+                                        ]),
+                                child: Image.network(
+                                  widget.subjectCoverImage,
+                                  height: 258,
+                                  width: double.infinity,
+                                  alignment: Alignment.center,
+                                  fit: BoxFit.cover,
+                                ),
                               ),
                               Container(
                                 decoration: BoxDecoration(
@@ -250,15 +273,18 @@ class _UnitResourcePageState extends State<UnitResourcePage>
                     preferredSize: Size.fromHeight(kTextTabBarHeight),
                     child: Container(
                       padding: EdgeInsets.only(top: 8),
-                      color: Colors.white,
+                      color:
+                          Theme.of(context).brightness == Brightness.light
+                              ? Colors.white
+                              : Colors.black,
                       child: TabBar(
-                        isScrollable: true,
+                        // isScrollable: true,
                         controller: _tabController,
                         tabs: [
                           // Tab(text: "Roadmap"),
                           Tab(text: "Videos"),
                           Tab(text: "Notes"),
-                          Tab(text: "Cheatsheets"),
+                          // Tab(text: "Cheatsheets"),
                         ],
                       ),
                     ),
@@ -276,10 +302,10 @@ class _UnitResourcePageState extends State<UnitResourcePage>
                   // _buildRoadmapView(widget.unit.roadmap),
                   _buildVideoView(widget.unit.videos, widget.courseId),
                   _buildNotesView(widget.unit.notes, widget.courseId),
-                  _buildCheatsheetView(
-                    widget.unit.cheatsheets,
-                    widget.courseId,
-                  ),
+                  // _buildCheatsheetView(
+                  //   widget.unit.cheatsheets,
+                  //   widget.courseId,
+                  // ),
                 ],
               ),
             ),

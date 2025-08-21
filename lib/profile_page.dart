@@ -42,7 +42,10 @@ class ProfilePage extends StatelessWidget {
       return Scaffold(body: Center(child: Text("User not found")));
     }
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor:
+          Theme.of(context).brightness == Brightness.light
+              ? Colors.white
+              : Colors.black,
       body: SingleChildScrollView(
         child: Column(
           children: [
@@ -109,7 +112,13 @@ class ProfilePage extends StatelessWidget {
                       SizedBox(height: 130),
                       Container(
                         decoration: BoxDecoration(
-                          border: Border.all(width: 8, color: Colors.white),
+                          border: Border.all(
+                            width: 8,
+                            color:
+                                Theme.of(context).brightness == Brightness.light
+                                    ? Colors.white
+                                    : Colors.black,
+                          ),
                           shape: BoxShape.circle,
                         ),
                         child: ClipOval(
@@ -179,7 +188,10 @@ class ProfilePage extends StatelessWidget {
                             [];
                         if (titles.isEmpty) {
                           return Card(
-                            color: Colors.white,
+                            color:
+                                Theme.of(context).brightness == Brightness.light
+                                    ? Colors.white
+                                    : Colors.grey.shade900,
                             child: AspectRatio(
                               aspectRatio: 1.5,
                               child: Center(
@@ -267,9 +279,9 @@ class ProfilePage extends StatelessWidget {
               },
               child: Text("Sign out"),
             ),
-            SizedBox(height: 16),
+            SizedBox(height: 24),
             Opacity(
-              opacity: 0.2,
+              opacity: 0.3,
               child: Column(
                 children: [
                   Text("Made with 🖤 by"),
@@ -278,7 +290,10 @@ class ProfilePage extends StatelessWidget {
                     offset: Offset(6, 0),
                     child: SvgPicture.asset(
                       "assets/images/theananta.svg",
-                      color: Colors.grey.shade700,
+                      color:
+                          Theme.of(context).brightness == Brightness.light
+                              ? Colors.grey.shade700
+                              : Colors.grey.shade300,
                     ),
                   ),
                 ],

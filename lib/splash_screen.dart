@@ -109,6 +109,9 @@ class SplashScreen extends StatelessWidget {
                     "Your last moment preparation buddy",
                     style: Theme.of(context).textTheme.titleMedium?.copyWith(
                       fontWeight: FontWeight.w600,
+                      color: Theme.of(
+                        context,
+                      ).colorScheme.onBackground.withValues(alpha: 0.3),
                     ),
                   ),
                   SizedBox(height: 24),
@@ -158,14 +161,19 @@ class SplashScreen extends StatelessWidget {
                     opacity: 0.2,
                     child: Column(
                       children: [
-                        Text("Made with 🖤 by"),
+                        Text(
+                          "Made with 🖤 by",
+                          style: Theme.of(context).textTheme.bodyMedium,
+                        ),
                         SizedBox(height: 4),
                         Transform.translate(
                           offset: Offset(6, 0),
                           child: SvgPicture.asset(
                             "assets/images/theananta.svg",
                             colorFilter: ColorFilter.mode(
-                              Colors.grey.shade700,
+                              Theme.of(context).brightness == Brightness.light
+                                  ? Colors.grey.shade700
+                                  : Colors.grey.shade300,
                               BlendMode.srcIn,
                             ),
                           ),
