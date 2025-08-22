@@ -2,9 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:pdfrx/pdfrx.dart';
 
 class Marker {
-  Marker(this.color, this.ranges);
+  Marker(this.color,);
   final Color color;
-  final PdfTextRanges ranges;
+  // final PdfTextRanges ranges;
 }
 
 class MarkersView extends StatefulWidget {
@@ -33,17 +33,17 @@ class _MarkersViewState extends State<MarkersView> {
           padding: const EdgeInsets.only(bottom: 1),
           child: Stack(
             children: [
-              Material(
-                color: marker.color.withAlpha(100),
-                child: InkWell(
-                  onTap: () => widget.onTap?.call(marker),
-                  child: SizedBox(
-                    width: double.infinity,
-                    height: 40,
-                    child: Text('Page #${marker.ranges.pageNumber} - ${marker.ranges.text}'),
-                  ),
-                ),
-              ),
+              // Material(
+              //   color: marker.color.withAlpha(100),
+              //   child: InkWell(
+              //     onTap: () => widget.onTap?.call(marker),
+              //     child: SizedBox(
+              //       width: double.infinity,
+              //       height: 40,
+              //       child: Text('Page #${marker.ranges.pageNumber} - ${marker.ranges.text}'),
+              //     ),
+              //   ),
+              // ),
               Align(
                 alignment: Alignment.centerRight,
                 child: IconButton(

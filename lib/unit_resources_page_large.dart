@@ -55,7 +55,7 @@ class _UnitResourcePageExtendedState extends State<UnitResourcePageExtended>
     //   widget.initialUnit,
     //   widget.initialUnitIndex,
     // );
-    _tabController = TabController(length: 3, vsync: this);
+    _tabController = TabController(length: 2, vsync: this);
     _scrollController = ScrollController(
       onAttach: (scrollPosition) {
         _scrollController.addListener(() {
@@ -434,10 +434,10 @@ class _UnitResourcePageExtendedState extends State<UnitResourcePageExtended>
                                 children: [
                                   _buildVideoView(unit.videos, widget.courseId),
                                   _buildNotesView(unit.notes, widget.courseId),
-                                  _buildCheatsheetView(
-                                    unit.cheatsheets,
-                                    widget.courseId,
-                                  ),
+                                  // _buildCheatsheetView(
+                                  //   unit.cheatsheets,
+                                  //   widget.courseId,
+                                  // ),
                                 ],
                               ),
                             ),
@@ -508,7 +508,7 @@ class _UnitResourcePageExtendedState extends State<UnitResourcePageExtended>
                                         ),
                                     controller: viewController,
                                     params: PdfViewerParams(
-                                      enableTextSelection: false,
+                                      // enableTextSelection: false,
                                       loadingBannerBuilder: (
                                         context,
                                         bytesDownloaded,

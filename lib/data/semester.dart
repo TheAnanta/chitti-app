@@ -32,12 +32,14 @@ class Unit {
   final int totalResources;
   final Roadmap? roadmap;
   final ImportantQuestion? importantQuestions;
+  final Cheatsheet? cheatsheets;
   const Unit({
     required this.unitId,
     required this.name,
     required this.description,
     required this.difficulty,
     required this.importantQuestions,
+    required this.cheatsheets,
     this.isUnlocked = false,
     this.totalResources = 0,
     this.roadmap,
@@ -51,6 +53,14 @@ class Unit {
       difficulty: data["difficulty"],
       isUnlocked: data["isUnlocked"],
       totalResources: data["total-resources"] ?? 0,
+      cheatsheets:
+          data["cheatsheet"] != null
+              ? Cheatsheet(
+                id: data["cheatsheet"]["cheatId"],
+                name: data["cheatsheet"]["name"],
+                url: data["cheatsheet"]["url"],
+              )
+              : null,
       importantQuestions:
           data["importantQuestions"] != null
               ? List<ImportantQuestion>.from(
@@ -132,7 +142,6 @@ class UnitWithResources {
   final Roadmap? roadmap;
   final List<Video>? videos;
   final List<Notes>? notes;
-  final List<Cheatsheet>? cheatsheets;
 
   const UnitWithResources({
     required this.unitId,
@@ -143,7 +152,6 @@ class UnitWithResources {
     this.roadmap,
     this.notes,
     this.videos,
-    this.cheatsheets,
   });
 }
 

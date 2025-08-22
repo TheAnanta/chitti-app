@@ -28,7 +28,7 @@ class _PDFViewPageState extends State<PDFViewPage> with WidgetsBindingObserver {
   final outline = ValueNotifier<List<PdfOutlineNode>?>(null);
   final textSearcher = ValueNotifier<PdfTextSearcher?>(null);
   final _markers = <int, List<Marker>>{};
-  List<PdfTextRanges>? textSelections;
+  // List<PdfTextRanges>? textSelections;
 
   void _update() {
     if (mounted) {
@@ -103,24 +103,24 @@ class _PDFViewPageState extends State<PDFViewPage> with WidgetsBindingObserver {
                     Expanded(child: Text(widget.pdfName)),
                     Spacer(),
                   ],
-                  IconButton(
-                    visualDensity: visualDensity,
-                    icon: const Icon(Icons.circle, color: Colors.red),
-                    onPressed: () => _addCurrentSelectionToMarkers(Colors.red),
-                  ),
-                  IconButton(
-                    visualDensity: visualDensity,
-                    icon: const Icon(Icons.circle, color: Colors.green),
-                    onPressed:
-                        () => _addCurrentSelectionToMarkers(Colors.green),
-                  ),
-                  IconButton(
-                    visualDensity: visualDensity,
-                    icon: const Icon(Icons.circle, color: Colors.orangeAccent),
-                    onPressed:
-                        () =>
-                            _addCurrentSelectionToMarkers(Colors.orangeAccent),
-                  ),
+                  // IconButton(
+                  //   visualDensity: visualDensity,
+                  //   icon: const Icon(Icons.circle, color: Colors.red),
+                  //   onPressed: () => _addCurrentSelectionToMarkers(Colors.red),
+                  // ),
+                  // IconButton(
+                  //   visualDensity: visualDensity,
+                  //   icon: const Icon(Icons.circle, color: Colors.green),
+                  //   onPressed:
+                  //       () => _addCurrentSelectionToMarkers(Colors.green),
+                  // ),
+                  // IconButton(
+                  //   visualDensity: visualDensity,
+                  //   icon: const Icon(Icons.circle, color: Colors.orangeAccent),
+                  //   onPressed:
+                  //       () =>
+                  //           _addCurrentSelectionToMarkers(Colors.orangeAccent),
+                  // ),
                   IconButton(
                     visualDensity: visualDensity,
                     icon: const Icon(Icons.zoom_in),
@@ -207,53 +207,53 @@ class _PDFViewPageState extends State<PDFViewPage> with WidgetsBindingObserver {
                             Expanded(
                               child: TabBarView(
                                 children: [
-                                  ValueListenableBuilder(
-                                    valueListenable: textSearcher,
-                                    builder: (context, textSearcher, child) {
-                                      if (textSearcher == null) {
-                                        return SizedBox();
-                                      }
-                                      return TextSearchView(
-                                        textSearcher: textSearcher,
-                                      );
-                                    },
-                                  ),
-                                  ValueListenableBuilder(
-                                    valueListenable: outline,
-                                    builder:
-                                        (context, outline, child) =>
-                                            OutlineView(
-                                              outline: outline,
-                                              controller: controller,
-                                            ),
-                                  ),
-                                  ThumbnailsView(
-                                    documentRef: widget.documentRef,
-                                    controller: controller,
-                                  ),
-                                  MarkersView(
-                                    markers:
-                                        _markers.values
-                                            .expand((e) => e)
-                                            .toList(),
-                                    onTap: (marker) {
-                                      final rect = controller
-                                          .calcRectForRectInsidePage(
-                                            pageNumber:
-                                                marker
-                                                    .ranges
-                                                    .pageText
-                                                    .pageNumber,
-                                            rect: marker.ranges.bounds,
-                                          );
-                                      controller.ensureVisible(rect);
-                                    },
-                                    onDeleteTap: (marker) {
-                                      _markers[marker.ranges.pageNumber]!
-                                          .remove(marker);
-                                      setState(() {});
-                                    },
-                                  ),
+                                  // ValueListenableBuilder(
+                                  //   valueListenable: textSearcher,
+                                  //   builder: (context, textSearcher, child) {
+                                  //     if (textSearcher == null) {
+                                  //       return SizedBox();
+                                  //     }
+                                  //     return TextSearchView(
+                                  //       textSearcher: textSearcher,
+                                  //     );
+                                  //   },
+                                  // ),
+                                  // ValueListenableBuilder(
+                                  //   valueListenable: outline,
+                                  //   builder:
+                                  //       (context, outline, child) =>
+                                  //           OutlineView(
+                                  //             outline: outline,
+                                  //             controller: controller,
+                                  //           ),
+                                  // ),
+                                  // ThumbnailsView(
+                                  //   documentRef: widget.documentRef,
+                                  //   controller: controller,
+                                  // ),
+                                  // MarkersView(
+                                  //   markers:
+                                  //       _markers.values
+                                  //           .expand((e) => e)
+                                  //           .toList(),
+                                  //   onTap: (marker) {
+                                  //     final rect = controller
+                                  //         .calcRectForRectInsidePage(
+                                  //           pageNumber:
+                                  //               marker
+                                  //                   .ranges
+                                  //                   .pageText
+                                  //                   .pageNumber,
+                                  //           rect: marker.ranges.bounds,
+                                  //         );
+                                  //     controller.ensureVisible(rect);
+                                  //   },
+                                  //   onDeleteTap: (marker) {
+                                  //     _markers[marker.ranges.pageNumber]!
+                                  //         .remove(marker);
+                                  //     setState(() {});
+                                  //   },
+                                  // ),
                                 ],
                               ),
                             ),
@@ -283,7 +283,9 @@ class _PDFViewPageState extends State<PDFViewPage> with WidgetsBindingObserver {
                         //passwordProvider: () => passwordDialog(context),
                         controller: controller,
                         params: PdfViewerParams(
-                          enableTextSelection: false,
+                          textSelectionParams: PdfTextSelectionParams(
+                            enabled: false,
+                          ),
                           maxScale: 8,
                           // facing pages algorithm
                           // layoutPages: (pages, params) {
@@ -446,14 +448,14 @@ class _PDFViewPageState extends State<PDFViewPage> with WidgetsBindingObserver {
                           pagePaintCallbacks: [
                             if (textSearcher.value != null)
                               textSearcher.value!.pageTextMatchPaintCallback,
-                            _paintMarkers,
+                            // _paintMarkers,
                           ],
                           onDocumentChanged: (document) async {
                             if (document == null) {
                               textSearcher.value?.dispose();
                               textSearcher.value = null;
                               outline.value = null;
-                              textSelections = null;
+                              // textSelections = null;
                               _markers.clear();
                             }
                           },
@@ -471,9 +473,9 @@ class _PDFViewPageState extends State<PDFViewPage> with WidgetsBindingObserver {
                               }
                             });
                           },
-                          onTextSelectionChange: (selections) {
-                            textSelections = selections;
-                          },
+                          // onTextSelectionChange: (selections) {
+                          //   textSelections = selections;
+                          // },
                         ),
                       );
                     },
@@ -487,43 +489,43 @@ class _PDFViewPageState extends State<PDFViewPage> with WidgetsBindingObserver {
     );
   }
 
-  void _paintMarkers(Canvas canvas, Rect pageRect, PdfPage page) {
-    final markers = _markers[page.pageNumber];
-    if (markers == null) {
-      return;
-    }
-    for (final marker in markers) {
-      final paint =
-          Paint()
-            ..color = marker.color.withAlpha(100)
-            ..style = PaintingStyle.fill;
+  // void _paintMarkers(Canvas canvas, Rect pageRect, PdfPage page) {
+  //   final markers = _markers[page.pageNumber];
+  //   if (markers == null) {
+  //     return;
+  //   }
+  //   for (final marker in markers) {
+  //     final paint =
+  //         Paint()
+  //           ..color = marker.color.withAlpha(100)
+  //           ..style = PaintingStyle.fill;
 
-      for (final range in marker.ranges.ranges) {
-        final f = PdfTextRangeWithFragments.fromTextRange(
-          marker.ranges.pageText,
-          range.start,
-          range.end,
-        );
-        if (f != null) {
-          canvas.drawRect(
-            f.bounds.toRectInPageRect(page: page, pageRect: pageRect),
-            paint,
-          );
-        }
-      }
-    }
-  }
+  //     for (final range in marker.ranges.ranges) {
+  //       final f = PdfTextRangeWithFragments.fromTextRange(
+  //         marker.ranges.pageText,
+  //         range.start,
+  //         range.end,
+  //       );
+  //       if (f != null) {
+  //         canvas.drawRect(
+  //           f.bounds.toRectInPageRect(page: page, pageRect: pageRect),
+  //           paint,
+  //         );
+  //       }
+  //     }
+  //   }
+  // }
 
-  void _addCurrentSelectionToMarkers(Color color) {
-    if (controller.isReady && textSelections != null) {
-      for (final selectedText in textSelections!) {
-        _markers
-            .putIfAbsent(selectedText.pageNumber, () => [])
-            .add(Marker(color, selectedText));
-      }
-      setState(() {});
-    }
-  }
+  // void _addCurrentSelectionToMarkers(Color color) {
+  //   if (controller.isReady && textSelections != null) {
+  //     for (final selectedText in textSelections!) {
+  //       _markers
+  //           .putIfAbsent(selectedText.pageNumber, () => [])
+  //           .add(Marker(color, selectedText));
+  //     }
+  //     setState(() {});
+  //   }
+  // }
 
   Future<void> navigateToUrl(Uri url) async {
     if (await shouldOpenUrl(context, url)) {

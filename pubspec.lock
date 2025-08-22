@@ -564,10 +564,18 @@ packages:
     dependency: "direct main"
     description:
       name: pdfrx
-      sha256: bd6731e45c3a356ff839527621f39aedbd3a6e9763a26949a4d9c8b547749bba
+      sha256: a88e7797623d3b89d4a863f583c973c681f39aa48eadceb4aa61c0c99cc7fa19
       url: "https://pub.dev"
     source: hosted
-    version: "1.2.0"
+    version: "2.1.3"
+  pdfrx_engine:
+    dependency: transitive
+    description:
+      name: pdfrx_engine
+      sha256: "69a2448ca87d0536fe4eb78fbe753fb2fb2f8ae3a1b73e2fd1937585e717c2b1"
+      url: "https://pub.dev"
+    source: hosted
+    version: "0.1.12"
   petitparser:
     dependency: transitive
     description:
@@ -942,5 +950,5 @@ packages:
     source: hosted
     version: "3.1.3"
 sdks:
-  dart: ">=3.8.0 <4.0.0"
+  dart: ">=3.8.1 <4.0.0"
   flutter: ">=3.29.0"

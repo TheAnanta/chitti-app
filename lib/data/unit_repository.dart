@@ -30,7 +30,6 @@ class UnitRepository {
       roadmap: roadmap,
       notes: notes,
       videos: videos,
-      cheatsheets: cheatsheet,
     );
     fetchedUnits["$subjectId/${unit.unitId}/$roadmapId"] = unitWithResources;
     return unitWithResources;
