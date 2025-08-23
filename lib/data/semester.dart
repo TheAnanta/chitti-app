@@ -10,7 +10,7 @@ class Instructor {
   final String bio;
   final String id;
   final double gpa;
-  final int rating;
+  final double rating;
   final int hours;
   const Instructor({
     required this.name,
