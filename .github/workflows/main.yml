@@ -25,7 +25,8 @@ jobs:
       - name: Set up Flutter SDK
         uses: flutter-actions/setup-flutter@v3
         with:
-          channel: master
+          channel: beta
+          version: 3.36.0-0.1.pre
           
       - name: Install dependencies & Lint check
         run: |
