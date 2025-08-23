@@ -59,11 +59,11 @@ class DefaultFirebaseOptions {
 
   static const FirebaseOptions ios = FirebaseOptions(
     apiKey: 'AIzaSyA2ApdpjaXZ_EQP-yFOXKLhAm0PaVg_9X4',
-    appId: '1:513797872748:ios:9443903e441b8fbd368c49',
+    appId: '1:513797872748:ios:c17e84d774e672b4368c49',
     messagingSenderId: '513797872748',
     projectId: 'chitti-ananta',
     storageBucket: 'chitti-ananta.firebasestorage.app',
-    iosBundleId: 'dev.theananta.chitti',
+    iosBundleId: 'dev.theananta.chittiapp',
   );
 
   static const FirebaseOptions macos = FirebaseOptions(

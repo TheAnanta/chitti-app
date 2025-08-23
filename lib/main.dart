@@ -43,6 +43,30 @@ Future<void> main() async {
         announcement: true,
         criticalAlert: true,
       );
+  final apnsToken = await FirebaseMessaging.instance.getAPNSToken();
+  print("APNS Token: $apnsToken");
+  print('User granted permission: ${notificationSettings.authorizationStatus}');
+  if (notificationSettings.authorizationStatus ==
+      AuthorizationStatus.authorized) {
+    print('User granted permission');
+  } else if (notificationSettings.authorizationStatus ==
+      AuthorizationStatus.provisional) {
+    print('User granted provisional permission');
+  } else {
+    // requested permission
+    final notificationSettings = await FirebaseMessaging.instance
+        .requestPermission(
+          provisional: false,
+          alert: true,
+          badge: true,
+          sound: true,
+          announcement: true,
+          criticalAlert: true,
+        );
+  }
+  print(
+    'Firebase Messaging Token: ${await FirebaseMessaging.instance.getToken()}',
+  );
   FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
 
   runApp(const MyApp());

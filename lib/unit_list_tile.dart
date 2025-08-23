@@ -96,6 +96,7 @@ class UnitListTile extends StatelessWidget {
                 );
               } else if (units[index].isUnlocked &&
                   roadmapId != "IMPQUES" &&
+                  roadmapId != "CHEATSHEET" &&
                   (units[index].roadmap?.roadmapItems
                           .where((i) => i.id == roadmapId)
                           .firstOrNull
@@ -236,6 +237,53 @@ class UnitListTile extends StatelessWidget {
                                           resourceName: units[index].name,
                                           unitId: units[index].unitId,
                                           resourceType: "important_questions",
+                                        ),
+                                      );
+                                    },
+                                  );
+                                },
+                              ),
+                            ),
+                          ),
+                        ),
+                  ),
+                );
+              } else if (roadmapId == "CHEATSHEET" && units[1].isUnlocked) {
+                Navigator.of(context).push(
+                  MaterialPageRoute(
+                    builder:
+                        (context) => Scaffold(
+                          body: Center(
+                            child: WatermarkWidget(
+                              text:
+                                  FirebaseAuth.instance.currentUser?.uid ??
+                                  "Anonymous",
+                              opacity: 0.05,
+                              fontSize: 18,
+                              child: Builder(
+                                builder: (context) {
+                                  final uri =
+                                      Uri.tryParse(
+                                        units[index].cheatsheets!.url,
+                                      ) ??
+                                      Uri.parse(
+                                        "https://pdfobject.com/pdf/sample.pdf",
+                                      );
+                                  final pdfDocumentRef = PdfDocumentRefUri(uri);
+                                  return PDFViewPage(
+                                    documentRef: pdfDocumentRef,
+                                    pdfName:
+                                        '${units[index].name} - Cheatsheet',
+                                    onAddResource: () {
+                                      addCompletedResource(
+                                        context,
+                                        CompletedResources(
+                                          courseId: courseId,
+                                          resourceId:
+                                              units[index].cheatsheets!.id,
+                                          resourceName: units[index].name,
+                                          unitId: units[index].unitId,
+                                          resourceType: "cheatsheet",
                                         ),
                                       );
                                     },
@@ -557,37 +605,146 @@ class UnitListTile extends StatelessWidget {
                 enabled: units[index].isUnlocked,
                 children: List.generate(
                   (units[index].roadmap?.roadmapItems.length ?? 0) +
-                      (units[index].importantQuestions != null ? 1 : 0),
+                      (units[index].importantQuestions != null ||
+                              units[index].cheatsheets != null
+                          ? 1
+                          : 0),
                   (topicIndex) {
                     if (topicIndex ==
                         units[index].roadmap?.roadmapItems.length) {
-                      return ListTile(
-                        title: Text(
-                          "Important Questions",
-                          style: Theme.of(
-                            context,
-                          ).textTheme.bodyLarge?.copyWith(
-                            fontWeight: FontWeight.w500,
-                            color:
-                                units[index].isUnlocked
-                                    ? Theme.of(context).brightness ==
-                                            Brightness.dark
-                                        ? Colors.grey.shade500
-                                        : Colors.grey.shade800
-                                    : Theme.of(context).brightness ==
-                                        Brightness.dark
-                                    ? Colors.grey.shade700
-                                    : Colors.grey.shade400,
-                          ),
-                        ),
-                        onTap: () {
-                          onTapUnitTile("IMPQUES", "IMPQUES");
-                        },
-                        trailing: Icon(
-                          units[index].isUnlocked
-                              ? Icons.chevron_right_outlined
-                              : Icons.lock_outline,
-                        ),
+                      return Column(
+                        children: [
+                          units[index].importantQuestions != null
+                              ? ListTile(
+                                title: Text(
+                                  "Important Questions",
+                                  style: Theme.of(
+                                    context,
+                                  ).textTheme.bodyMedium?.copyWith(
+                                    fontSize: 15,
+                                    fontWeight: FontWeight.w600,
+                                    color:
+                                        units[index].isUnlocked
+                                            ? Theme.of(context).brightness ==
+                                                    Brightness.dark
+                                                ? Colors.grey.shade500
+                                                : Colors.grey.shade800
+                                            : Theme.of(context).brightness ==
+                                                Brightness.dark
+                                            ? Colors.grey.shade700
+                                            : Colors.grey.shade400,
+                                  ),
+                                ),
+                                onTap: () {
+                                  onTapUnitTile("IMPQUES", "IMPQUES");
+                                },
+                                leading: Opacity(
+                                  opacity: 0.6,
+                                  child: Icon(
+                                    Icons.question_answer_outlined,
+                                    color:
+                                        units[index].isUnlocked
+                                            ? Theme.of(context).brightness ==
+                                                    Brightness.dark
+                                                ? Colors.grey.shade500
+                                                : Colors.grey.shade800
+                                            : Theme.of(context).brightness ==
+                                                Brightness.dark
+                                            ? Colors.grey.shade700
+                                            : Colors.grey.shade400,
+                                  ),
+                                ),
+                                trailing: Opacity(
+                                  opacity: 0.7,
+                                  child: Icon(
+                                    (units[index]
+                                                .roadmap
+                                                ?.roadmapItems
+                                                .last
+                                                .isUnlocked ??
+                                            false)
+                                        ? Icons.chevron_right_outlined
+                                        : Icons.lock_outline,
+                                    color:
+                                        units[index].isUnlocked
+                                            ? Theme.of(context).brightness ==
+                                                    Brightness.dark
+                                                ? Colors.grey.shade500
+                                                : Colors.grey.shade800
+                                            : Theme.of(context).brightness ==
+                                                Brightness.dark
+                                            ? Colors.grey.shade700
+                                            : Colors.grey.shade400,
+                                  ),
+                                ),
+                              )
+                              : SizedBox.shrink(),
+                          units[index].cheatsheets != null
+                              ? ListTile(
+                                title: Text(
+                                  "Cheatsheet",
+                                  style: Theme.of(
+                                    context,
+                                  ).textTheme.bodyMedium?.copyWith(
+                                    fontSize: 15,
+                                    fontWeight: FontWeight.w600,
+                                    color:
+                                        units[index].isUnlocked
+                                            ? Theme.of(context).brightness ==
+                                                    Brightness.dark
+                                                ? Colors.grey.shade500
+                                                : Colors.grey.shade800
+                                            : Theme.of(context).brightness ==
+                                                Brightness.dark
+                                            ? Colors.grey.shade700
+                                            : Colors.grey.shade400,
+                                  ),
+                                ),
+                                onTap: () {
+                                  onTapUnitTile("CHEATSHEET", "CHEATSHEET");
+                                },
+                                leading: Opacity(
+                                  opacity: 0.6,
+                                  child: Icon(
+                                    Icons.question_answer_outlined,
+                                    color:
+                                        units[index].isUnlocked
+                                            ? Theme.of(context).brightness ==
+                                                    Brightness.dark
+                                                ? Colors.grey.shade500
+                                                : Colors.grey.shade800
+                                            : Theme.of(context).brightness ==
+                                                Brightness.dark
+                                            ? Colors.grey.shade700
+                                            : Colors.grey.shade400,
+                                  ),
+                                ),
+                                trailing: Opacity(
+                                  opacity: 0.7,
+                                  child: Icon(
+                                    (units[index]
+                                                .roadmap
+                                                ?.roadmapItems
+                                                .last
+                                                .isUnlocked ??
+                                            false)
+                                        ? Icons.chevron_right_outlined
+                                        : Icons.lock_outline,
+                                    color:
+                                        units[index].isUnlocked
+                                            ? Theme.of(context).brightness ==
+                                                    Brightness.dark
+                                                ? Colors.grey.shade500
+                                                : Colors.grey.shade800
+                                            : Theme.of(context).brightness ==
+                                                Brightness.dark
+                                            ? Colors.grey.shade700
+                                            : Colors.grey.shade400,
+                                  ),
+                                ),
+                              )
+                              : SizedBox.shrink(),
+                        ],
                       );
                     }
                     final roadmapItem =
