@@ -14,9 +14,7 @@ jobs:
       APP_STORE_CONNECT_ISSUER_ID: ${{ secrets.APP_STORE_CONNECT_ISSUER_ID }}
       APP_STORE_CONNECT_KEY_IDENTIFIER: ${{ secrets.APP_STORE_CONNECT_KEY_IDENTIFIER }}
       APP_STORE_APP_ID: ${{ secrets.APP_STORE_APP_ID }}
-      DISTRIBUTION_CERTIFICATE: ${{ secrets.DIST_CERTIFICATE_BASE64 }}
-      DISTRIBUTION_CERTIFICATE_PASSWORD: ${{ secrets.DIST_CERTIFICATE_PASSWORD }}
-      PROVISIONING_PROFILE: ${{ secrets.PROVISIONING_PROFILE_BASE64 }}
+      CERTIFICATE_PRIVATE_KEY: ${{ secrets.CERTIFICATE_PRIVATE_KEY }}
 
     steps:
       - name: Checkout Repo
@@ -39,18 +37,13 @@ jobs:
       - name: Initialize keychain
         run: keychain initialize
 
-      - name: Set up Provisioning Profile
+      - name: Fetch signing files
         run: |
-          PROFILES_HOME="$HOME/Library/MobileDevice/Provisioning Profiles"
-          mkdir -p "$PROFILES_HOME"
-          PROFILE_PATH="$(mktemp "$PROFILES_HOME"/$(uuidgen).mobileprovision)"
-          echo ${PROVISIONING_PROFILE} | base64 --decode > "$PROFILE_PATH"
-          echo "Saved provisioning profile $PROFILE_PATH"   
-
-      - name: Set up Distribution Certificate
-        run: |
-          echo $DISTRIBUTION_CERTIFICATE | base64 --decode > /tmp/certificate.p12
-          keychain add-certificates --certificate /tmp/certificate.p12 --certificate-password $DISTRIBUTION_CERTIFICATE_PASSWORD
+          app-store-connect fetch-signing-files $(xcode-project detect-bundle-id) \
+          --type IOS_APP_STORE \
+          --create    
+      - name: Set up signing certificate
+        run: keychain add-certificates
 
       - name: Set up Code signing settings on Xcode project
         run: xcode-project use-profiles
