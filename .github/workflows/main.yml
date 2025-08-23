@@ -20,6 +20,19 @@ jobs:
       - name: Checkout Repo
         uses: actions/checkout@v4
 
+      - name: Install the CodeMagic CLI
+        run:  pip install codemagic-cli-tools
+
+      - name: Initialize keychain
+        run: keychain initialize
+
+      - name: Fetch signing files
+        run: |
+          app-store-connect fetch-signing-files "$dev.theananta.chittiapp" \
+          --issuer-id APP_STORE_CONNECT_ISSUER_ID --private-key APP_STORE_CONNECT_PRIVATE_KEY --key-id APP_STORE_CONNECT_KEY_IDENTIFIER 
+          --type IOS_APP_STORE \
+          --create    
+
       - name: Set up Flutter SDK
         uses: flutter-actions/setup-flutter@v3
         with:
@@ -31,17 +44,7 @@ jobs:
           flutter clean
           flutter pub get
           
-      - name: Install the CodeMagic CLI
-        run:  pip install codemagic-cli-tools
-
-      - name: Initialize keychain
-        run: keychain initialize
-
-      - name: Fetch signing files
-        run: |
-          app-store-connect --issuer-id APP_STORE_CONNECT_ISSUER_ID --private-key APP_STORE_CONNECT_PRIVATE_KEY --key-id APP_STORE_CONNECT_KEY_IDENTIFIER fetch-signing-files "$dev.theananta.chittiapp" \
-          --type IOS_APP_STORE \
-          --create    
+      
       - name: Set up signing certificate
         run: keychain add-certificates
 
