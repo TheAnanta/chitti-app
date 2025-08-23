@@ -39,7 +39,7 @@ jobs:
 
       - name: Fetch signing files
         run: |
-          app-store-connect fetch-signing-files dev.theananta.chittiapp \
+          app-store-connect fetch-signing-files "$dev.theananta.chittiapp" \
           --type IOS_APP_STORE \
           --create    
       - name: Set up signing certificate
