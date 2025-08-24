@@ -284,9 +284,7 @@ class Semester {
           .toList(),
     );
     final completed = List<CompletedResources>.from(
-      ((data["completed"] as List<dynamic>)..sorted((a, b) {
-            return a["updatedAt"].compareTo(b["updatedAt"]);
-          }))
+      ((data["completed"] as List<dynamic>))
           .map((e) {
             return CompletedResources.fromSnapshot(e);
           })

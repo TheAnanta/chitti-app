@@ -385,7 +385,7 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin {
                                             ),
                                             SizedBox(height: 16),
                                             LinearProgressIndicator(
-                                              value: subject.progress,
+                                              value: subject.progress / 100,
                                             ),
                                           ],
                                         ),

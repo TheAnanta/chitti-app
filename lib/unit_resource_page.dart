@@ -422,7 +422,8 @@ class _UnitResourcePageState extends State<UnitResourcePage>
                                       (context) => VideoPlayerWidget(
                                         video: videos[index],
                                         onPlayedVideo: () {
-                                          Navigator.of(context).pop();
+                                          print("Hello World");
+                                          // Navigator.of(context).pop();
                                           addCompletedResource(
                                             context,
                                             CompletedResources(
@@ -841,7 +842,7 @@ class _VideoPlayerWidgetState extends State<VideoPlayerWidget> {
 
     _initializeVideoPlayerFuture = _controller.initialize();
     _controller.addListener(() {
-      if (_controller.value.position + Duration(seconds: 10) ==
+      if (_controller.value.position + Duration(seconds: 5) ==
           _controller.value.duration) {
         widget.onPlayedVideo();
       }
