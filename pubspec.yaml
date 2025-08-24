@@ -36,8 +36,9 @@ dev_dependencies:
 
 msix_config:
   display_name: CHITTI
-  publisher_display_name: Chitti
-  identity_name: dev.theananta.chitti
+  publisher_display_name: "Score with CHITTI"
+  identity_name: ScorewithCHITTI.Chitti
+  publisher: CN=EF93FA87-25A2-4A25-BBCB-78538F7CAA8E
   msix_version: 1.0.0.0
   logo_path: D:\Learning\Projects\the-ananta\CHITTI\chitti_ghost_orange.png
   capabilities: internetClient
