@@ -1,5 +1,8 @@
+import 'dart:math';
+
 import 'package:chitti/data/semester.dart';
 import 'package:chitti/injector.dart';
+import 'package:collection/collection.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
@@ -17,14 +20,27 @@ class _CartPageState extends State<CartPage> {
   @override
   Widget build(BuildContext context) {
     print("Cart items: ${Injector.cartRepository.items}");
+    final totalSubjects = List<Subject>.from(
+      Injector.semesterRepository.semester?.courses.values.fold(
+            List<Subject>.empty(),
+            (prev, t) => [...prev ?? [], ...t],
+          ) ??
+          [],
+    );
     final cartItems =
-        List<Subject>.from(
-              Injector.semesterRepository.semester?.courses.values.fold(
-                    List<Subject>.empty(),
-                    (prev, t) => [...prev ?? [], ...t],
-                  ) ??
-                  [],
-            )
+        Injector.cartRepository.items
+            .map((e) {
+              final c = totalSubjects.firstWhereOrNull(
+                (subject) => subject.courseId == e.item,
+              );
+              if (c == null) {
+                Injector.cartRepository.removeItem(e.item);
+                Injector.cartRepository.persist(context);
+              }
+              return c;
+            })
+            .where((e) => e != null)
+            .map((e) => e!)
             .where(
               (subject) => Injector.cartRepository.items.any(
                 (cartItem) => cartItem.item == subject.courseId,

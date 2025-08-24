@@ -222,7 +222,7 @@ class Subject {
               image: instructor["image"],
               bio: instructor["bio"],
               gpa: instructor["gpa"] ?? 0,
-              rating: instructor["rating"] ?? 0,
+              rating: double.parse(instructor["rating"]?.toString() ?? "0.0"),
               hours: instructor["hours"] ?? 0,
             );
           })).toList(),
@@ -285,6 +285,9 @@ class Semester {
     );
     final completed = List<CompletedResources>.from(
       ((data["completed"] as List<dynamic>))
+          .where((e) {
+            return e != null;
+          })
           .map((e) {
             return CompletedResources.fromSnapshot(e);
           })
