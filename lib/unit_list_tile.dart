@@ -725,8 +725,8 @@ class UnitListTile extends StatelessWidget {
                                     (units[index]
                                                 .roadmap
                                                 ?.roadmapItems
-                                                .last
-                                                .isUnlocked ??
+                                                .lastOrNull
+                                                ?.isUnlocked ??
                                             false)
                                         ? Icons.chevron_right_outlined
                                         : Icons.lock_outline,

@@ -64,6 +64,8 @@ Future<void> main() async {
           criticalAlert: true,
         );
   }
+  // for handling the recieved notifications on windows, we are manualloy showing the notification using flutter local notifications
+  
   print(
     'Firebase Messaging Token: ${await FirebaseMessaging.instance.getToken()}',
   );

@@ -156,7 +156,8 @@ class CartRepository {
   }
 
   Future<void> checkout(
-    BuildContext context, {
+    BuildContext context,
+    NavigatorState navigator, {
     Coupon? coupon,
     required Function(bool) onLoading,
   }) async {
@@ -290,22 +291,21 @@ class CartRepository {
                 );
               }).then((semester) {
                 SharedPreferences.getInstance().then((sharedPreferences) {
-                  Navigator.of(context).pop();
-                  if (context.mounted) {
-                    Navigator.of(context).pushReplacement(
-                      MaterialPageRoute(
-                        builder:
-                            (context) => MyHomePage(
-                              name:
-                                  userCredential.user?.displayName?.split(
-                                    " ",
-                                  )[0] ??
-                                  "User",
-                              semester: semester,
-                            ),
-                      ),
-                    );
-                  }
+                  navigator.pop();
+
+                  navigator.pushReplacement(
+                    MaterialPageRoute(
+                      builder:
+                          (context) => MyHomePage(
+                            name:
+                                userCredential.user?.displayName?.split(
+                                  " ",
+                                )[0] ??
+                                "User",
+                            semester: semester,
+                          ),
+                    ),
+                  );
                 });
               });
             } on Exception catch (e) {

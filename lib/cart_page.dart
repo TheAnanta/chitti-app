@@ -354,6 +354,7 @@ class _CartPageState extends State<CartPage> {
                                 // Handle checkout action
                                 await Injector.cartRepository.checkout(
                                   context,
+                                  Navigator.of(context),
                                   coupon: coupon,
                                   onLoading: (p0) {
                                     isLoading.value = p0;
