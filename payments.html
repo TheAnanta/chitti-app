@@ -57,8 +57,7 @@
             payButton.disabled = true;
             payButton.textContent = 'Redirecting...';
 
-            const userId = searchParams.get('userid'); // price_descendi; // You can dynamically set this if needed
-            const courseId = searchParams.get('courseid');
+            const paymentId = searchParams.get('paymentId');
 
             try {
                 // Step 1: Create Razorpay order from backend
@@ -68,9 +67,7 @@
                         "Content-Type": "application/json",
                     },
                     body: JSON.stringify({
-                        userId: userId,
-                        courseId: courseId,
-                        amount: 10956, // in paisa: ₹1.00
+                        paymentId: paymentId
                     }),
                 });
 
@@ -85,7 +82,7 @@
                 // Step 2: Setup Razorpay payment options
                 const options = {
                     key: "rzp_live_dXsSgWNlpWQ07d", // Replace with your key
-                    amount: 10956,
+                    amount: data["amount_due"],
                     currency: "INR",
                     name: "Score With CHITTI.",
                     description: "Purchasing subscription to study with CHITTI.",
