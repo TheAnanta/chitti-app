@@ -88,7 +88,10 @@ class _UnitResourcePageExtendedState extends State<UnitResourcePageExtended>
     return LayoutBuilder(
       builder: (context, constraints) {
         return Scaffold(
-          backgroundColor: Colors.white,
+          backgroundColor:
+              Theme.of(context).brightness == Brightness.dark
+                  ? Colors.black
+                  : Colors.white,
           body: Column(
             children: [
               ClipRect(
@@ -211,7 +214,13 @@ class _UnitResourcePageExtendedState extends State<UnitResourcePageExtended>
                                                   context,
                                                 ).textTheme.bodyLarge?.copyWith(
                                                   fontWeight: FontWeight.w800,
-                                                  color: Colors.black38,
+                                                  color:
+                                                      Theme.of(
+                                                                context,
+                                                              ).brightness ==
+                                                              Brightness.dark
+                                                          ? Colors.white
+                                                          : Colors.black38,
                                                   fontSize: 16,
                                                 ),
                                               ),
@@ -304,7 +313,11 @@ class _UnitResourcePageExtendedState extends State<UnitResourcePageExtended>
                             headerSliverBuilder: (context, innerBoxIsScrolled) {
                               return [
                                 SliverAppBar(
-                                  backgroundColor: Colors.white,
+                                  backgroundColor:
+                                      Theme.of(context).brightness ==
+                                              Brightness.dark
+                                          ? Colors.black
+                                          : Colors.white,
                                   foregroundColor: Colors.white,
                                   expandedHeight:
                                       242 -
@@ -408,7 +421,11 @@ class _UnitResourcePageExtendedState extends State<UnitResourcePageExtended>
                                     ),
                                     child: Container(
                                       padding: EdgeInsets.only(top: 8),
-                                      color: Colors.white,
+                                      color:
+                                          Theme.of(context).brightness ==
+                                                  Brightness.dark
+                                              ? Colors.black
+                                              : Colors.white,
                                       child: TabBar(
                                         isScrollable: true,
                                         controller: _tabController,

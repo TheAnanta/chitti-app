@@ -36,9 +36,8 @@ class SplashScreen extends StatelessWidget {
               return;
             }
             try {
-              await fetchCart(context);
               Injector.semesterRepository
-                  .fetchSemester(token, () {
+                  .fetchSemester(context, token, () {
                     ScaffoldMessenger.of(context).showSnackBar(
                       SnackBar(
                         content: Text("Session expired, please login again."),

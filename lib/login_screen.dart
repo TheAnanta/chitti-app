@@ -311,17 +311,21 @@ class _LoginScreenState extends State<LoginScreen> {
                                                   return;
                                                 }
                                                 try {
-                                                  fetchSemester(token, () {
-                                                    Navigator.of(
-                                                      context,
-                                                    ).pushReplacement(
-                                                      MaterialPageRoute(
-                                                        builder:
-                                                            (context) =>
-                                                                LoginScreen(),
-                                                      ),
-                                                    );
-                                                  }).then((semester) {
+                                                  fetchSemester(
+                                                    context,
+                                                    token,
+                                                    () {
+                                                      Navigator.of(
+                                                        context,
+                                                      ).pushReplacement(
+                                                        MaterialPageRoute(
+                                                          builder:
+                                                              (context) =>
+                                                                  LoginScreen(),
+                                                        ),
+                                                      );
+                                                    },
+                                                  ).then((semester) {
                                                     SharedPreferences.getInstance().then((
                                                       sharedPreferences,
                                                     ) {
@@ -642,17 +646,21 @@ class _LoginScreenState extends State<LoginScreen> {
                                                   return;
                                                 }
                                                 try {
-                                                  fetchSemester(token, () {
-                                                    Navigator.of(
-                                                      context,
-                                                    ).pushReplacement(
-                                                      MaterialPageRoute(
-                                                        builder:
-                                                            (context) =>
-                                                                LoginScreen(),
-                                                      ),
-                                                    );
-                                                  }).then((semester) {
+                                                  fetchSemester(
+                                                    context,
+                                                    token,
+                                                    () {
+                                                      Navigator.of(
+                                                        context,
+                                                      ).pushReplacement(
+                                                        MaterialPageRoute(
+                                                          builder:
+                                                              (context) =>
+                                                                  LoginScreen(),
+                                                        ),
+                                                      );
+                                                    },
+                                                  ).then((semester) {
                                                     SharedPreferences.getInstance().then((
                                                       sharedPreferences,
                                                     ) {

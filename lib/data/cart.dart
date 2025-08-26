@@ -280,7 +280,7 @@ class CartRepository {
               return;
             }
             try {
-              fetchSemester(token, () {
+              fetchSemester(context, token, () {
                 ScaffoldMessenger.of(context).showSnackBar(
                   SnackBar(
                     content: Text("Session expired, please login again."),

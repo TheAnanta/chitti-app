@@ -27,16 +27,18 @@ class _CartPageState extends State<CartPage> {
           ) ??
           [],
     );
+    print(Injector.semesterRepository.semester);
+    print("Total subjects: $totalSubjects");
     final cartItems =
         Injector.cartRepository.items
             .map((e) {
               final c = totalSubjects.firstWhereOrNull(
                 (subject) => subject.courseId == e.item,
               );
-              if (c == null) {
-                Injector.cartRepository.removeItem(e.item);
-                Injector.cartRepository.persist(context);
-              }
+              // if (c == null) {
+              //   Injector.cartRepository.removeItem(e.item);
+              //   Injector.cartRepository.persist(context);
+              // }
               return c;
             })
             .where((e) => e != null)

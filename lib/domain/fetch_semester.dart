@@ -2,9 +2,11 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:chitti/data/semester.dart';
+import 'package:chitti/domain/fetch_cart.dart';
 import 'package:device_info_plus/device_info_plus.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:http/http.dart';
 
 Future<String> fetchDeviceId() async {
@@ -25,7 +27,12 @@ Future<String> fetchDeviceId() async {
   }
 }
 
-Future<Semester> fetchSemester(String token, Function onSignOut) async {
+Future<Semester> fetchSemester(
+  BuildContext context,
+  String token,
+  Function onSignOut,
+) async {
+  // fetchCart(context);
   final request = await get(
     Uri.parse(
       "https://asia-south1-chitti-ananta.cloudfunctions.net/api/dashboard/${await fetchDeviceId()}",
@@ -36,9 +43,15 @@ Future<Semester> fetchSemester(String token, Function onSignOut) async {
     },
   );
   if (request.statusCode == 200) {
-    print(request.body);
-    final response = json.decode(request.body);
-    return Semester.fromMap(response);
+    try {
+      final requestBody = request.body;
+      print(requestBody);
+      final response = json.decode(requestBody);
+      return Semester.fromMap(response);
+    } catch (e) {
+      print(e);
+      throw Exception("Unable to fetch semester, $e");
+    }
   } else if (request.statusCode == 401) {
     // MARK: Alert the user on wrong authentication details
     await FirebaseAuth.instance.signOut();
@@ -53,5 +66,5 @@ Future<Semester> fetchSemester(String token, Function onSignOut) async {
       await FirebaseAuth.instance.signOut();
       throw Exception("Unable to fetch semester, $e");
     }
-  } 
+  }
 }

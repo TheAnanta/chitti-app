@@ -1,11 +1,17 @@
 import 'package:chitti/data/semester.dart';
 import 'package:chitti/domain/fetch_semester.dart' as fs;
+import 'package:flutter/cupertino.dart';
 
 class SemesterRepository {
   Semester? semester;
 
-  Future<Semester> fetchSemester(String token, Function onSignOut) async {
-    semester = await fs.fetchSemester(token, onSignOut);
+  Future<Semester> fetchSemester(
+    BuildContext context,
+    String token,
+    Function onSignOut,
+  ) async {
+    semester = await fs.fetchSemester(context, token, onSignOut);
+    print(semester);
     return semester!;
   }
 }

@@ -514,12 +514,14 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin {
     for (var unit in subject.units) {
       for (var roadmap
           in (unit.roadmap?.roadmapItems ?? List<Roadmap>.empty())) {
-        await Injector.unitRepository.fetchUnit(
-          context,
-          subject.courseId,
-          unit,
-          (roadmap as RoadmapItem).id,
-        );
+        if (roadmap is RoadmapItem && roadmap.isUnlocked) {
+          await Injector.unitRepository.fetchUnit(
+            context,
+            subject.courseId,
+            unit,
+            (roadmap as RoadmapItem).id,
+          );
+        }
       }
     }
   }
