@@ -24,7 +24,9 @@ class SplashScreen extends StatelessWidget {
     } else {
       WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
         try {
-          FirebaseAuth.instance.currentUser!.getIdToken(true).then((token) {
+          FirebaseAuth.instance.currentUser!.getIdToken(true).then((
+            token,
+          ) async {
             if (token == null) {
               if (context.mounted) {
                 ScaffoldMessenger.of(context).showSnackBar(
@@ -34,7 +36,7 @@ class SplashScreen extends StatelessWidget {
               return;
             }
             try {
-              fetchCart(context);
+              await fetchCart(context);
               Injector.semesterRepository
                   .fetchSemester(token, () {
                     ScaffoldMessenger.of(context).showSnackBar(

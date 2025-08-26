@@ -245,9 +245,11 @@ class _LoginScreenState extends State<LoginScreen> {
                                                 "deviceId":
                                                     await fetchDeviceId(),
                                                 "fcmToken":
-                                                    await FirebaseMessaging
-                                                        .instance
-                                                        .getToken(),
+                                                    Platform.isWindows
+                                                        ? "windows"
+                                                        : await FirebaseMessaging
+                                                            .instance
+                                                            .getToken(),
                                               }),
                                             );
                                             if (loginRequest.statusCode ==
@@ -593,8 +595,11 @@ class _LoginScreenState extends State<LoginScreen> {
                                           "name": name,
                                           "courses": res.toSet().toList(),
                                           "fcmToken":
-                                              await FirebaseMessaging.instance
-                                                  .getToken(),
+                                              Platform.isWindows
+                                                  ? "windows"
+                                                  : await FirebaseMessaging
+                                                      .instance
+                                                      .getToken(),
                                         };
                                         print("PAYLOAD: $payload");
                                         final signupRequest = await post(
@@ -753,6 +758,11 @@ class _LoginScreenState extends State<LoginScreen> {
                             Text(
                               ".. as we break some walls for you.",
                               style: Theme.of(context).textTheme.bodyMedium,
+                            ),
+                            Text(
+                              "This may take a while, upto 2 minutes depending on your network.",
+                              style: Theme.of(context).textTheme.bodySmall
+                                  ?.copyWith(fontStyle: FontStyle.italic),
                             ),
                           ],
                         ),

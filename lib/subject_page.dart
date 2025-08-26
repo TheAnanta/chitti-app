@@ -158,16 +158,26 @@ class SubjectPage extends StatelessWidget {
                           overflow: TextOverflow.ellipsis,
                         ),
                         SizedBox(height: 20),
-                        LinearProgressIndicator(value: subject.progress / 100),
+                        ValueListenableBuilder(
+                          valueListenable: subject.progress,
+                          builder: (context, value, child) {
+                            return LinearProgressIndicator(value: value / 100);
+                          },
+                        ),
                         SizedBox(height: 8),
                         Opacity(
                           opacity: 0.3,
                           child: Align(
                             alignment: Alignment.bottomRight,
-                            child: Text(
-                              "${(subject.progress).toInt()}% completed",
-                              style: Theme.of(context).textTheme.labelLarge
-                                  ?.copyWith(fontWeight: FontWeight.bold),
+                            child: ValueListenableBuilder(
+                              valueListenable: subject.progress,
+                              builder: (context, value, child) {
+                                return Text(
+                                  "${(value).toInt()}% completed",
+                                  style: Theme.of(context).textTheme.labelLarge
+                                      ?.copyWith(fontWeight: FontWeight.bold),
+                                );
+                              },
                             ),
                           ),
                         ),

@@ -830,6 +830,7 @@ class _VideoPlayerWidgetState extends State<VideoPlayerWidget> {
 
   ValueNotifier<double> zoomScale = ValueNotifier<double>(1.0);
   ValueNotifier<Offset> panOffset = ValueNotifier<Offset>(Offset(0, 0));
+  ValueNotifier<bool> calledOnSubmitProgress = ValueNotifier<bool>(false);
 
   @override
   void initState() {
@@ -842,8 +843,9 @@ class _VideoPlayerWidgetState extends State<VideoPlayerWidget> {
 
     _initializeVideoPlayerFuture = _controller.initialize();
     _controller.addListener(() {
-      if (_controller.value.position + Duration(seconds: 5) ==
-          _controller.value.duration) {
+      if (_controller.value.position >=
+              _controller.value.duration - Duration(seconds: 5) &&
+          !calledOnSubmitProgress.value) {
         widget.onPlayedVideo();
       }
       if (_controller.value.isCompleted) {

@@ -27,6 +27,7 @@ class _PDFViewPageState extends State<PDFViewPage> with WidgetsBindingObserver {
   final showLeftPane = ValueNotifier<bool>(false);
   final outline = ValueNotifier<List<PdfOutlineNode>?>(null);
   final textSearcher = ValueNotifier<PdfTextSearcher?>(null);
+
   final _markers = <int, List<Marker>>{};
 
   @override
@@ -269,6 +270,18 @@ class _PDFViewPageState extends State<PDFViewPage> with WidgetsBindingObserver {
                             thumbBuilder:
                                 (context, thumbSize, pageNumber, controller) =>
                                     Container(color: Colors.red),
+                          ),
+                          Align(
+                            alignment: Alignment.bottomCenter,
+                            child: Padding(
+                              padding: const EdgeInsets.only(bottom: 24.0),
+                              child: FilledButton(
+                                onPressed: () {
+                                  widget.onAddResource();
+                                },
+                                child: Text("Next"),
+                              ),
+                            ),
                           ),
                         ],
                     loadingBannerBuilder:

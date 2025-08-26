@@ -99,7 +99,17 @@ Future<String> addCompletedResource(
     },
   ).then((response) {
     if (response.statusCode == 200) {
-      return json.decode(response.body);
+      final d = json.decode(response.body);
+      print(d);
+      final newProgress = d["progress"];
+      if (newProgress != null) {
+        final s2 = (Injector.semesterRepository.semester?.courses.values
+                    .fold([], (a, b) => [...a, ...b])
+                    .firstWhere((course) => course.courseId == res.courseId)
+                as Subject)
+            .copyWithProgress(newProgress);
+      }
+      return d;
     } else {
       try {
         final result = json.decode(response.body);

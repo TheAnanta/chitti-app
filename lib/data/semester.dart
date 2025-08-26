@@ -161,7 +161,7 @@ class Subject {
   final String title;
   final String description;
   final IconData icon;
-  final double progress;
+  final ValueNotifier<double> progress;
   final String image;
   final List<Unit> units;
   final List<Instructor> instructor;
@@ -174,7 +174,7 @@ class Subject {
     required this.title,
     required this.description,
     this.icon = Icons.category_outlined,
-    this.progress = 0.0,
+    required this.progress,
     this.image =
         "https://images.squarespace-cdn.com/content/v1/570b9bd42fe131a6e20717c2/1730901328712-ARXW9LQ4S2MVG2PULIKV/Gitam_Banner.jpg?format=2500w",
     this.units = const [],
@@ -195,7 +195,9 @@ class Subject {
       description: data["description"],
       icon: IconData(data["icon"], fontFamily: "MaterialIcons"),
       image: data["image"],
-      progress: double.tryParse(data["progress"].toString()) ?? 0,
+      progress: ValueNotifier(
+        double.tryParse(data["progress"].toString()) ?? 0,
+      ),
       units: List<Unit>.from(
         data["units"].map((unit) {
           return Unit.fromMap(unit);
@@ -230,19 +232,20 @@ class Subject {
   }
 
   copyWithProgress(double progress) {
-    return Subject(
-      courseId: courseId,
-      courseCategory: courseCategory,
-      title: title,
-      description: description,
-      icon: icon,
-      image: image,
-      progress: progress,
-      units: units,
-      instructor: instructor,
-      rating: rating,
-      reviews: reviews,
-    );
+    this.progress.value = progress;
+    // return Subject(
+    //   courseId: courseId,
+    //   courseCategory: courseCategory,
+    //   title: title,
+    //   description: description,
+    //   icon: icon,
+    //   image: image,
+    //   progress: progress,
+    //   units: units,
+    //   instructor: instructor,
+    //   rating: rating,
+    //   reviews: reviews,
+    // );
   }
 }
 

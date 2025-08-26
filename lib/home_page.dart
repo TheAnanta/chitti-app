@@ -384,8 +384,13 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin {
                                               overflow: TextOverflow.ellipsis,
                                             ),
                                             SizedBox(height: 16),
-                                            LinearProgressIndicator(
-                                              value: subject.progress / 100,
+                                            ValueListenableBuilder(
+                                              valueListenable: subject.progress,
+                                              builder: (context, value, child) {
+                                                return LinearProgressIndicator(
+                                                  value: value / 100,
+                                                );
+                                              },
                                             ),
                                           ],
                                         ),
@@ -721,12 +726,17 @@ class SubjectCardExpanded extends StatelessWidget {
               ),
             ),
             Spacer(),
-            LinearProgressIndicator(
-              backgroundColor: Color(0xFF053F5C),
-              value: subject.progress,
-              borderRadius: BorderRadius.circular(12),
-              minHeight: 6,
-              color: Color(0xFFF27F0C),
+            ValueListenableBuilder(
+              valueListenable: subject.progress,
+              builder: (context, value, child) {
+                return LinearProgressIndicator(
+                  backgroundColor: Color(0xFF053F5C),
+                  value: value,
+                  borderRadius: BorderRadius.circular(12),
+                  minHeight: 6,
+                  color: Color(0xFFF27F0C),
+                );
+              },
             ),
           ],
         ),
