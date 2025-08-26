@@ -5,6 +5,7 @@ import 'package:chitti/cart_page.dart';
 import 'package:chitti/domain/fetch_cart.dart';
 import 'package:chitti/domain/fetch_semester.dart';
 import 'package:chitti/home_page.dart';
+import 'package:chitti/injector.dart';
 import 'package:chitti/payment_webview.dart';
 import 'package:chitti/splash_screen.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -280,34 +281,36 @@ class CartRepository {
               return;
             }
             try {
-              fetchSemester(context, token, () {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(
-                    content: Text("Session expired, please login again."),
-                  ),
-                );
-                Navigator.of(context).pushReplacement(
-                  MaterialPageRoute(builder: (context) => SplashScreen()),
-                );
-              }).then((semester) {
-                SharedPreferences.getInstance().then((sharedPreferences) {
-                  navigator.pop();
+              Injector.semesterRepository
+                  .fetchSemester(context, token, () {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                        content: Text("Session expired, please login again."),
+                      ),
+                    );
+                    Navigator.of(context).pushReplacement(
+                      MaterialPageRoute(builder: (context) => SplashScreen()),
+                    );
+                  })
+                  .then((semester) {
+                    SharedPreferences.getInstance().then((sharedPreferences) {
+                      navigator.pop();
 
-                  navigator.pushReplacement(
-                    MaterialPageRoute(
-                      builder:
-                          (context) => MyHomePage(
-                            name:
-                                userCredential.user?.displayName?.split(
-                                  " ",
-                                )[0] ??
-                                "User",
-                            semester: semester,
-                          ),
-                    ),
-                  );
-                });
-              });
+                      navigator.pushReplacement(
+                        MaterialPageRoute(
+                          builder:
+                              (context) => MyHomePage(
+                                name:
+                                    userCredential.user?.displayName?.split(
+                                      " ",
+                                    )[0] ??
+                                    "User",
+                                semester: semester,
+                              ),
+                        ),
+                      );
+                    });
+                  });
             } on Exception catch (e) {
               onLoading(false);
               if (context.mounted) {

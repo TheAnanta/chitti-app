@@ -3,6 +3,7 @@ import 'dart:developer' as developer show log;
 import 'dart:io';
 import 'package:chitti/domain/fetch_semester.dart';
 import 'package:chitti/home_page.dart';
+import 'package:chitti/injector.dart';
 import 'package:chitti/size_config.dart';
 import 'package:device_info_plus/device_info_plus.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -311,54 +312,53 @@ class _LoginScreenState extends State<LoginScreen> {
                                                   return;
                                                 }
                                                 try {
-                                                  fetchSemester(
-                                                    context,
-                                                    token,
-                                                    () {
-                                                      Navigator.of(
+                                                  Injector.semesterRepository
+                                                      .fetchSemester(
                                                         context,
-                                                      ).pushReplacement(
-                                                        MaterialPageRoute(
-                                                          builder:
-                                                              (context) =>
-                                                                  LoginScreen(),
-                                                        ),
-                                                      );
-                                                    },
-                                                  ).then((semester) {
-                                                    SharedPreferences.getInstance().then((
-                                                      sharedPreferences,
-                                                    ) {
-                                                      if (context.mounted) {
-                                                        sharedPreferences
-                                                            .setBool(
-                                                              "isFirstTime",
-                                                              true,
-                                                            );
-                                                        Navigator.of(
-                                                          context,
-                                                        ).pushReplacement(
-                                                          MaterialPageRoute(
-                                                            builder:
-                                                                (
-                                                                  context,
-                                                                ) => MyHomePage(
-                                                                  name:
-                                                                      userCredential
-                                                                          .user
-                                                                          ?.displayName
-                                                                          ?.split(
+                                                        token,
+                                                        () {
+                                                          Navigator.of(
+                                                            context,
+                                                          ).pushReplacement(
+                                                            MaterialPageRoute(
+                                                              builder:
+                                                                  (context) =>
+                                                                      LoginScreen(),
+                                                            ),
+                                                          );
+                                                        },
+                                                      )
+                                                      .then((semester) {
+                                                        SharedPreferences.getInstance().then((
+                                                          sharedPreferences,
+                                                        ) {
+                                                          if (context.mounted) {
+                                                            sharedPreferences
+                                                                .setBool(
+                                                                  "isFirstTime",
+                                                                  true,
+                                                                );
+                                                            Navigator.of(
+                                                              context,
+                                                            ).pushReplacement(
+                                                              MaterialPageRoute(
+                                                                builder:
+                                                                    (
+                                                                      context,
+                                                                    ) => MyHomePage(
+                                                                      name:
+                                                                          userCredential.user?.displayName?.split(
                                                                             " ",
                                                                           )[0] ??
-                                                                      "User",
-                                                                  semester:
-                                                                      semester,
-                                                                ),
-                                                          ),
-                                                        );
-                                                      }
-                                                    });
-                                                  });
+                                                                          "User",
+                                                                      semester:
+                                                                          semester,
+                                                                    ),
+                                                              ),
+                                                            );
+                                                          }
+                                                        });
+                                                      });
                                                 } on Exception catch (e) {
                                                   isLoading.value = false;
                                                   if (context.mounted) {
@@ -626,27 +626,28 @@ class _LoginScreenState extends State<LoginScreen> {
                                                   .signInWithCustomToken(token);
                                           await userCredential.user
                                               ?.updateDisplayName(name);
-                                          FirebaseAuth.instance.currentUser!
-                                              .getIdToken(true)
-                                              .then((token) {
-                                                if (token == null) {
-                                                  if (context.mounted) {
-                                                    isLoading.value = false;
-                                                    ScaffoldMessenger.of(
-                                                      context,
-                                                    ).showSnackBar(
-                                                      SnackBar(
-                                                        content: Text(
-                                                          "Unable to create token.",
-                                                        ),
-                                                      ),
-                                                    );
-                                                    setState(() {});
-                                                  }
-                                                  return;
-                                                }
-                                                try {
-                                                  fetchSemester(
+                                          FirebaseAuth.instance.currentUser!.getIdToken(true).then((
+                                            token,
+                                          ) {
+                                            if (token == null) {
+                                              if (context.mounted) {
+                                                isLoading.value = false;
+                                                ScaffoldMessenger.of(
+                                                  context,
+                                                ).showSnackBar(
+                                                  SnackBar(
+                                                    content: Text(
+                                                      "Unable to create token.",
+                                                    ),
+                                                  ),
+                                                );
+                                                setState(() {});
+                                              }
+                                              return;
+                                            }
+                                            try {
+                                              Injector.semesterRepository
+                                                  .fetchSemester(
                                                     context,
                                                     token,
                                                     () {
@@ -660,7 +661,8 @@ class _LoginScreenState extends State<LoginScreen> {
                                                         ),
                                                       );
                                                     },
-                                                  ).then((semester) {
+                                                  )
+                                                  .then((semester) {
                                                     SharedPreferences.getInstance().then((
                                                       sharedPreferences,
                                                     ) {
@@ -697,21 +699,19 @@ class _LoginScreenState extends State<LoginScreen> {
                                                       }
                                                     });
                                                   });
-                                                } on Exception catch (e) {
-                                                  if (context.mounted) {
-                                                    isLoading.value = false;
-                                                    ScaffoldMessenger.of(
-                                                      context,
-                                                    ).showSnackBar(
-                                                      SnackBar(
-                                                        content: Text(
-                                                          e.toString(),
-                                                        ),
-                                                      ),
-                                                    );
-                                                  }
-                                                }
-                                              });
+                                            } on Exception catch (e) {
+                                              if (context.mounted) {
+                                                isLoading.value = false;
+                                                ScaffoldMessenger.of(
+                                                  context,
+                                                ).showSnackBar(
+                                                  SnackBar(
+                                                    content: Text(e.toString()),
+                                                  ),
+                                                );
+                                              }
+                                            }
+                                          });
                                         } else {
                                           final result = json.decode(
                                             signupRequest.body,

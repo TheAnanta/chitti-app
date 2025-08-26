@@ -703,7 +703,12 @@ class VideoThumbnailWidget extends StatelessWidget {
   Widget build(BuildContext context) {
     return Stack(
       children: [
-        Image.network(url, height: 116, fit: BoxFit.cover),
+        Image.network(
+          "https://firebasestorage.googleapis.com/v0/b/chitti-ananta.firebasestorage.app/o/thumbnails%2FTHUMBNAIL-CHITTI.jpg?alt=media&token=39150028-303b-4d33-ae92-f791a90eaa4f",
+          height: 116,
+          width: double.infinity,
+          fit: BoxFit.cover,
+        ),
         Container(
           color: Colors.black.withValues(alpha: 0.4),
           width: double.infinity,

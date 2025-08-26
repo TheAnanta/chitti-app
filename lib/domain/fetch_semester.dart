@@ -32,7 +32,6 @@ Future<Semester> fetchSemester(
   String token,
   Function onSignOut,
 ) async {
-  // fetchCart(context);
   final request = await get(
     Uri.parse(
       "https://asia-south1-chitti-ananta.cloudfunctions.net/api/dashboard/${await fetchDeviceId()}",
