@@ -246,8 +246,9 @@ class _LoginScreenState extends State<LoginScreen> {
                                                 "deviceId":
                                                     await fetchDeviceId(),
                                                 "fcmToken":
-                                                    Platform.isWindows
-                                                        ? "windows"
+                                                    Platform.isWindows ||
+                                                            Platform.isMacOS
+                                                        ? "desktop"
                                                         : await FirebaseMessaging
                                                             .instance
                                                             .getToken(),
@@ -599,8 +600,9 @@ class _LoginScreenState extends State<LoginScreen> {
                                           "name": name,
                                           "courses": res.toSet().toList(),
                                           "fcmToken":
-                                              Platform.isWindows
-                                                  ? "windows"
+                                              Platform.isWindows ||
+                                                      Platform.isMacOS
+                                                  ? "desktop"
                                                   : await FirebaseMessaging
                                                       .instance
                                                       .getToken(),
